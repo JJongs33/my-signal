@@ -447,7 +447,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.</footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 17</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -541,8 +541,8 @@ function renderState() {
   $("sicon").textContent = { SELL: "▼ SELL", BUY: "▲ BUY", HOLD: "■ HOLD" }[d.state];
   const rd = d.run_days || (d.run * 5);
   const acts = {
-    SELL: `매주 1번 · 남은 보유 주식의 <span class="nb"><b>${d.sell_pct}%</b>를 팔아요.</span><br><b>화요일</b>을 추천해요.`,
-    BUY: `매주 1번 · 모아 둔 현금의 <span class="nb"><b>${d.buy_pct}%</b>를 사요.</span><br><b>화요일</b>을 추천해요.`,
+    SELL: `주 1회, 보유 주식의 <span class="nb"><b>${d.sell_pct}%</b>를 매도하세요.</span><br><b>화요일</b> 추천`,
+    BUY: `주 1회, 모아 둔 현금의 <span class="nb"><b>${d.buy_pct}%</b>를 매수하세요.</span><br><b>화요일</b> 추천`,
     HOLD: "매도도 매수도 하지 않아요.",
   };
   $("action").innerHTML = acts[d.state];
@@ -916,7 +916,11 @@ $("themeBtn").addEventListener("click", () => {
 window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
 applyTheme();
 
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+if ("serviceWorker" in navigator) {
+  const hadSW = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js");
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (hadSW) location.reload(); });
+}
 window.addEventListener("resize", () => D && renderCharts());
 load();
 </script>

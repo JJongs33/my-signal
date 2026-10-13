@@ -205,6 +205,10 @@
   .action b { font-weight: 800; } .nb { white-space: nowrap; }
   .progress { background: transparent; padding: 0; margin-top: 28px; font-size: 14px; color: var(--muted); line-height: 1.7; }
   .progress b { color: var(--text); } .progress .plabel { margin-top: 2px; }
+  .yearbar { display: flex; gap: 6px; margin: 0 0 14px; }
+  .yearbar i { flex: 0 0 26px; height: 10px; border-radius: 1px; background: var(--hold); opacity: .35; }
+  .yearbar i.now { opacity: 1; background: var(--hold); }
+  .SELL .yearbar i { background: var(--sell); } .BUY .yearbar i { background: var(--buy); }
   .progress .pbar { margin: 0 0 12px; }
   .meta { border-top: 0; margin-top: 24px; padding-top: 0; font: 400 12px/1.6 var(--f-mono); color: var(--faint); letter-spacing: .02em; }
   .note { font-size: 14px; line-height: 1.75; margin-top: 16px; }
@@ -431,7 +435,7 @@
       <div><b>적립식 (기준)</b><span>매월 첫 거래일에 정해 둔 금액만 사는 방식</span></div>
       <div><b>쫑 규칙</b><span>적립식 + 쫑지표 신호로 매주 매도·매수</span></div>
     </div>
-    <div class="note">약 10년 구간마다 새로 시작 · 시작 1억 + 매월 100만원 · 세금(22%)·거래비용 반영<br><b>연평균</b> 납입 시점을 반영한 연 수익률 · <b>총수익률</b> 최종 평가금액 ÷ 총 납입금 − 1 (4자리 이상은 100 단위 반올림)<br><b>하락 평균</b> 계좌가 전고점보다 10% 넘게 빠졌던 구간들의 저점 평균 (괄호는 그런 구간의 횟수)</div>
+    <div class="note">약 10년 구간마다 새로 시작 · 시작 1억 + 매월 100만원 · 세금(22%)·거래비용 반영<br><b>연평균</b> 납입 시점을 반영한 연 수익률 · <b>총수익률</b> 최종 평가금액 ÷ 총 납입금 − 1 (세 자리는 10 단위, 네 자리 이상은 100 단위로 반올림)<br><b>하락 평균</b> 계좌가 전고점보다 10% 넘게 빠졌던 구간들의 저점 평균 (괄호는 그런 구간의 횟수)</div>
     <div class="key"><span class="ku">윗줄 · 적립식 (기준)</span><span class="kr">아랫줄 · 쫑 규칙</span></div>
     <div id="perfBox"></div>
     <div class="note">큰 하락은 줄였지만, 꾸준히 오른 구간(QLD 2010~2019)에는 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격이고, 마지막 구간은 6년 10개월입니다. 앞으로는 이보다 낮을 수 있어요.</div>
@@ -475,7 +479,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 20</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 21</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -489,11 +493,11 @@ const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
 const PERF = {
   QLD: { sub: "나스닥 100 · 2배", rows: [
     { p: "2000~2009", paid: 2.2, a: [-9, -2], t: [-47, -14], f: [1.2, 1.9], dd: [[-40, 4], [-38, 4]] },
-    { p: "2010~2019", paid: 2.2, a: [29, 27], t: [748, 599], f: [19, 15], dd: [[-21, 18], [-18, 16]] },
-    { p: "2020~2026.10", paid: 1.8, a: [27, 32], t: [297, 400], f: [7.2, 9.1], dd: [[-31, 10], [-24, 11]] } ] },
+    { p: "2010~2019", paid: 2.2, a: [29, 27], t: [750, 600], f: [19, 15], dd: [[-21, 18], [-18, 16]] },
+    { p: "2020~2026.10", paid: 1.8, a: [27, 32], t: [300, 400], f: [7.2, 9.1], dd: [[-31, 10], [-24, 11]] } ] },
   USD: { sub: "반도체 · 2배", rows: [
     { p: "2000~2009", paid: 2.2, a: [-17, -9], t: [-68, -47], f: [0.7, 1.2], dd: [[-43, 3], [-42, 3]] },
-    { p: "2010~2019", paid: 2.2, a: [26, 28], t: [593, 653], f: [15, 17], dd: [[-25, 16], [-22, 16]] },
+    { p: "2010~2019", paid: 2.2, a: [26, 28], t: [590, 650], f: [15, 17], dd: [[-25, 16], [-22, 16]] },
     { p: "2020~2026.10", paid: 1.8, a: [55, 64], t: [1300, 1800], f: [25, 35], dd: [[-27, 18], [-21, 23]] } ] },
 };
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
@@ -595,10 +599,20 @@ function renderState() {
   if (d.state === "HOLD") pg.classList.add("hidden");
   else {
     pg.classList.remove("hidden");
-    const isS = d.state === "SELL", S = isS ? ws.sell : ws.buy, run = d.run;
+    const isS = d.state === "SELL", name = isS ? "매도" : "매수", run = d.run;
     const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
-    pg.innerHTML = `<div><b>이번 구간 ${run}주째</b> · 과거 ${isS ? "매도" : "매수"} 구간은 평균 ${S.avg.toFixed(0)}주</div>
-      <div class="plabel">규칙대로 ${isS ? "팔았다면 보유 주식의" : "샀다면 모아 둔 현금의"} 약 ${cum.toFixed(0)}%${isS ? "가 현금" : "를 사용"}</div>`;
+    const yr = d.asof.slice(0, 4);                       // which stretch of this state is it, counted within this year
+    let n = 0, prev = null, first = true;
+    D.history.forEach((p) => {
+      const st = stateOf(p.s), inYr = p.d.slice(0, 4) === yr;
+      if (inYr) { if (st === d.state && (first || prev !== d.state)) n++; first = false; }
+      prev = st;
+    });
+    n = Math.max(1, n);
+    const cells = Math.min(n, 12);
+    let bar = ""; for (let i = 1; i <= cells; i++) bar += `<i class="${i === cells ? "now" : ""}"></i>`;
+    pg.innerHTML = `<div class="yearbar">${bar}</div><div><b>올해 ${n}번째 ${name} 구간</b></div>
+      <div class="plabel">${run}주째 · 규칙대로 ${isS ? "팔았다면 보유 주식의" : "샀다면 모아 둔 현금의"} 약 ${cum.toFixed(0)}%${isS ? "가 현금" : "를 사용"}</div>`;
   }
   $("meta").textContent = `점수 ${sgn(disp(d.score))} · ${d.state_kr} ${rd}거래일째`;
 

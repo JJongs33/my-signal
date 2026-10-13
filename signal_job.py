@@ -8,13 +8,14 @@ Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US m
      score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read EVERY trading day
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
-3. Sends a web-push notification ONLY when the score moves INTO the sell zone or INTO the buy zone (secrets VAPID_PRIVATE_KEY and
-   PUSH_SUBSCRIPTIONS).  Entering the same zone again within 7 days of the last alert is recorded but not announced (noise at the line).
-   The state of the previous run is kept in data.json ("daily"), so a missed run never loses a crossing.
-   Action rule that was tested: first action on the NEXT trading day after the crossing, then again every 5th trading day while the
-   score stays in the zone (sell 5% of the holding / buy 25% of the cash pile each time).
+3. Sends a web-push notification when
+     - the state CHANGES (sell <-> hold <-> buy), or
+     - the score STAYS in the sell zone / buy zone and it is the 5th trading day since the last action day (repeat reminder).
+   Nothing is sent while the state stays HOLD.  The state of the previous run is kept in data.json ("daily"), so a missed run never loses
+   an event.  Action rule that was tested: first action on the NEXT trading day after the crossing, then again every 5th trading day while
+   the score stays in the zone (sell 5% of the holding / buy 25% of the cash pile each time).
 
-    python signal_job.py             # compute, write data, push on a crossing
+    python signal_job.py             # compute, write data, push on a state change / repeat day
     python signal_job.py --no-push   # compute and write only
     python signal_job.py --test-push # also send the current state once (to test the phone)
 """
@@ -33,7 +34,6 @@ BUY_LEVEL = 0.0    # score at or above: buy with 25% of the cash from earlier sa
 SELL_PCT, BUY_PCT = 5, 25
 SCALE = 100        # the app shows score x 100
 HISTORY_WEEKS = 530  # about 10 years
-COOLDOWN_DAYS = 7    # no second alert for the same zone within this many calendar days
 CYCLE_DAYS = 5       # actions repeat every 5th trading day while the score stays in the zone
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "docs", "data.json")
@@ -135,39 +135,59 @@ def message(d):
 
 
 def daily_info(sc, prev):
-    """Crossing detection on the daily score. prev = the previous data.json (dict) or None."""
+    """Event detection on the daily score. prev = the previous data.json (dict) or None.
+    Event days since the previous run: a state change, or (inside sell/buy) every 5th trading day after the first day of the stretch."""
     s = sc["score"].dropna()
     states = [state_of(v) for v in s.to_numpy()]
-    cur, asof = states[-1], s.index[-1]
-    run_days = 0
-    for st in states[::-1]:
-        if st != cur:
-            break
-        run_days += 1
+    runs, r = [], 0
+    for i, st in enumerate(states):
+        r = r + 1 if i and states[i - 1] == st else 1
+        runs.append(r)
+    cur, asof, run_days = states[-1], s.index[-1], runs[-1]
     old = (prev or {}).get("daily") or {}
-    last_alert = dict(old.get("last_alert") or {"SELL": None, "BUY": None})
-    alert = None
-    if old.get("state") and old["state"] != cur and str(asof.date()) > old.get("asof", ""):
-        if cur in ("SELL", "BUY"):
-            la = last_alert.get(cur)
-            if la is None or (asof - pd.Timestamp(la)).days > COOLDOWN_DAYS:
-                alert = cur
-                last_alert[cur] = str(asof.date())
+    kind = None
+    if old.get("state"):
+        for i in range(len(states)):
+            if str(s.index[i].date()) <= old.get("asof", ""):
+                continue
+            if runs[i] == 1:                                   # first day of a new state (also the first day after a skipped day)
+                ev = "enter"
+            elif states[i] in ("SELL", "BUY") and (runs[i] - 1) % CYCLE_DAYS == 0:
+                ev = "repeat"
             else:
-                print(f"crossing into {cur} on {asof.date()} not announced (last {cur} alert {la}, within {COOLDOWN_DAYS} days)")
-    return {"state": cur, "asof": str(asof.date()), "run_days": run_days, "last_alert": last_alert}, alert
+                continue
+            kind = ev if i == len(states) - 1 else "catchup"   # event was on an earlier day (a run was missed): say where we are now
+            if ev == "enter" and old["state"] == states[i]:
+                kind = None                                     # not a real change
+    prev_state = old.get("state")
+    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, prev_state)
 
 
-def alert_message(d, kind):
+def alert_message(d, ev, prev_state):
+    """-> (title, body) for event ev in ('enter', 'repeat', 'catchup') with the current state d['state']."""
     sc_ = d["scale"]
     score = f"{round(d['score'] * sc_):+d}"
-    if kind == "SELL":
+    st, rounds = d["state"], d["run"]
+    tail = f" (기준일 {d['asof']})"
+    if st == "SELL":
+        if ev == "repeat" or ev == "catchup":
+            return (f"매도 {rounds}번째 (5거래일마다)",
+                    f"점수 {score}: 매도 구간이 이어지고 있어요. 오늘 밤 미국 장에서 지금 남은 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요.{tail}")
         return ("매도 신호가 켜졌어요",
-                f"점수 {score}: 매도 구간(-30 이하)으로 넘어갔습니다. 오늘 미국 장에서 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요. "
-                f"구간이 이어지면 5거래일(약 1주)마다 반복합니다. (기준일 {d['asof']})")
-    return ("매수 신호가 켜졌어요",
-            f"점수 {score}: 매수 구간(0 이상)으로 넘어갔습니다. 매도로 모아 둔 현금이 있으면 오늘 미국 장에서 그 {d['buy_pct']}%를 매수하세요 "
-            f"(현금이 없으면 할 일 없음). 구간이 이어지면 5거래일(약 1주)마다 반복합니다. (기준일 {d['asof']})")
+                f"점수 {score}: 매도 구간(-30 이하)으로 넘어갔습니다. 오늘 밤 미국 장에서 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요. "
+                f"구간이 이어지면 5거래일(약 1주)마다 다시 알려드려요.{tail}")
+    if st == "BUY":
+        if ev == "repeat" or ev == "catchup":
+            return (f"매수 {rounds}번째 (5거래일마다)",
+                    f"점수 {score}: 매수 구간이 이어지고 있어요. 오늘 밤 미국 장에서 남은 현금의 {d['buy_pct']}%를 매수하세요 (현금이 없으면 할 일 없음).{tail}")
+        return ("매수 신호가 켜졌어요",
+                f"점수 {score}: 매수 구간(0 이상)으로 넘어갔습니다. 매도로 모아 둔 현금이 있으면 오늘 밤 미국 장에서 그 {d['buy_pct']}%를 매수하세요 "
+                f"(현금이 없으면 할 일 없음). 구간이 이어지면 5거래일(약 1주)마다 다시 알려드려요.{tail}")
+    came = {"SELL": "매도", "BUY": "매수"}.get(prev_state, "")
+    stop = f"{came}를 멈추세요. " if came else ""
+    rest = "모아 둔 현금은 그대로 두세요. " if prev_state == "SELL" else ""
+    return ("관망 구간이 됐어요",
+            f"점수 {score}: 관망 구간(-29~-1)으로 돌아왔습니다. {stop}{rest}아무것도 하지 않아도 됩니다.{tail}")
 
 
 def push(title, body):
@@ -202,7 +222,7 @@ def main():
         pass
     wk, sc = compute()
     d = build(wk)
-    daily, alert = daily_info(sc, prev)
+    daily, (ev, prev_state) = daily_info(sc, prev)
     d["daily"] = daily
     d["run"] = (daily["run_days"] - 1) // CYCLE_DAYS + 1   # action rounds: day 1, 6, 11, ... of the stretch
     d["run_days"] = daily["run_days"]
@@ -211,17 +231,17 @@ def main():
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
     with open(PRICES, "w", encoding="utf-8") as f:
         json.dump(build_prices(sc), f, separators=(",", ":"))
-    print(f"asof {d['asof']} state {d['state']} score {round(d['score'] * SCALE)} run_days {daily['run_days']} alert {alert}")
+    print(f"asof {d['asof']} state {d['state']} score {round(d['score'] * SCALE)} run_days {daily['run_days']} event {ev} (previous state {prev_state})")
     if args.no_push:
         return
-    if alert:
-        title, body = alert_message(d, alert)
+    if ev:
+        title, body = alert_message(d, ev, prev_state)
         print(title); print(body)
         push(title, body)
     elif args.test_push:
         push("테스트 알림", f"지금 상태: {d['state_kr']} (점수 {round(d['score'] * SCALE):+d}). 점수가 매도·매수 구간으로 넘어가는 날 저녁 8시(한국 시간)에 알림이 옵니다.")
     else:
-        print("no zone crossing today: no notification")
+        print("no state change / repeat day today: no notification")
 
 
 if __name__ == "__main__":

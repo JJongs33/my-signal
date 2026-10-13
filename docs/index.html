@@ -173,6 +173,18 @@
 
   .themebtn { width: auto; margin-left: auto; padding: 8px 12px; font-size: 12px; background: transparent; color: var(--text); border: 1px solid var(--line2); border-radius: 999px; white-space: nowrap; flex: none; }
 
+  /* 종목 전환 */
+  .fundsw { position: sticky; top: 0; z-index: 20; display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin: 0 -2px; padding: 10px 2px 8px; background: var(--bg); }
+  .fundsw button { padding: 10px 6px 9px; background: transparent; color: var(--muted); border: 1px solid var(--line2); border-radius: 0; display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.2; }
+  .fundsw button:first-child { border-radius: 2px 0 0 2px; } .fundsw button:last-child { border-radius: 0 2px 2px 0; margin-left: -1px; }
+  .fundsw button b { font: 900 17px/1.1 var(--f-disp); letter-spacing: -.01em; }
+  .fundsw button span { font: 500 11px/1.2 var(--f-text); }
+  .fundsw button.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+  @media (hover: hover) { .fundsw button:not(.on):hover { background: transparent; color: var(--text); } }
+  .fundtag { font: 400 11px/1.4 var(--f-mono); letter-spacing: .04em; color: var(--faint); margin: 0 0 12px; }
+  .fundtag b { color: var(--text); font-weight: 600; }
+  .kv.sel { border-left: 3px solid var(--sell); }
+
   @media (max-width: 360px) { .badge { font-size: 38px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -187,8 +199,14 @@
     <button class="themebtn" id="themeBtn" aria-label="화면 색상 선택">자동</button>
   </header>
 
+  <nav class="fundsw" id="fundSw" aria-label="종목 선택">
+    <button data-f="QLD" class="on"><b>QLD</b><span>나스닥 100 · 2배</span></button>
+    <button data-f="USD"><b>USD</b><span>반도체 · 2배</span></button>
+  </nav>
+
   <!-- 1. 이번 주 신호 -->
   <section class="card state" id="stateCard">
+    <div class="fundtag" id="fundTag"></div>
     <div class="headrow"><span class="sicon" id="sicon">▼</span><div class="badge" id="badge">-</div></div>
     <div class="action" id="action"></div>
     <div class="subaction" id="subaction"></div>
@@ -208,7 +226,7 @@
       </div>
     </div>
     <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
-      <span class="d">보유한 QLD(또는 USD)의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 신호가 켜진 주마다 <u>매주 1번</u> 반복 (매번 그때 남은 보유분의 5%)</span></div></div>
+      <span class="d">보유한 <span class="fname">QLD</span>의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 신호가 켜진 주마다 <u>매주 1번</u> 반복 (매번 그때 남은 보유분의 5%)</span></div></div>
     <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
       <span class="d">아무것도 하지 않음 (매도도 매수도 없음)</span></div></div>
     <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
@@ -232,7 +250,7 @@
     <h2><span class="idx">02</span>이번 주 얼마를 사고팔까요?</h2>
     <div id="calcHold" class="hidden"></div>
     <div id="calcSell" class="hidden">
-      <label class="field">지금 계좌에 있는 QLD(또는 국내 2배 상품)의 <b>평가금액</b> (만원)</label>
+      <label class="field">지금 계좌에 있는 <span id="calcName">QLD(또는 국내 2배 상품)</span>의 <b>평가금액</b> (만원)</label>
       <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
       <div class="help">증권사 앱에서 해당 종목의 <b>'평가금액'</b>(지금 팔면 받을 금액)을 적으세요. 이번 주는 <b>매도 신호</b>라서 이 금액의 5%를 팝니다. 현금은 입력하지 않아도 됩니다.</div>
     </div>
@@ -285,8 +303,8 @@
     <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD (반도체 2배)</span></div>
     <div class="note" id="scaleNote">로그 눈금은 2배 오를 때마다 같은 간격으로 그려서, 오래 오른 종목도 한 화면에 비교됩니다.</div>
     <div class="grid" style="margin-top:12px">
-      <div class="kv"><span>QLD 지금 가격</span><b id="qldNow">-</b><span id="qldDD"></span></div>
-      <div class="kv"><span>USD 지금 가격</span><b id="usdNow">-</b><span id="usdDD"></span></div>
+      <div class="kv" id="kvQ"><span>QLD 지금 가격</span><b id="qldNow">-</b><span id="qldDD"></span></div>
+      <div class="kv" id="kvU"><span>USD 지금 가격</span><b id="usdNow">-</b><span id="usdDD"></span></div>
     </div>
   </section>
 
@@ -299,14 +317,12 @@
   <!-- 7. 과거 성과 -->
   <section class="card">
     <h2><span class="idx">06</span>과거 시뮬레이션 성과 요약<span class="tag">참고용</span></h2>
-    <div class="note" style="margin-top:-4px">QLD, 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b></div>
+    <div class="note" style="margin-top:-4px" id="perfNote"></div>
     <table class="perf-table">
       <tr><th>기간</th><th>적립식 매수(매월초)</th><th>이 규칙 적용</th><th>최대 하락폭</th></tr>
-      <tr><td>2008~2025</td><td>연 25.1%</td><td class="hi">연 27.5%</td><td>-80% → -66%</td></tr>
-      <tr><td>2000~2025</td><td>연 16.8%</td><td class="hi">연 18.8%</td><td>-99% → -97%</td></tr>
-      <tr><td>2026 (1~10월)</td><td>+38.8%</td><td>+29.5%</td><td>-23% → -23%</td></tr>
+      <tbody id="perfBody"></tbody>
     </table>
-    <div class="note">이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 적립식 매수(매월초)보다 낮았습니다 (예: 2013년 -10%p, 2017년 -18%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다.</div>
+    <div class="note" id="perfText"></div>
   </section>
 
   <!-- 참고 -->
@@ -329,7 +345,7 @@
     <div class="refitem"><b>매도해서 생긴 현금</b>
       <div class="d">MMF·단기채·예금처럼 이자가 붙는 곳에 두는 것으로 시험했습니다 (미국 단기국채 금리 가정).</div></div>
     <div class="refitem"><b>시험에 넣지 않은 것</b>
-      <div class="d">세금·수수료·환전 비용은 시험에 반영하지 않았습니다. 2배 레버리지 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다. 규칙은 과거 자료에서 고른 것이라 앞으로의 결과는 다를 수 있고, 이 앱은 투자 조언이 아닙니다.</div></div>
+      <div class="d">세금·수수료·환전 비용은 시험에 반영하지 않았습니다. <span id="riskNote">2배 레버리지 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.</span> 규칙은 과거 자료에서 고른 것이라 앞으로의 결과는 다를 수 있고, 이 앱은 투자 조언이 아닙니다.</div></div>
   </section>
 
   <!-- 8. 알림 -->
@@ -357,6 +373,18 @@ const cv = (v) => css().getPropertyValue(v).trim();
 const man = (x) => Math.round(x).toLocaleString("ko-KR");
 const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
 const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
+const FUNDS = {
+  QLD: { name: "QLD", sub: "나스닥 100 · 2배", calc: "QLD(또는 국내 2배 상품)", risk: "2배 레버리지 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.",
+    perfNote: "QLD, 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b>",
+    perf: [["2008~2025", "연 25.1%", "연 27.5%", "-80% → -66%", true], ["2000~2025", "연 16.8%", "연 18.8%", "-99% → -97%", true], ["2026 (1~10월)", "+38.8%", "+29.5%", "-23% → -23%", false]],
+    perfText: "이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 적립식 매수(매월초)보다 낮았습니다 (예: 2013년 -31%p, 2017년 -22%p, 2023년 -21%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다." },
+  USD: { name: "USD", sub: "반도체 · 2배", calc: "USD(반도체 2배, 또는 국내 반도체 2배 상품)", risk: "반도체 2배 상품은 큰 하락장에서 -80% 이상 빠질 수 있고, 2배 나스닥(QLD)보다 훨씬 크게 흔들립니다.",
+    perfNote: "USD(반도체 2배), 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b> · 2007년 이전은 반도체 지수로 만든 가상 가격",
+    perf: [["2008~2025", "연 31.3%", "연 37.1%", "-84% → -69%", true], ["2000~2025", "연 19.7%", "연 23.3%", "-100% → -99%", true], ["2026 (1~10월)", "+66.6%", "+59.5%", "-39% → -28%", false]],
+    perfText: "같은 점수 규칙을 USD에 그대로 적용한 결과입니다. 2008년·2022년 같은 큰 하락을 줄여 이긴 구조는 QLD와 같고, 오르기만 한 해에는 낮았습니다 (예: 2013년 -23%p, 2021년 -31%p, 2023년 -43%p). USD는 변동이 커서 해마다 차이도 크게 벌어집니다. 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다." },
+};
+let FUND = "QLD";
+try { const f = localStorage.getItem("fund"); if (f && FUNDS[f]) FUND = f; } catch (_) {}
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
 
 let D = null;           // data.json
@@ -388,6 +416,27 @@ async function load() {
   }
 }
 
+function renderFund() {
+  const f = FUNDS[FUND];
+  [...$("fundSw").children].forEach((b) => b.classList.toggle("on", b.dataset.f === FUND));
+  $("fundTag").innerHTML = `<b>${f.name}</b> · ${f.sub} · 신호(점수)는 QLD·USD 공통`;
+  document.querySelectorAll(".fname").forEach((e) => { e.textContent = f.name; });
+  $("calcName").textContent = f.calc;
+  $("riskNote").textContent = f.risk;
+  $("perfNote").innerHTML = f.perfNote;
+  $("perfBody").innerHTML = f.perf.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td${r[4] ? ' class="hi"' : ""}>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  $("perfText").textContent = f.perfText;
+  $("kvQ").classList.toggle("sel", FUND === "QLD"); $("kvU").classList.toggle("sel", FUND === "USD");
+  if ($("logTk")) $("logTk").value = FUND;
+  document.title = `쫑우 투자신호 · ${f.name}`;
+}
+$("fundSw").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b || b.dataset.f === FUND) return;
+  FUND = b.dataset.f;
+  try { localStorage.setItem("fund", FUND); } catch (_) {}
+  renderFund(); if (D) renderCharts();
+});
+
 function init() {
   renderState();
   renderCalc();
@@ -396,6 +445,7 @@ function init() {
   renderChanges();
   renderRef();
   initLog();
+  renderFund();
 }
 
 /* ---------- 1·2. 신호 카드 + 기준표 ---------- */
@@ -608,7 +658,7 @@ function drawScore() {
   const dc = disp(h[n - 1].s), dmx = Math.round(mx), pos = mx === mn ? 0 : (cur - mn) / (mx - mn) * 100;
   const lines = [`기간 최고 ${sgn(dmx)} (${h[iMax].d})`, `현재 ${sgn(dc)} · 최고보다 ${Math.round(mx - cur)}점 낮음 · 범위 내 위치 ${pos.toFixed(0)}%`];
   const bw = W - L - R, bh = 38, bx = L, by = 4;
-  s += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="8" fill="${cv("--card")}" fill-opacity=".92" stroke="${cv("--line")}"/>`;
+  s += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="2" fill="${cv("--card")}" fill-opacity=".92" stroke="${cv("--line")}"/>`;
   lines.forEach((t, i) => { s += `<text x="${bx + 8}" y="${by + 15 + i * 16}" font-size="11" fill="${i === 0 ? cv("--peak") : cv("--text")}" font-weight="${i === 1 ? 700 : 500}">${t}</text>`; });
   $("chartScore").innerHTML = s;
   attachHover("chartScore", "wrapScore", "tipScore", h, x, [T, H - B], {
@@ -638,8 +688,9 @@ function drawPrice() {
   });
   s += xAxis(h, x, W, H, L, R, B, true, T);
   const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
-  s += `<path d="${path(u)}" fill="none" stroke="${cv("--usd")}" stroke-width="2"/>`;
-  s += `<path d="${path(q)}" fill="none" stroke="${cv("--qld")}" stroke-width="2.4"/>`;
+  const lineQ = `<path d="${path(q)}" fill="none" stroke="${cv("--qld")}" stroke-width="${FUND === "QLD" ? 2.6 : 1.4}" stroke-opacity="${FUND === "QLD" ? 1 : .6}"/>`;
+  const lineU = `<path d="${path(u)}" fill="none" stroke="${cv("--usd")}" stroke-width="${FUND === "USD" ? 2.6 : 1.4}" stroke-opacity="${FUND === "USD" ? 1 : .6}"/>`;
+  s += FUND === "QLD" ? lineU + lineQ : lineQ + lineU;
   const info = {};
   [["QLD", q, "--qld"], ["USD", u, "--usd"]].forEach(([nm, arr, col]) => {
     const pk = Math.max(...arr), ip = arr.indexOf(pk), cur = arr[n - 1], dd = (cur / pk - 1) * 100;

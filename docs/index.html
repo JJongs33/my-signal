@@ -20,25 +20,25 @@
      기존 변수 이름(--card, --text, --muted …)은 JS가 쓰고 있어서 그대로 두고 값만 바꿨습니다. */
   :root {
     --bg: #f4f1ea; --card: #e8e4da; --field: #dfdacd; --text: #0a0708; --muted: #4a4441; --faint: #6b6460; --line: #d8d3c7; --line2: #b3aa99;
-    --sell: #96101c; --sell-bg: #ecdcd3; --buy: #0d7096; --buy-bg: #d9e4e1; --hold: #6b6460; --hold-bg: #e3dfd3;
-    --accent: #a50e1a; --accent2: #0d7096; --zone-sell: rgba(150,16,28,.12); --zone-buy: rgba(13,112,150,.12);
-    --qld: #0d7096; --usd: #7a5c0e; --peak: #7a5c0e; --now: #96101c;
+    --sell: #0d7096; --sell-bg: #d6e3e8; --buy: #96101c; --buy-bg: #ecdcd3; --hold: #6b6460; --hold-bg: #e3dfd3;
+    --accent: #0a0708; --accent2: #0a0708; --zone-sell: rgba(13,112,150,.12); --zone-buy: rgba(150,16,28,.12);
+    --qld: #0a0708; --usd: #7a5c0e; --peak: #7a5c0e; --now: #0a0708;
     --on-accent: #f2efe9; --on-zone: #f2efe9; --shadow: rgba(10,7,8,.13);
   }
   :root[data-theme="dark"] {
     --bg: #0a0708; --card: #1d1819; --field: #2a2426; --text: #f2efe9; --muted: #a39b98; --faint: #8a8380; --line: #2a2426; --line2: #4a4441;
-    --sell: #ef3340; --sell-bg: #2a1417; --buy: #2a8fbe; --buy-bg: #11242e; --hold: #8a8380; --hold-bg: #231e1f;
-    --accent: #a50e1a; --accent2: #2a8fbe; --zone-sell: rgba(239,51,64,.16); --zone-buy: rgba(42,143,190,.16);
-    --qld: #2a8fbe; --usd: #e8b33a; --peak: #e8b33a; --now: #ef3340;
-    --on-accent: #f2efe9; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
+    --sell: #2a8fbe; --sell-bg: #11242e; --buy: #ef3340; --buy-bg: #2a1417; --hold: #8a8380; --hold-bg: #231e1f;
+    --accent: #f2efe9; --accent2: #f2efe9; --zone-sell: rgba(42,143,190,.18); --zone-buy: rgba(239,51,64,.18);
+    --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9;
+    --on-accent: #0a0708; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
   }
   @media (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]):not([data-theme="dark"]) {
       --bg: #0a0708; --card: #1d1819; --field: #2a2426; --text: #f2efe9; --muted: #a39b98; --faint: #8a8380; --line: #2a2426; --line2: #4a4441;
-      --sell: #ef3340; --sell-bg: #2a1417; --buy: #2a8fbe; --buy-bg: #11242e; --hold: #8a8380; --hold-bg: #231e1f;
-      --accent: #a50e1a; --accent2: #2a8fbe; --zone-sell: rgba(239,51,64,.16); --zone-buy: rgba(42,143,190,.16);
-      --qld: #2a8fbe; --usd: #e8b33a; --peak: #e8b33a; --now: #ef3340;
-      --on-accent: #f2efe9; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
+      --sell: #2a8fbe; --sell-bg: #11242e; --buy: #ef3340; --buy-bg: #2a1417; --hold: #8a8380; --hold-bg: #231e1f;
+      --accent: #f2efe9; --accent2: #f2efe9; --zone-sell: rgba(42,143,190,.18); --zone-buy: rgba(239,51,64,.18);
+      --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9;
+      --on-accent: #0a0708; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
     }
   }
   :root {
@@ -55,7 +55,7 @@
   header img { width: 36px; height: 36px; border-radius: 2px; flex: none; }
   header > div { min-width: 0; }
   h1 { font: 900 24px/1.1 var(--f-disp); letter-spacing: -.02em; margin: 0; white-space: nowrap; }
-  .dot { color: var(--sell); }
+  .dot { color: var(--faint); }
   .sub { color: var(--faint); font: 400 11px/1.5 var(--f-mono); letter-spacing: .02em; margin-top: 3px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 2px; padding: 18px 16px; margin: 14px 0; }
   .state { border-top: 4px solid var(--hold); }
@@ -67,7 +67,7 @@
   .action { font: 700 17px/1.45 var(--f-text); margin-top: 14px; text-wrap: pretty; }
   .meta { color: var(--muted); font-size: 13px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
   h2 { font: 800 17px/1.3 var(--f-disp); letter-spacing: -.01em; margin: 0 0 12px; color: var(--text); display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; text-wrap: balance; }
-  h2 .idx { font: 400 11px/1 var(--f-mono); letter-spacing: .2em; color: var(--sell); }
+  h2 .idx { font: 400 11px/1 var(--f-mono); letter-spacing: .2em; color: var(--text); }
   h3 { font: 700 13px/1.4 var(--f-text); margin: 18px 0 6px; color: var(--muted); }
   .note { color: var(--muted); font-size: 13px; margin-top: 8px; text-wrap: pretty; }
   .hidden { display: none !important; }
@@ -79,10 +79,10 @@
   button { font: 700 15px/1.2 var(--f-text); background: var(--accent); color: var(--on-accent); border: 0; border-radius: 2px; padding: 14px 16px; width: 100%; cursor: pointer;
            transition: background .32s var(--ease), color .18s var(--ease), border-color .18s var(--ease); }
   button.secondary { background: transparent; color: var(--text); border: 1px solid var(--line2); margin-top: 8px; }
-  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--sell); outline-offset: 2px; }
-  @media (hover: hover) { button:hover { background: var(--text); color: var(--bg); } button.secondary:hover { background: transparent; color: var(--sell); border-color: var(--sell); } }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+  @media (hover: hover) { button:hover { background: var(--muted); color: var(--bg); } button.secondary:hover { background: transparent; color: var(--muted); border-color: var(--muted); } }
   input, select { font: 400 16px/1.3 var(--f-text); width: 100%; padding: 10px 12px; border-radius: 2px; border: 1px solid var(--line2); background: transparent; color: var(--text); min-height: 46px; transition: border-color .18s var(--ease); }
-  input:focus, select:focus { border-color: var(--sell); outline-offset: 0; }
+  input:focus, select:focus { border-color: var(--text); outline-offset: 0; }
   label.field { display: block; font-size: 13px; color: var(--muted); margin: 12px 0 5px; }
   textarea { width: 100%; min-height: 110px; font: 12px/1.5 var(--f-mono); border-radius: 2px; border: 1px solid var(--line2); background: transparent; color: var(--text); padding: 8px; margin-top: 10px; }
   footer { color: var(--faint); font-size: 12px; text-align: center; margin-top: 22px; text-wrap: balance; }
@@ -253,7 +253,7 @@
   .card { border-top: 2px solid var(--text); padding: 28px 0 8px; margin-top: 80px; }
   .card.hero { border-top: 0; padding-top: 40px; margin-top: 0; }
   h2 { font: 900 22px/1.2 var(--f-disp); letter-spacing: -.02em; margin: 0 0 36px; align-items: baseline; gap: 14px; }
-  h2 .idx { font: 900 34px/1 var(--f-disp); letter-spacing: -.03em; color: var(--sell); }
+  h2 .idx { font: 900 34px/1 var(--f-disp); letter-spacing: -.03em; color: var(--text); }
   h2 .tag { align-self: center; }
 
   /* ===== 구역 구분: 구역마다 배경 띠(화면 끝까지) + 사이 간격 ===== */
@@ -268,8 +268,8 @@
 
   /* ===== 쫑지표 히어로 ===== */
   .card.hero { background: linear-gradient(180deg, var(--card) 0%, var(--bg) 100%); border-top: 3px solid var(--text); margin-top: 0; padding-top: 36px; }
-  .jcap { font: 400 11px/1 var(--f-mono); letter-spacing: .3em; color: var(--sell); display: flex; align-items: center; gap: 10px; }
-  .jnew { border: 1px solid var(--sell); border-radius: 2px; padding: 3px 6px; letter-spacing: .18em; font-size: 10px; }
+  .jcap { font: 400 11px/1 var(--f-mono); letter-spacing: .3em; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+  .jnew { border: 1px solid var(--muted); border-radius: 2px; padding: 3px 6px; letter-spacing: .18em; font-size: 10px; }
   .jname { font: 900 28px/1.2 var(--f-disp); letter-spacing: -.03em; margin-top: 14px; }
   .jname span { font: 500 13px/1 var(--f-text); letter-spacing: 0; color: var(--muted); margin-left: 10px; }
   .jrow { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-top: 20px; }
@@ -297,7 +297,7 @@
   .legend2 div { padding: 10px 0; border-top: 1px solid var(--line2); }
   .legend2 div:last-child { border-bottom: 1px solid var(--line2); }
   .legend2 div { display: flex; gap: 14px; } .legend2 b { flex: none; min-width: 92px; }
-  .legend2 div:first-child b { color: var(--muted); } .legend2 div:last-child b { color: var(--sell); }
+  .legend2 div:first-child b { color: var(--muted); } .legend2 div:last-child b { color: var(--text); }
   .pfund { display: flex; align-items: baseline; gap: 12px; margin: 44px 0 14px; }
   .pfund b { font: 900 22px/1 var(--f-disp); letter-spacing: -.02em; }
   .pfund span { font: 400 12px/1 var(--f-mono); color: var(--faint); }
@@ -324,6 +324,32 @@
 
   table.acc td { text-align: right; } table.acc td:first-child { text-align: left; } table.acc td span { display: block; font: 400 11px/1.4 var(--f-mono); color: var(--faint); }
   table.acc th span { font-size: 10px; color: var(--faint); font-weight: 400; }
+
+  /* ===== 06 과거 성과 v23: 규칙(위 단계) > 항목(아래 단계) ===== */
+  .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line2); margin-bottom: 14px; }
+  .rules .rb { padding: 14px 14px 16px; } .rules .rb + .rb { border-left: 1px solid var(--line2); }
+  .rules .rb b { display: block; font: 800 16px/1.3 var(--f-text); margin-bottom: 4px; }
+  .rules .rb span { font-size: 12px; line-height: 1.55; color: var(--muted); }
+  .rules .rb.r { background: var(--field); } .rules .rb.r b { color: var(--text); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+  .subh { font: 800 17px/1.3 var(--f-disp); letter-spacing: -.01em; margin: 44px 0 16px; color: var(--text); }
+  .pcn { display: flex; align-items: baseline; gap: 12px; margin: 28px 0 8px; flex-wrap: wrap; }
+  .pcn b { font: 900 20px/1 var(--f-disp); } .pcn span { font-size: 12px; color: var(--muted); } .pcn i { font-style: normal; color: var(--faint); }
+  #perfCharts svg { height: auto; }
+  table.perf4 { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .perf4 th { font: 700 12px/1.35 var(--f-text); color: var(--muted); text-align: center; padding: 0 4px 10px; border-left: 1px solid var(--line2); }
+  .perf4 th:first-child { text-align: left; border-left: 0; padding-left: 0; } .perf4 th:nth-child(2) { border-left: 0; }
+  .perf4 th.r { color: var(--text); font-weight: 900; box-shadow: inset 0 -2px 0 var(--text); }
+  .perf4 td { padding: 11px 6px; text-align: center; vertical-align: top; border-top: 1px dotted var(--line2); border-left: 1px solid var(--line2); font-variant-numeric: tabular-nums; line-height: 1.35; }
+  .perf4 tr.p1 td { border-top: 1px solid var(--line2); }
+  .perf4 td.per { text-align: left; padding-left: 0; border-left: 0; border-top: 1px solid var(--line2); width: 74px; }
+  .perf4 td.per b { font: 700 12px/1.3 var(--f-mono); }
+  .perf4 td.m { text-align: left; border-left: 0; color: var(--muted); font-size: 12px; padding-left: 4px; white-space: nowrap; }
+  .perf4 td.r { background: var(--field); font-weight: 800; }
+  .perf4 tr:last-child td { border-bottom: 1px solid var(--line2); }
+  .perf4 em { display: block; font: 600 11px/1.4 var(--f-mono); font-style: normal; margin-top: 2px; }
+  .perf4 em.up { color: var(--buy); } .perf4 em.down { color: var(--sell); }
+  .perf4 .fin { font: 400 11px/1.4 var(--f-mono); color: var(--faint); margin-top: 3px; font-weight: 400; }
+  .perf4 td.per .fin { margin-top: 4px; }
 
   @media (max-width: 360px) { .jscore { font-size: 76px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
@@ -439,19 +465,28 @@
   <!-- 7. 과거 성과 -->
   <section class="card">
     <h2><span class="idx">06</span>과거 성과</h2>
-    <div class="legend2">
-      <div><b>적립식 (기준)</b><span>매월 첫 거래일에 정해 둔 금액만 사는 방식</span></div>
-      <div><b>쫑 규칙</b><span>적립식 + 쫑지표 신호로 매주 매도·매수</span></div>
+    <div class="rules">
+      <div class="rb"><b>적립식 규칙</b><span>매월 첫 거래일에 정해 둔 금액만 사요</span></div>
+      <div class="rb r"><b>쫑 규칙</b><span>적립식 규칙 + 쫑지표 신호로 매주 매도·매수</span></div>
     </div>
-    <dl class="defs">
-      <div><dt>구간</dt><dd>약 10년마다 새로 시작 · 시작 0원, 매월 100만원 · 세금·비용 반영</dd></div>
-      <div><dt>연평균</dt><dd>납입 시점을 반영한 1년 수익률</dd></div>
-      <div><dt>총수익률</dt><dd>(최종 금액 − 총 납입금) ÷ 총 납입금</dd></div>
-      <div><dt>하락 평균</dt><dd>전고점보다 10% 넘게 빠졌을 때의 평균 (아래 숫자는 그 횟수)</dd></div>
-      <div><dt>표시</dt><dd>세 자리는 10 단위, 네 자리 이상은 100 단위로 반올림</dd></div>
-    </dl>
-    <div class="key"><span class="ku">윗줄 · 적립식 (기준)</span><span class="kr">아랫줄 · 쫑 규칙</span></div>
+    <div class="note">시작 0원, 매월 100만원 · 세금·거래비용 반영</div>
+
+    <h3 class="subh">연평균 수익률 추이</h3>
+    <div class="seg" id="perfMode"><button data-m="irr" class="on">2000년부터 누적 연평균</button><button data-m="yr">연도별 수익률</button></div>
+    <div id="perfCharts"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--faint)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--text)"></i>쫑 규칙</span></div>
+    <div class="note" id="perfChartNote"></div>
+
+    <h3 class="subh">10년 구간별 비교</h3>
     <div id="perfBox"></div>
+    <details class="more first"><summary>표 보는 법</summary>
+      <dl class="defs">
+        <div><dt>구간</dt><dd>약 10년마다 새로 시작 (시작 0원)</dd></div>
+        <div><dt>연평균</dt><dd>납입 시점을 반영한 1년 수익률</dd></div>
+        <div><dt>총수익률</dt><dd>(최종 금액 − 총 납입금) ÷ 총 납입금</dd></div>
+        <div><dt>하락 평균</dt><dd>전고점보다 10% 넘게 빠졌을 때의 평균 (아래 숫자는 그 횟수)</dd></div>
+        <div><dt>반올림</dt><dd>세 자리는 10 단위, 네 자리 이상은 100 단위</dd></div>
+      </dl></details>
     <div class="note">큰 하락은 줄였지만, 꾸준히 오른 구간(QLD 2010~2019)에는 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격이고, 마지막 구간은 6년 10개월입니다. 앞으로는 이보다 낮을 수 있어요.</div>
   </section>
 
@@ -498,7 +533,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 22</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 23</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -519,6 +554,12 @@ const PERF = {
     { p: "2010~2019", paid: 1.2, a: [31, 33], t: [420, 470], f: [6.2, 6.8], dd: [[-25, 16], [-23, 16]] },
     { p: "2020~2026.10", paid: 0.8, a: [64, 72], t: [730, 960], f: [6.8, 8.7], dd: [[-27, 18], [-21, 22]] } ] },
 };
+const PCH = {
+  years: ["2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026.10"],
+  QLD: { dca_irr: [-90.0, -57.8, -59.4, -5.7, 2.2, 1.2, 2.4, 7.7, -22.9, -1.5, 4.3, 3.6, 7.3, 14.0, 16.1, 16.0, 15.5, 19.0, 16.8, 20.3, 23.7, 25.3, 17.5, 21.5, 22.4, 22.8, 23.7], rule_irr: [-85.2, -50.9, -51.4, -2.3, 6.0, 2.2, 2.0, 7.3, -7.4, 8.3, 13.1, 10.4, 12.6, 16.5, 17.6, 16.9, 16.3, 18.5, 18.0, 20.4, 23.8, 24.5, 20.3, 23.3, 23.7, 24.2, 24.5], dca_yr: [-74.3, -68.0, -68.5, 104.2, 15.2, -3.0, 5.2, 29.0, -72.9, 121.2, 36.9, 0.0, 34.8, 82.1, 37.6, 14.7, 10.0, 70.3, -8.3, 81.7, 88.9, 54.7, -60.5, 117.7, 42.8, 30.4, 38.1], rule_yr: [-67.7, -61.7, -57.1, 96.2, 20.3, -7.7, 1.8, 28.1, -46.7, 111.5, 44.1, -0.8, 33.0, 57.8, 34.4, 17.2, 15.6, 50.7, 13.9, 73.1, 88.9, 38.0, -25.1, 97.7, 38.7, 43.0, 25.4] },
+  USD: { dca_irr: [-91.7, -58.0, -75.1, -4.9, -17.2, -7.6, -10.1, -7.1, -44.7, -11.7, -5.7, -7.5, -8.1, 1.3, 8.2, 6.5, 10.5, 15.1, 11.1, 16.3, 19.1, 22.9, 13.7, 20.6, 24.7, 26.2, 28.3], rule_irr: [-87.1, -50.2, -70.4, -4.4, -11.4, -6.5, -10.7, -7.7, -23.2, -1.0, 3.9, 0.2, -1.8, 4.6, 10.1, 9.1, 12.5, 15.9, 14.6, 18.4, 21.0, 23.5, 18.9, 24.3, 27.7, 29.8, 31.3], dca_yr: [-63.8, -50.1, -79.8, 161.1, -35.5, 12.3, -16.1, 3.3, -79.8, 137.4, 19.4, -14.9, -10.2, 77.7, 78.1, -7.5, 56.8, 81.7, -26.9, 110.4, 68.2, 104.3, -68.6, 228.8, 139.6, 62.1, 73.4], rule_yr: [-55.5, -41.7, -75.3, 145.9, -24.0, 2.9, -21.1, 2.5, -54.6, 127.6, 29.9, -14.5, -9.6, 58.9, 68.2, 5.1, 60.5, 68.5, 1.5, 101.3, 68.2, 73.4, -30.4, 190.1, 129.5, 101.7, 60.8] },
+};
+let perfMode = "irr";
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
 
 let D = null;           // data.json
@@ -554,15 +595,34 @@ function renderPerf() {
   const n = (x) => x.toLocaleString("ko-KR"), sg = (x) => (x > 0 ? "+" : "") + n(x);
   const diff = (a, b) => { const d = b - a; return `<em class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "+" : ""}${d}%p</em>`; };
   $("perfBox").innerHTML = Object.entries(PERF).map(([f, o]) => {
-    const rows = o.rows.map((r) => `<tr>
-        <td><b>${r.p}</b><div class="fin">총 납입 ${r.paid}억</div></td>
-        <td><div class="u">${r.a[0]}%</div><div class="r">${r.a[1]}%</div>${diff(r.a[0], r.a[1])}</td>
-        <td><div class="u">${sg(r.t[0])}%</div><div class="r">${sg(r.t[1])}%</div><div class="fin">${r.f[0]}억 → ${r.f[1]}억</div></td>
-        <td><div class="u">${r.dd[0][0]}%</div><div class="r">${r.dd[1][0]}%</div><div class="fin">${r.dd[0][1]}번 → ${r.dd[1][1]}번</div></td></tr>`).join("");
+    const rows = o.rows.map((r) => `<tr class="p1"><td rowspan="3" class="per"><b>${r.p}</b><div class="fin">총 납입 ${r.paid}억</div></td><td class="m">연평균</td><td>${r.a[0]}%</td><td class="r">${r.a[1]}%${diff(r.a[0], r.a[1])}</td></tr>
+      <tr><td class="m">총수익률</td><td>${sg(r.t[0])}%<div class="fin">최종 ${r.f[0]}억</div></td><td class="r">${sg(r.t[1])}%<div class="fin">최종 ${r.f[1]}억</div></td></tr>
+      <tr><td class="m">하락 평균</td><td>${r.dd[0][0]}%<div class="fin">${r.dd[0][1]}번</div></td><td class="r">${r.dd[1][0]}%<div class="fin">${r.dd[1][1]}번</div></td></tr>`).join("");
     return `<div class="pfund"><b>${f}</b><span>${o.sub}</span></div>
-      <table class="perf3"><tr><th></th><th>연평균</th><th>총수익률<br><span>(최종 금액)</span></th><th>하락 평균<br><span>(10%↓ 횟수)</span></th></tr>${rows}</table>`;
+      <table class="perf4"><tr><th>구간</th><th></th><th>적립식 규칙</th><th class="r">쫑 규칙</th></tr>${rows}</table>`;
   }).join("");
+  drawPerf();
 }
+function drawPerf() {
+  const box = $("perfCharts"); if (!box) return;
+  const irr = perfMode === "irr", yrs = PCH.years, W = 360, H = 210, L = 38, R = 12, T = 16, B = 26, nn = yrs.length;
+  const lo = irr ? -50 : -80, hi = irr ? 40 : 140, x = (i) => L + (W - L - R) * i / (nn - 1), y = (v) => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const ticks = irr ? [-40, -20, 0, 20, 40] : [-50, 0, 50, 100];
+  box.innerHTML = ["QLD", "USD"].map((f) => {
+    const d = PCH[f], a = d[irr ? "dca_irr" : "dca_yr"], b = d[irr ? "rule_irr" : "rule_yr"];
+    let g = "";
+    ticks.forEach((v) => { g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${cv(v === 0 ? "--muted" : "--line2")}" stroke-width="${v === 0 ? 1.2 : .7}" ${v === 0 ? "" : 'stroke-dasharray="3 4"'}/><text x="${L - 6}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${cv("--muted")}">${v}%</text>`; });
+    [0, 5, 10, 15, 20].forEach((i) => { if (i < nn) g += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${cv("--muted")}">${yrs[i]}</text>`; });
+    g += `<text x="${x(nn - 1)}" y="${H - 6}" font-size="11" text-anchor="end" fill="${cv("--muted")}">26.10</text>`;
+    const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+    g += `<defs><clipPath id="cp${f}"><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}"/></clipPath></defs><g clip-path="url(#cp${f})"><path d="${path(a)}" fill="none" stroke="${cv("--faint")}" stroke-width="2" stroke-linejoin="round"/><path d="${path(b)}" fill="none" stroke="${cv("--text")}" stroke-width="2.8" stroke-linejoin="round"/></g>`;
+    const ea = a[nn - 1], eb = b[nn - 1], sgn1 = (v) => (v > 0 ? "+" : "") + Math.round(v) + "%";
+    g += `<circle cx="${x(nn - 1)}" cy="${y(ea)}" r="3.4" fill="${cv("--faint")}"/><circle cx="${x(nn - 1)}" cy="${y(eb)}" r="4" fill="${cv("--text")}"/>`;
+    return `<div class="pcn"><b>${f}</b><span>쫑 규칙 ${sgn1(eb)} · 적립식 규칙 ${sgn1(ea)} <i>(2026.10 기준)</i></span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${f} 연평균 수익률 추이">${g}</svg>`;
+  }).join("");
+  $("perfChartNote").textContent = irr ? "2000년부터 지금까지 쌓은 돈 전체의 연평균 수익률이에요. 2000~2002년은 -50% 아래라 그래프 밖으로 나가요." : "해마다의 수익률이에요. 큰 하락이 있던 2000~2002, 2008, 2022년에 쫑 규칙이 덜 빠졌어요.";
+}
+$("perfMode").addEventListener("click", (e) => { const bt = e.target.closest("button"); if (!bt) return; perfMode = bt.dataset.m; [...$("perfMode").children].forEach((x) => x.classList.toggle("on", x === bt)); drawPerf(); });
 
 function init() {
   renderState();
@@ -777,10 +837,10 @@ function drawSpark() {
   let s = `<line x1="0" x2="${W}" y1="${y(0)}" y2="${y(0)}" stroke="${cv("--buy")}" stroke-dasharray="2 3" stroke-opacity=".8"/>`;
   s += `<line x1="0" x2="${W}" y1="${y(SELL_AT)}" y2="${y(SELL_AT)}" stroke="${cv("--sell")}" stroke-dasharray="2 3" stroke-opacity=".8"/>`;
   s += `<path d="${v.map((a, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(a).toFixed(1)).join(" ")}" fill="none" stroke="${cv("--text")}" stroke-width="1.8" stroke-linejoin="round"/>`;
-  s += `<circle cx="${x(v.length - 1)}" cy="${y(v[v.length - 1])}" r="3.6" fill="${cv("--now")}" stroke="${cv("--bg")}" stroke-width="1.6"/>`;
+  s += `<circle cx="${x(v.length - 1)}" cy="${y(v[v.length - 1])}" r="3.8" fill="${cv(D.state === "SELL" ? "--sell" : D.state === "BUY" ? "--buy" : "--hold")}" stroke="${cv("--bg")}" stroke-width="1.6"/>`;
   el.innerHTML = s;
 }
-function renderCharts() { if (D) { drawScore(); drawPrice(); drawSpark(); } }
+function renderCharts() { if (D) { drawScore(); drawPrice(); drawSpark(); drawPerf(); } }
 
 /* ---------- ① 점수 차트 ---------- */
 function drawScore() {

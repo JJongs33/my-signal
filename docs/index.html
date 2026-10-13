@@ -92,7 +92,7 @@
   .zonebar .z { display: flex; align-items: center; justify-content: center; font: 700 13px/1 var(--f-text); color: var(--on-zone); white-space: nowrap; }
   .zonebar .z.sell { background: var(--sell); flex: 70; } .zonebar .z.hold { background: var(--hold); flex: 30; } .zonebar .z.buy { background: var(--buy); flex: 100; }
   .zonewrap { position: relative; }
-  .marker { position: absolute; left: 0; right: 0; top: -30px; height: 28px; z-index: 2; }
+  .marker { position: absolute; left: 0; right: 0; top: -22px; height: 28px; z-index: 2; }
   .mlabel { position: absolute; top: 0; font: 400 12px/1 var(--f-mono); letter-spacing: .02em; transform: translateX(-50%); white-space: nowrap; color: var(--now); font-weight: 600; }
   .zticks { position: relative; height: 20px; font: 400 11px/1 var(--f-mono); color: var(--faint); margin-top: 4px; }
   .zticks span { position: absolute; transform: translateX(-50%); }
@@ -227,11 +227,11 @@
       </div>
     </div>
     <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
-      <span class="d">보유분의 <span class="amt">5%</span>를 팔아 현금으로 보관. 5거래일마다 반복.</span></div></div>
+      <span class="d">남은 보유 주식의 <span class="amt">5%</span>를 팔아 현금으로 보관. 매주 1번 반복.</span></div></div>
     <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
       <span class="d">아무것도 하지 않음.</span></div></div>
     <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
-      <span class="d">모아 둔 현금의 <span class="amt">25%</span>를 매수. 5거래일마다 반복.</span></div></div>
+      <span class="d">모아 둔 현금의 <span class="amt">25%</span>를 매수. 매주 1번 반복.</span></div></div>
     <details style="margin-top:12px">
       <summary>점수는 어떻게 계산되나요?</summary>
       <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2</b></div>
@@ -478,12 +478,10 @@ function renderState() {
   $("stateCard").className = "card state " + d.state;
   $("badge").textContent = d.state_kr;
   $("sicon").textContent = { SELL: "▼", BUY: "▲", HOLD: "■" }[d.state];
-  const rd = d.run_days || (d.run * 5), left = (5 - ((rd - 1) % 5)) % 5;   // 0 = act tonight, else trading days until the next action day
-  const sellTxt = left === 0 ? `오늘 밤 보유분의 <b>${d.sell_pct}%</b>를 매도해 현금으로 보관하세요.` : `오늘은 매도하지 않아요. 다음 매도는 <b>${left}거래일 뒤</b>예요.`;
-  const buyTxt = left === 0 ? `오늘 밤 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요.` : `오늘은 매수하지 않아요. 다음 매수는 <b>${left}거래일 뒤</b>예요.`;
+  const rd = d.run_days || (d.run * 5);
   const acts = {
-    SELL: [sellTxt, `매도 구간에서는 5거래일마다 팝니다. 매번 남은 보유분의 ${d.sell_pct}%.`],
-    BUY: [buyTxt, `매수 구간에서는 5거래일마다 삽니다. 매번 남은 현금의 ${d.buy_pct}%. 현금이 없으면 할 일 없음.`],
+    SELL: [`매주 1번, 남은 보유 주식의 <b>${d.sell_pct}%</b>를 매도해 현금으로 보관하세요. <b>화요일</b>을 추천해요.`, `매도 구간이 이어지는 동안 매주 반복해요. 매번 그때 남은 보유 주식의 ${d.sell_pct}%.`],
+    BUY: [`매주 1번, 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요. <b>화요일</b>을 추천해요.`, `매수 구간이 이어지는 동안 매주 반복해요. 매번 그때 남은 현금의 ${d.buy_pct}%. 현금이 없으면 할 일 없음.`],
     HOLD: ["매도도 매수도 하지 않아요.", "지금 상태를 유지하세요."],
   };
   $("action").innerHTML = acts[d.state][0];
@@ -497,8 +495,8 @@ function renderState() {
     const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
     const cells = Math.min(24, Math.max(run, Math.round(S.avg)));
     let bar = ""; for (let i = 0; i < cells; i++) bar += `<i class="${i < Math.min(run, cells) ? "on" : ""}"></i>`;
-    const l1 = isS ? `<b>${run}회째</b> 매도 · 처음 보유분의 약 <b>${cum.toFixed(0)}%</b>를 현금으로 바꿨어요`
-                   : `<b>${run}회째</b> 매수 · 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 썼어요`;
+    const l1 = isS ? `이번 구간 <b>${run}번째 주</b> · 매주 ${d.sell_pct}%씩 팔았다면 처음 보유분의 약 <b>${cum.toFixed(0)}%</b>가 현금이에요`
+                   : `이번 구간 <b>${run}번째 주</b> · 매주 ${d.buy_pct}%씩 샀다면 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 썼어요`;
     const l2 = `칸 하나 = 5거래일(약 1주). 과거 ${isS ? "매도" : "매수"} 구간은 평균 ${S.avg.toFixed(0)}주, 최장 ${S.max}주 이어졌어요.`;
     pg.innerHTML = `<div>${l1}</div><div class="pbar">${bar}</div><div class="plabel">${l2}</div>`;
   }

@@ -251,6 +251,16 @@
   h2 .idx { font: 900 34px/1 var(--f-disp); letter-spacing: -.03em; color: var(--sell); }
   h2 .tag { align-self: center; }
 
+  /* ===== 구역 구분: 구역마다 배경 띠(화면 끝까지) + 사이 간격 ===== */
+  .card { background: var(--card); border: 0; border-top: 3px solid var(--text); border-radius: 0; margin: 32px -24px 0; padding: 36px 24px 36px; }
+  .card.hero { background: transparent; border-top: 0; margin: 0 -24px; padding: 40px 24px 40px; }
+  .card.hero + .card { margin-top: 0; }
+  h2 { margin-bottom: 32px; }
+  .card .kv, .card .result, .card .summary, .card .logitem { border-color: var(--line2); }
+  .card input, .card select { background: var(--bg); }
+  .crit, details.more, ul.changes li, .perf-table th, .perf-table td { border-color: var(--line2); }
+  footer { margin-top: 56px; }
+
   @media (max-width: 360px) { .badge { font-size: 44px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
 </head>

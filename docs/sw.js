@@ -1,27 +1,31 @@
-// Service worker for "내 투자 신호": offline shell + weekly push notifications.
-const CACHE = "signal-v1";
-const SHELL = ["./", "index.html", "config.js", "manifest.json", "icon-192.png", "icon-512.png", "icon-180.png"];
+// Service worker for "쫑우 투자신호": offline fallback + push notifications.
+// Strategy: always try the network first (so a new version of the app and fresh data show up right away),
+// and use the saved copy only when the phone is offline.
+const CACHE = "signal-v3";
+const SHELL = ["./", "index.html", "config.js", "manifest.json", "icon-192.png", "icon-512.png", "icon-180.png", "data.json", "prices.json"];
 
 self.addEventListener("install", (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: "reload" })))).catch(() => {}).then(() => self.skipWaiting()));
 });
 
 self.addEventListener("activate", (e) => {
   e.waitUntil(caches.keys().then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)))).then(() => self.clients.claim()));
 });
 
-// data.json: always try the network first so the latest signal shows; fall back to the cached copy offline
 self.addEventListener("fetch", (e) => {
-  const url = new URL(e.request.url);
-  if (url.pathname.endsWith("data.json")) {
-    e.respondWith(fetch(e.request).then((r) => {
-      const copy = r.clone();
-      caches.open(CACHE).then((c) => c.put("data.json", copy));
-      return r;
-    }).catch(() => caches.match("data.json")));
-    return;
-  }
-  e.respondWith(caches.match(e.request).then((hit) => hit || fetch(e.request)));
+  const req = e.request;
+  if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.origin !== self.location.origin) return;
+  e.respondWith(
+    fetch(req).then((res) => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then((c) => c.put(req, copy));
+      }
+      return res;
+    }).catch(() => caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match("index.html")))
+  );
 });
 
 self.addEventListener("push", (e) => {

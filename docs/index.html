@@ -3,27 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>쫑우의 투자신호</title>
+<title>쫑우 투자신호</title>
 <meta name="theme-color" content="#0B4C73">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="쫑우의 투자신호">
+<meta name="apple-mobile-web-app-title" content="쫑우 투자신호">
 <style>
   :root {
-    /* Mediterranean (Aegean) blue & white, warm terracotta accent */
-    --bg: #eef5fa; --card: #ffffff; --text: #0b2a3d; --muted: #5b7a90; --line: #d7e6f0;
-    --sell: #c2572e; --sell-bg: #fdede4; --buy: #0f8a72; --buy-bg: #e5f6f1; --hold: #5b7a90; --hold-bg: #eef2f6;
-    --accent: #0b4c73; --accent2: #0ea5c7; --zone-sell: rgba(194,87,46,.10); --zone-buy: rgba(15,138,114,.10);
-    --qld: #0b4c73; --ndx: #8fb6cc;
+    /* 지중해 블루 + 회색기 도는 연한 바탕 */
+    --bg: #dde4e9; --card: #eff3f5; --field: #e1e8ec; --text: #12262f; --muted: #587080; --line: #c8d2d9;
+    --sell: #b4532a; --sell-bg: #f5e5da; --buy: #0d7a68; --buy-bg: #daeee8; --hold: #64798a; --hold-bg: #e2e8ed;
+    --accent: #0b4c73; --accent2: #0e8fb0; --zone-sell: rgba(180,83,42,.13); --zone-buy: rgba(13,122,104,.12);
+    --qld: #0b4c73; --usd: #b8821f; --peak: #8a5a12;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #071826; --card: #0e2a3e; --text: #e7f1f8; --muted: #86a7bd; --line: #1c3b52;
+      --bg: #071826; --card: #0e2a3e; --field: #0a2030; --text: #e7f1f8; --muted: #86a7bd; --line: #1c3b52;
       --sell: #f0885c; --sell-bg: #2a1810; --buy: #34d6b6; --buy-bg: #0e2a24; --hold: #8fa7ba; --hold-bg: #15293a;
       --accent: #38bdf8; --accent2: #22d3ee; --zone-sell: rgba(240,136,92,.12); --zone-buy: rgba(52,214,182,.10);
-      --qld: #38bdf8; --ndx: #4f6f84;
+      --qld: #38bdf8; --usd: #f2c14e; --peak: #f2c14e;
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -43,42 +43,83 @@
   .SELL .badge { color: var(--sell); } .BUY .badge { color: var(--buy); } .HOLD .badge { color: var(--hold); }
   .action { font-size: 17px; font-weight: 600; margin-top: 4px; }
   .meta { color: var(--muted); font-size: 13px; margin-top: 8px; }
-  h2 { font-size: 15px; margin: 0 0 10px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
-  h2 .ico { font-size: 15px; }
-  .gauge { position: relative; height: 34px; margin: 6px 0 2px; }
-  .gauge .bar { position: absolute; top: 12px; left: 0; right: 0; height: 10px; border-radius: 5px;
-                background: linear-gradient(90deg, var(--sell) 0 35%, var(--hold) 35% 50%, var(--buy) 50% 100%); opacity: .35; }
-  .gauge .tick { position: absolute; top: 6px; width: 2px; height: 22px; background: var(--text); opacity: .5; }
-  .gauge .dot { position: absolute; top: 7px; width: 20px; height: 20px; margin-left: -10px; border-radius: 50%; background: var(--text); border: 3px solid var(--card); }
-  .scale { display: flex; justify-content: space-between; color: var(--muted); font-size: 12px; }
+  h2 { font-size: 15px; margin: 0 0 10px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  h3 { font-size: 13px; margin: 14px 0 6px; color: var(--muted); font-weight: 700; }
+  .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
+  .hidden { display: none !important; }
   .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .kv { background: var(--bg); border-radius: 12px; padding: 10px; }
+  .kv { background: var(--field); border-radius: 12px; padding: 10px; }
   .kv b { display: block; font-size: 20px; }
   .kv span { color: var(--muted); font-size: 12px; }
-  svg { width: 100%; height: auto; display: block; }
+  svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
+  button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 16px; width: 100%; cursor: pointer; }
+  [data-theme] { }
+  @media (prefers-color-scheme: dark) { button { color: #04202e; } }
+  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-top: 8px; }
+  input, select { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--field); color: var(--text); min-height: 44px; }
+  label.field { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
+  textarea { width: 100%; min-height: 110px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; border-radius: 10px; border: 1px solid var(--line);
+             background: var(--field); color: var(--text); padding: 8px; margin-top: 10px; }
+  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 18px; }
+
+  /* 점수 기준표 */
+  .zonebar { position: relative; display: flex; height: 38px; border-radius: 10px; overflow: hidden; margin: 28px 0 4px; }
+  .zonebar .z { display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
+  .zonebar .z.sell { background: var(--sell); flex: 70; } .zonebar .z.hold { background: var(--hold); flex: 30; } .zonebar .z.buy { background: var(--buy); flex: 100; }
+  @media (prefers-color-scheme: dark) { .zonebar .z { color: #07131c; } }
+  .zonewrap { position: relative; }
+  .marker { position: absolute; left: 0; right: 0; top: -28px; height: 28px; z-index: 2; }
+  .mlabel { position: absolute; top: 0; font-size: 12px; font-weight: 800; transform: translateX(-50%); white-space: nowrap; }
+  .mtri { position: absolute; top: 17px; width: 0; height: 0; transform: translateX(-50%); border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 8px solid var(--text); }
+  .zticks { position: relative; height: 18px; font-size: 12px; color: var(--muted); }
+  .zticks span { position: absolute; transform: translateX(-50%); }
+  .crit { display: flex; gap: 12px; align-items: flex-start; padding: 11px 12px; border-radius: 12px; margin-top: 8px; border: 2px solid transparent; background: var(--field); }
+  .crit .sym { font-size: 22px; line-height: 1.2; width: 26px; text-align: center; flex: none; }
+  .crit b { display: block; font-size: 15px; } .crit span.d { font-size: 13px; color: var(--muted); }
+  .crit.SELL .sym, .crit.SELL b { color: var(--sell); } .crit.BUY .sym, .crit.BUY b { color: var(--buy); } .crit.HOLD .sym, .crit.HOLD b { color: var(--hold); }
+  .crit.DCA .sym, .crit.DCA b { color: var(--accent); }
+  .crit.now { border-color: currentColor; } .crit.SELL.now { border-color: var(--sell); } .crit.BUY.now { border-color: var(--buy); } .crit.HOLD.now { border-color: var(--hold); }
+  .nowtag { display: inline-block; font-size: 11px; font-weight: 800; background: var(--text); color: var(--card); border-radius: 6px; padding: 1px 7px; margin-left: 6px; vertical-align: 2px; }
+  .amt { font-weight: 800; }
+
+  /* 계산기 */
+  .result { margin-top: 12px; background: var(--field); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+  .result b { font-size: 19px; } .result .formula { color: var(--muted); font-size: 13px; margin-top: 2px; }
+  .help { background: var(--field); border-radius: 12px; padding: 10px 12px; font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+  /* 기록 */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .form-row.three { grid-template-columns: 1fr 1fr 1fr; }
+  .logitem { background: var(--field); border-radius: 12px; padding: 10px 12px; margin-top: 8px; display: flex; gap: 10px; align-items: center; }
+  .logitem .body { flex: 1; font-size: 14px; min-width: 0; }
+  .logitem .l1 { font-weight: 700; } .logitem .l2 { color: var(--muted); font-size: 12px; }
+  .logitem button.del { width: 36px; height: 36px; padding: 0; border-radius: 10px; background: transparent; color: var(--muted); border: 1px solid var(--line); font-size: 16px; }
+  .tagbuy { color: var(--buy); font-weight: 800; } .tagsell { color: var(--sell); font-weight: 800; }
+  .summary { background: var(--field); border-radius: 12px; padding: 10px 12px; margin: 10px 0 4px; font-size: 14px; }
+  .summary .row { display: flex; justify-content: space-between; padding: 3px 0; } .summary .row span { color: var(--muted); }
+  .up { color: var(--buy); font-weight: 800; } .down { color: var(--sell); font-weight: 800; }
+
+  /* 차트 */
+  .range { display: grid; grid-template-columns: 1fr auto 1fr; gap: 8px; align-items: center; }
+  .range .tilde { color: var(--muted); }
+  .seg { display: flex; gap: 6px; margin-top: 8px; }
+  .seg button { flex: 1; padding: 8px 4px; font-size: 13px; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 10px; }
+  .seg button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  @media (prefers-color-scheme: dark) { .seg button.on { color: #04202e; } }
+  .chartwrap { position: relative; margin-top: 10px; }
+  .tip { position: absolute; top: 4px; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 5px 9px; font-size: 12px; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,.18); z-index: 3; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; } .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .toggle { display: inline-flex; gap: 0; margin-left: auto; }
+  .toggle button { width: auto; padding: 4px 10px; font-size: 12px; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 0; }
+  .toggle button:first-child { border-radius: 8px 0 0 8px; } .toggle button:last-child { border-radius: 0 8px 8px 0; }
+  .toggle button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
+  @media (prefers-color-scheme: dark) { .toggle button.on { color: #04202e; } }
+
   ul.changes { list-style: none; padding: 0; margin: 0; font-size: 14px; }
   ul.changes li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); }
   ul.changes li:last-child { border-bottom: 0; }
-  details summary { cursor: pointer; font-weight: 600; }
-  .rule { font-size: 14px; width: 100%; } .rule td { padding: 4px 6px; vertical-align: top; } .rule td:first-child { white-space: nowrap; color: var(--muted); }
-  button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 16px; width: 100%; cursor: pointer; }
-  button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-top: 8px; }
-  input[type=number] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
-  label.field { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
-  textarea { width: 100%; min-height: 110px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; border-radius: 10px; border: 1px solid var(--line);
-             background: var(--bg); color: var(--text); padding: 8px; margin-top: 10px; }
-  .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
-  .hidden { display: none; }
-  footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 18px; }
-  .result { margin-top: 12px; background: var(--bg); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
-  .result b { font-size: 19px; }
-  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
-  .legend span { display: inline-flex; align-items: center; gap: 5px; }
-  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
-  .checklist { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
-  .checklist:last-child { border-bottom: 0; }
-  .checklist input { width: 20px; height: 20px; accent-color: var(--accent); }
-  .checklist .m { flex: 1; } .checklist .m b { display: block; font-size: 14px; } .checklist .m span { color: var(--muted); font-size: 12px; }
+  details summary { cursor: pointer; font-weight: 600; font-size: 14px; }
   .perf-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
   .perf-table th, .perf-table td { text-align: right; padding: 7px 4px; border-bottom: 1px solid var(--line); }
   .perf-table th:first-child, .perf-table td:first-child { text-align: left; color: var(--muted); font-weight: 500; }
@@ -91,105 +132,139 @@
   <header>
     <img src="icon-192.png" alt="">
     <div>
-      <h1>쫑우의 투자신호</h1>
+      <h1>쫑우 투자신호</h1>
       <div class="sub" id="updated">불러오는 중…</div>
     </div>
   </header>
 
+  <!-- 1. 이번 주 신호 -->
   <section class="card state" id="stateCard">
     <div class="badge" id="badge">-</div>
     <div class="action" id="action"></div>
     <div class="meta" id="meta"></div>
   </section>
 
+  <!-- 2. 점수 기준표 -->
   <section class="card">
-    <h2><span class="ico">🧮</span>이번 주 매매 금액 계산기</h2>
-    <label class="field">현재 QLD(또는 국내 2배 상품) 평가금액 (만원)</label>
-    <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
-    <label class="field">현재 보유 현금 (만원, 이전에 매도해 둔 돈)</label>
-    <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
-    <div class="result" id="calcResult">금액을 입력하면 이번 주에 사고팔 금액을 계산해 드립니다.</div>
+    <h2><span>🧭</span>점수 기준표 <span class="tag">점수 = 매도·매수 신호의 세기 (-100 ~ +100)</span></h2>
+    <div class="zonewrap">
+      <div class="marker"><span class="mlabel" id="mlabel">현재 -</span><span class="mtri" id="mtri"></span></div>
+      <div class="zonebar"><div class="z sell">매도</div><div class="z hold">관망</div><div class="z buy">매수</div></div>
+      <div class="zticks">
+        <span style="left:0%;transform:none">-100</span><span style="left:35%">-30</span><span style="left:50%">0</span><span style="left:100%;transform:translateX(-100%)">+100</span>
+      </div>
+    </div>
+    <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
+      <span class="d">보유한 QLD(또는 USD)의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 이 구간이 이어지면 <u>매주</u> 반복</span></div></div>
+    <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
+      <span class="d">아무것도 하지 않음 (매도도 매수도 없음)</span></div></div>
+    <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
+      <span class="d">매도로 쌓아 둔 현금의 <span class="amt">25%</span>를 매수 · 이 구간이 이어지면 <u>매주</u> 반복 (쌓인 현금이 없으면 할 일 없음)</span></div></div>
+    <div class="crit DCA"><div class="sym">●</div><div><b>매월 첫 거래일 → 적립식 매수(매월초)</b>
+      <span class="d">점수와 상관없이 적립금 전액을 그대로 매수합니다</span></div></div>
+    <details style="margin-top:12px">
+      <summary>점수는 어떻게 계산되나요?</summary>
+      <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2 × 100</b></div>
+      <div class="note">• <b>금리 점수</b>: 미국 10년물 금리가 최근 6개월 평균보다 높을수록 마이너스(매도 쪽), 낮을수록 플러스(매수 쪽)<br>
+        • <b>달러 점수</b>: 달러지수가 최근 100일 평균보다 강할수록 마이너스(매도 쪽), 약할수록 플러스(매수 쪽)<br>
+        각각 -100 ~ +100으로 제한한 뒤 평균을 냅니다. 금리가 오르고 달러가 강해지면 나스닥 같은 성장주에 불리하다는 이유로 만든 기준입니다.</div>
+      <div class="grid" style="margin-top:10px">
+        <div class="kv"><span>지금 금리 점수</span><b id="rates">-</b><span id="ratesNote"></span></div>
+        <div class="kv"><span>지금 달러 점수</span><b id="dxy">-</b><span id="dxyNote"></span></div>
+      </div>
+    </details>
+  </section>
+
+  <!-- 3. 이번 주 매매 금액 계산기 -->
+  <section class="card">
+    <h2><span>🧮</span>이번 주 얼마를 사고팔까요?</h2>
+    <div id="calcHold" class="hidden"></div>
+    <div id="calcSell" class="hidden">
+      <label class="field">지금 계좌에 있는 QLD(또는 국내 2배 상품)의 <b>평가금액</b> (만원)</label>
+      <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
+      <div class="help">증권사 앱에서 해당 종목의 <b>'평가금액'</b>(지금 팔면 받을 금액)을 적으세요. 이번 주는 <b>매도 신호</b>라서 이 금액의 5%를 팝니다. 현금은 입력하지 않아도 됩니다.</div>
+    </div>
+    <div id="calcBuy" class="hidden">
+      <label class="field">매도해서 모아 둔 <b>현금</b> (만원)</label>
+      <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
+      <div class="help">이전에 매도하고 아직 다시 사지 않은 <b>현금</b>을 적으세요. 이번 주는 <b>매수 신호</b>라서 그 현금의 25%를 삽니다. 평가금액은 입력하지 않아도 됩니다.</div>
+    </div>
+    <div class="result" id="calcResult"></div>
     <div class="note">입력한 금액은 이 기기의 브라우저에만 저장되고, 서버로 전송되지 않습니다.</div>
   </section>
 
+  <!-- 4. 매매 기록 -->
   <section class="card">
-    <h2><span class="ico">✅</span>매월 적립 체크리스트</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:6px">신호와 관계없이 매월 첫 거래일에 적립금을 전액 매수했는지 기록합니다.</div>
-    <div id="checklist"></div>
-    <div class="note">체크 상태는 이 기기에만 저장됩니다 (최근 6개월 표시).</div>
+    <h2><span>📒</span>매매 기록</h2>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">날짜와 금액을 넣으면 그날 종가로 몇 주를 얼마에 샀는지 자동 계산해서 쌓아 둡니다.</div>
+    <div class="form-row">
+      <div><label class="field" style="margin-top:0">날짜</label><input type="date" id="logDate"></div>
+      <div><label class="field" style="margin-top:0">금액 (만원)</label><input type="number" id="logAmt" inputmode="decimal" placeholder="예: 100"></div>
+    </div>
+    <div class="form-row" style="margin-top:2px">
+      <div><label class="field">종목</label><select id="logTk"><option value="QLD">QLD</option><option value="USD">USD (반도체 2배)</option></select></div>
+      <div><label class="field">구분</label><select id="logType"><option value="buy">매수</option><option value="sell">매도</option></select></div>
+    </div>
+    <button id="logAdd" style="margin-top:12px">기록 추가</button>
+    <div class="note" id="logMsg"></div>
+    <div class="summary hidden" id="logSummary"></div>
+    <div id="logList"></div>
+    <div class="grid" style="margin-top:10px"><button class="secondary hidden" id="logCsv">기록 복사 (백업)</button><button class="secondary hidden" id="logClear">전체 삭제</button></div>
+    <div class="note">기록은 이 기기에만 저장됩니다. 앱을 지우거나 브라우저 데이터를 지우면 사라지니 가끔 "기록 복사"로 백업해 두세요. 종가는 미국 장 마감 기준이며, 휴장일·주말은 직전 거래일 종가를 씁니다. 주식 분할이 반영된 가격입니다.</div>
   </section>
 
+  <!-- 5. 차트 -->
   <section class="card">
-    <h2><span class="ico">📈</span>나스닥100 · QLD 가격 (최근 3년)</h2>
-    <svg id="priceChart" viewBox="0 0 520 220" role="img" aria-label="나스닥100과 QLD 가격 추이"></svg>
-    <div class="legend">
-      <span><i class="sw" style="background:var(--qld)"></i>QLD (시작=100)</span>
-      <span><i class="sw" style="background:var(--ndx)"></i>나스닥100 (시작=100)</span>
+    <h2><span>📈</span>추이 차트</h2>
+    <div class="range">
+      <select id="yFrom" aria-label="시작 연도"></select><span class="tilde">~</span><select id="yTo" aria-label="끝 연도"></select>
     </div>
+    <div class="seg" id="quick">
+      <button data-y="1">1년</button><button data-y="3" class="on">3년</button><button data-y="5">5년</button><button data-y="10">10년</button>
+    </div>
+
+    <h3>① 점수 (매도 -30 이하 · 매수 0 이상)</h3>
+    <div class="chartwrap" id="wrapScore"><svg id="chartScore" viewBox="0 0 360 318" role="img" aria-label="점수 추이 차트"></svg><div class="tip hidden" id="tipScore"></div></div>
+    <div class="legend"><span><i class="sw" style="background:var(--zone-buy);border:1px solid var(--buy)"></i>매수 구간(0 이상)</span><span><i class="sw" style="background:var(--zone-sell);border:1px solid var(--sell)"></i>매도 구간(-30 이하)</span></div>
+
+    <h3 style="display:flex;align-items:center">② 가격 (시작일 = 100)
+      <span class="toggle" id="scaleToggle"><button data-s="lin">보통</button><button data-s="log" class="on">로그</button></span></h3>
+    <div class="chartwrap" id="wrapPrice"><svg id="chartPrice" viewBox="0 0 360 338" role="img" aria-label="QLD와 USD 가격 추이 차트"></svg><div class="tip hidden" id="tipPrice"></div></div>
+    <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD (반도체 2배)</span></div>
+    <div class="note" id="scaleNote">로그 눈금은 2배 오를 때마다 같은 간격으로 그려서, 오래 오른 종목도 한 화면에 비교됩니다.</div>
     <div class="grid" style="margin-top:12px">
-      <div class="kv"><span>나스닥100 지수</span><b id="ndxNow">-</b></div>
-      <div class="kv"><span>QLD 가격</span><b id="qldNow">-</b></div>
+      <div class="kv"><span>QLD 지금 가격</span><b id="qldNow">-</b><span id="qldDD"></span></div>
+      <div class="kv"><span>USD 지금 가격</span><b id="usdNow">-</b><span id="usdDD"></span></div>
     </div>
   </section>
 
+  <!-- 6. 변경 기록 -->
   <section class="card">
-    <h2><span class="ico">📊</span>점수 (금리 + 달러) ÷ 2</h2>
-    <div class="gauge" id="gauge">
-      <div class="bar"></div>
-      <div class="tick" style="left:35%"></div>
-      <div class="tick" style="left:50%"></div>
-      <div class="dot" id="dot" style="left:50%"></div>
-    </div>
-    <div class="scale"><span>-1 (나쁨)</span><span>매도 -0.30 · 재매수 0</span><span>+1 (좋음)</span></div>
-    <div class="grid" style="margin-top:12px">
-      <div class="kv"><span>금리 점수</span><b id="rates">-</b><span id="ratesNote"></span></div>
-      <div class="kv"><span>달러 점수</span><b id="dxy">-</b><span id="dxyNote"></span></div>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2><span class="ico">🕒</span>최근 3년 점수</h2>
-    <svg id="chart" viewBox="0 0 520 200" role="img" aria-label="최근 3년 점수 추이"></svg>
-    <div class="note">위쪽 초록 영역은 재매수(0 이상), 아래쪽 주황 영역은 매도(-0.30 이하) 구간입니다.</div>
-  </section>
-
-  <section class="card">
-    <h2><span class="ico">📜</span>신호가 바뀐 기록</h2>
+    <h2><span>📜</span>신호가 바뀐 기록</h2>
     <ul class="changes" id="changes"></ul>
   </section>
 
+  <!-- 7. 과거 성과 -->
   <section class="card">
-    <h2><span class="ico">🗂️</span>과거 시뮬레이션 성과 요약<span class="tag">참고용</span></h2>
-    <div class="note" style="margin-top:-4px">QLD, 매달 100만원 적립 기준 (세금·수수료는 가정에 따라 다를 수 있음)</div>
+    <h2><span>🗂️</span>과거 시뮬레이션 성과 요약<span class="tag">참고용</span></h2>
+    <div class="note" style="margin-top:-4px">QLD, 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b></div>
     <table class="perf-table">
-      <tr><th>기간</th><th>월초 매수만</th><th>이 규칙 적용</th><th>최대 하락폭</th></tr>
+      <tr><th>기간</th><th>적립식 매수(매월초)</th><th>이 규칙 적용</th><th>최대 하락폭</th></tr>
       <tr><td>2008~2025</td><td>연 25.1%</td><td class="hi">연 27.5%</td><td>-80% → -66%</td></tr>
       <tr><td>2000~2025</td><td>연 16.8%</td><td class="hi">연 18.8%</td><td>-99% → -97%</td></tr>
       <tr><td>2026 (1~10월)</td><td>+38.8%</td><td>+29.5%</td><td>-23% → -23%</td></tr>
     </table>
-    <div class="note">이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 월초 매수보다 낮았습니다 (예: 2013년 -10%p, 2017년 -18%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다.</div>
+    <div class="note">이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 적립식 매수(매월초)보다 낮았습니다 (예: 2013년 -10%p, 2017년 -18%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다.</div>
   </section>
 
+  <!-- 8. 알림 -->
   <section class="card">
-    <details>
-      <summary>운용 규칙</summary>
-      <table class="rule">
-        <tr><td>매월 첫 거래일</td><td>적립금 전액 매수 (신호와 관계없음)</td></tr>
-        <tr><td>점수 ≤ -0.30</td><td>다음 거래일에 보유분의 5% 매도, 현금 보관 (매주 반복)</td></tr>
-        <tr><td>점수 ≥ 0</td><td>매도로 쌓인 현금의 25% 재매수 (매주 반복)</td></tr>
-        <tr><td>그 사이</td><td>아무것도 하지 않음</td></tr>
-        <tr><td>금리 점수</td><td>-(10년물 금리 - 최근 126거래일 평균) ÷ 0.5, -1~+1</td></tr>
-        <tr><td>달러 점수</td><td>-(달러지수 ÷ 최근 100거래일 평균 - 1) ÷ 3%, -1~+1</td></tr>
-      </table>
-    </details>
-  </section>
-
-  <section class="card">
-    <h2><span class="ico">🔔</span>알림</h2>
+    <h2><span>🔔</span>알림</h2>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">매주 월요일 아침(한국 시간 8시)에 이번 주 신호가 도착합니다.</div>
     <div id="iosHint" class="note hidden">아이폰은 먼저 Safari의 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 홈 화면의 앱을 열어서 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
-      <div class="note">아래 코드를 복사해 GitHub 저장소의 Secrets에 <b>PUSH_SUBSCRIPTIONS</b>라는 이름으로 넣으면 매주 토요일 아침에 알림이 옵니다.</div>
+      <div class="note">아래 코드를 복사해 GitHub 저장소의 Secrets에 <b>PUSH_SUBSCRIPTIONS</b>라는 이름으로 넣으면 알림이 옵니다.</div>
       <textarea id="subText" readonly></textarea>
       <button class="secondary" id="copyBtn">코드 복사</button>
     </div>
@@ -202,184 +277,357 @@
 <script src="config.js"></script>
 <script>
 const $ = (id) => document.getElementById(id);
-const fmt = (x) => (x >= 0 ? "+" : "") + Number(x).toFixed(2);
-const won = (x) => Math.round(x).toLocaleString("ko-KR");
+const css = () => getComputedStyle(document.documentElement);
+const cv = (v) => css().getPropertyValue(v).trim();
+const man = (x) => Math.round(x).toLocaleString("ko-KR");
+const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
+const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
+const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
+
+let D = null;           // data.json
+let PR = null;          // prices.json: {dates:[], qld:[], usd:[], krw:[]}
+let range = { start: null, end: null };
+let scale = "log";
+
+/* ---------- 점수 표시: 항상 정수(×100). 기준선 근처에서도 신호 상태와 어긋나지 않게 맞춤 ---------- */
+function stateOf(raw) { return raw <= D.threshold ? "SELL" : (raw >= D.buy_level ? "BUY" : "HOLD"); }
+function disp(raw) {
+  let d = Math.round(raw * D.scale);
+  const st = stateOf(raw);
+  if (st === "SELL") d = Math.min(d, SELL_AT);
+  else if (st === "BUY") d = Math.max(d, BUY_AT);
+  else d = Math.max(SELL_AT + 1, Math.min(-1, d));
+  return d;
+}
+const sgn = (d) => (d > 0 ? "+" + d : String(d));
 
 async function load() {
   try {
-    const res = await fetch("data.json?ts=" + Date.now(), { cache: "no-store" });
-    const d = await res.json();
-    render(d);
+    const [r1, r2] = await Promise.all([fetch("data.json?ts=" + Date.now(), { cache: "no-store" }), fetch("prices.json?ts=" + Date.now(), { cache: "no-store" })]);
+    D = await r1.json();
+    const p = await r2.json();
+    PR = { dates: p.rows.map((r) => r[0]), qld: p.rows.map((r) => r[1]), usd: p.rows.map((r) => r[2]), krw: p.rows.map((r) => r[3]), updated: p.updated };
+    init();
   } catch (e) {
     $("updated").textContent = "데이터를 불러오지 못했습니다. 잠시 후 다시 열어 주세요.";
   }
 }
 
-function render(d) {
-  const up = new Date(d.updated);
+function init() {
+  renderState();
+  renderCalc();
+  initRange();
+  renderCharts();
+  renderChanges();
+  initLog();
+}
+
+/* ---------- 1·2. 신호 카드 + 기준표 ---------- */
+function renderState() {
+  const d = D, up = new Date(d.updated);
   $("updated").textContent = `기준일 ${d.asof} (미국 종가) · 갱신 ${up.toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" })}`;
-  const card = $("stateCard");
-  card.className = "card state " + d.state;
+  $("stateCard").className = "card state " + d.state;
   $("badge").textContent = d.state_kr;
   const acts = {
     SELL: `다음 거래일에 보유분의 ${d.sell_pct}%를 매도해 현금으로 보관하세요.`,
     BUY: `매도로 쌓인 현금이 있으면 그 ${d.buy_pct}%를 매수하세요. 현금이 없으면 할 일이 없습니다.`,
-    HOLD: "이번 주는 매도도 재매수도 하지 않습니다.",
+    HOLD: "이번 주는 매도도 매수도 하지 않습니다.",
   };
   $("action").textContent = acts[d.state];
   const changed = d.prev_state_kr !== d.state_kr ? ` · 지난주 ${d.prev_state_kr}에서 바뀜` : "";
-  $("meta").textContent = `${d.state_kr} ${d.run}주째 · 점수 ${fmt(d.score)} (지난주 ${fmt(d.prev_score)})${changed} · 월 적립은 매월 첫 거래일 전액 매수`;
-  $("dot").style.left = ((d.score + 1) / 2 * 100) + "%";
-  $("rates").textContent = fmt(d.rates);
-  $("ratesNote").textContent = `10년물 ${d.y10.toFixed(2)}% (평균 ${d.y10_mean.toFixed(2)}%)`;
-  $("dxy").textContent = fmt(d.dxy);
-  $("dxyNote").textContent = `달러지수 ${d.dxy_lvl.toFixed(1)} (평균 ${d.dxy_mean.toFixed(1)})`;
-  $("ndxNow").textContent = d.ndx_now.toLocaleString("ko-KR");
-  $("qldNow").textContent = "$" + d.qld_now.toFixed(2);
-  drawChart(d);
-  drawPriceChart(d);
-  const ul = $("changes");
-  ul.innerHTML = "";
-  (d.changes.length ? d.changes.slice(0, 12) : [{ d: "-", from: "", to: "최근 3년 변경 없음", s: "" }]).forEach((c) => {
-    const li = document.createElement("li");
-    li.innerHTML = `<span>${c.d}</span><span>${c.from ? c.from + " → " : ""}<b>${c.to}</b>${c.s !== "" ? " (" + fmt(c.s) + ")" : ""}</span>`;
-    ul.appendChild(li);
+  $("meta").textContent = `${d.state_kr} ${d.run}주째 · 점수 ${sgn(disp(d.score))} (지난주 ${sgn(Math.round(d.prev_score * d.scale))})${changed} · 적립식 매수(매월초)는 신호와 관계없이 그대로`;
+
+  const pos = (Math.max(-100, Math.min(100, disp(d.score))) + 100) / 2;
+  $("mlabel").style.left = Math.min(86, Math.max(14, pos)) + "%";
+  $("mlabel").textContent = "현재 " + sgn(disp(d.score));
+  $("mtri").style.left = pos + "%";
+  ["SELL", "HOLD", "BUY"].forEach((s) => {
+    const el = $("crit" + s);
+    el.classList.toggle("now", s === d.state);
+    el.querySelector(".nowtag").classList.toggle("hidden", s !== d.state);
   });
-  runCalculator(d);
+  $("rates").textContent = sgn(Math.round(d.rates * d.scale));
+  $("ratesNote").textContent = `10년물 ${d.y10.toFixed(2)}% / 6개월 평균 ${d.y10_mean.toFixed(2)}% → ${d.y10 > d.y10_mean ? "평균보다 높음(매도 쪽)" : "평균보다 낮음(매수 쪽)"}`;
+  $("dxy").textContent = sgn(Math.round(d.dxy * d.scale));
+  $("dxyNote").textContent = `달러지수 ${d.dxy_lvl.toFixed(1)} / 100일 평균 ${d.dxy_mean.toFixed(1)} → ${d.dxy_lvl > d.dxy_mean ? "평균보다 강함(매도 쪽)" : "평균보다 약함(매수 쪽)"}`;
 }
 
-function drawChart(d) {
-  const W = 520, H = 200, L = 34, R = 8, T = 10, B = 24;
-  const h = d.history, n = h.length;
-  const x = (i) => L + (W - L - R) * i / Math.max(1, n - 1);
-  const y = (v) => T + (H - T - B) * (1 - (v + 1) / 2);
-  const css = getComputedStyle(document.documentElement);
-  const c = (v) => css.getPropertyValue(v).trim();
-  let s = `<rect x="${L}" y="${y(1)}" width="${W - L - R}" height="${y(0) - y(1)}" fill="${c("--zone-buy")}"/>`;
-  s += `<rect x="${L}" y="${y(d.threshold)}" width="${W - L - R}" height="${y(-1) - y(d.threshold)}" fill="${c("--zone-sell")}"/>`;
-  [1, 0, d.threshold, -1].forEach((v) => {
-    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${c("--line")}"/>`;
-    s += `<text x="${L - 4}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${c("--muted")}">${v === d.threshold ? v.toFixed(2) : v}</text>`;
-  });
-  let path = h.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p.s).toFixed(1)).join(" ");
-  s += `<path d="${path}" fill="none" stroke="${c("--accent")}" stroke-width="2"/>`;
-  s += `<circle cx="${x(n - 1)}" cy="${y(h[n - 1].s)}" r="5" fill="${c("--accent")}"/>`;
-  const years = {};
-  h.forEach((p, i) => { const yr = p.d.slice(0, 4); if (!(yr in years)) years[yr] = i; });
-  Object.entries(years).forEach(([yr, i]) => {
-    if (i > 2) s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${c("--muted")}">${yr}</text>`;
-  });
-  $("chart").innerHTML = s;
-}
-
-function drawPriceChart(d) {
-  const W = 520, H = 220, L = 38, R = 8, T = 10, B = 24;
-  const h = d.price_history;
-  if (!h || !h.length) { $("priceChart").innerHTML = ""; return; }
-  const n = h.length;
-  const vals = h.flatMap((p) => [p.n, p.q]);
-  const vMin = Math.min(100, ...vals), vMax = Math.max(...vals);
-  const pad = (vMax - vMin) * 0.08 || 10;
-  const lo = vMin - pad, hi = vMax + pad;
-  const x = (i) => L + (W - L - R) * i / Math.max(1, n - 1);
-  const y = (v) => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
-  const css = getComputedStyle(document.documentElement);
-  const c = (v) => css.getPropertyValue(v).trim();
-  let s = "";
-  [100, vMax].forEach((v) => {
-    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${c("--line")}"/>`;
-    s += `<text x="${L - 4}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${c("--muted")}">${Math.round(v)}</text>`;
-  });
-  const pathOf = (key) => h.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p[key]).toFixed(1)).join(" ");
-  s += `<path d="${pathOf("n")}" fill="none" stroke="${c("--ndx")}" stroke-width="2"/>`;
-  s += `<path d="${pathOf("q")}" fill="none" stroke="${c("--qld")}" stroke-width="2.5"/>`;
-  s += `<circle cx="${x(n - 1)}" cy="${y(h[n - 1].q)}" r="5" fill="${c("--qld")}"/>`;
-  const years = {};
-  h.forEach((p, i) => { const yr = p.d.slice(0, 4); if (!(yr in years)) years[yr] = i; });
-  Object.entries(years).forEach(([yr, i]) => {
-    if (i > 2) s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${c("--muted")}">${yr}</text>`;
-  });
-  $("priceChart").innerHTML = s;
-}
-
-// ---- 1. trade amount calculator (per-device only, localStorage)
-let lastSignal = null;
-function runCalculator(d) {
-  lastSignal = d;
+/* ---------- 3. 계산기 ---------- */
+function renderCalc() {
+  const st = D.state;
+  $("calcSell").classList.toggle("hidden", st !== "SELL");
+  $("calcBuy").classList.toggle("hidden", st !== "BUY");
   try {
-    const saved = JSON.parse(localStorage.getItem("calc") || "{}");
-    if (saved.holding != null) $("calcHolding").value = saved.holding;
-    if (saved.cash != null) $("calcCash").value = saved.cash;
+    const s = JSON.parse(localStorage.getItem("calc2") || "{}");
+    if (s.holding != null) $("calcHolding").value = s.holding;
+    if (s.cash != null) $("calcCash").value = s.cash;
   } catch (_) {}
   updateCalc();
 }
 function updateCalc() {
-  const holding = parseFloat($("calcHolding").value), cash = parseFloat($("calcCash").value);
-  try { localStorage.setItem("calc", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
-  const box = $("calcResult");
-  if (!lastSignal || isNaN(holding) && isNaN(cash)) { box.textContent = "금액을 입력하면 이번 주에 사고팔 금액을 계산해 드립니다."; return; }
-  const h = isNaN(holding) ? 0 : holding, c = isNaN(cash) ? 0 : cash;
-  if (lastSignal.state === "SELL") {
-    const amt = h * lastSignal.sell_pct / 100;
-    box.innerHTML = `이번 주 <b style="color:var(--sell)">${won(amt)}만원</b> 매도 (보유금액의 ${lastSignal.sell_pct}%)<br>매도 후 예상 보유 ${won(h - amt)}만원, 현금 ${won(c + amt)}만원`;
-  } else if (lastSignal.state === "BUY") {
-    const amt = c * lastSignal.buy_pct / 100;
-    box.innerHTML = c > 0
-      ? `이번 주 <b style="color:var(--buy)">${won(amt)}만원</b> 재매수 (현금의 ${lastSignal.buy_pct}%)<br>재매수 후 예상 보유 ${won(h + amt)}만원, 현금 ${won(c - amt)}만원`
-      : `재매수 신호지만 쌓인 현금이 없어 할 일이 없습니다. (월 적립금은 평소대로 매수)`;
+  const box = $("calcResult"), st = D.state;
+  try { localStorage.setItem("calc2", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
+  if (st === "HOLD") { box.innerHTML = "이번 주는 <b>관망</b> 구간이라 사고팔 금액이 없습니다."; return; }
+  if (st === "SELL") {
+    const h = parseFloat($("calcHolding").value);
+    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 입력하면 이번 주 <b>매도할 금액</b>을 계산해 드려요."; return; }
+    const amt = h * D.sell_pct / 100;
+    box.innerHTML = `이번 주 <b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% = ${man(amt)}만원 → 매도 후 남는 평가금액 ${man(h - amt)}만원</div>`;
   } else {
-    box.textContent = "관망 구간입니다. 이번 주는 매도도 재매수도 하지 않습니다.";
+    const c = parseFloat($("calcCash").value);
+    if (isNaN(c) || c <= 0) { box.innerHTML = "모아 둔 현금을 입력하면 이번 주 <b>매수할 금액</b>을 계산해 드려요.<div class='formula'>현금이 없다면 이번 주는 할 일이 없습니다.</div>"; return; }
+    const amt = c * D.buy_pct / 100;
+    box.innerHTML = `이번 주 <b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% = ${man(amt)}만원 → 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
   }
 }
-$("calcHolding").addEventListener("input", updateCalc);
-$("calcCash").addEventListener("input", updateCalc);
+$("calcHolding").addEventListener("input", () => D && updateCalc());
+$("calcCash").addEventListener("input", () => D && updateCalc());
 
-// ---- 2. monthly DCA checklist (per-device only, localStorage)
-function monthKey(offset) {
-  const now = new Date(); now.setMonth(now.getMonth() - offset);
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+/* ---------- 5. 차트 공통 ---------- */
+function initRange() {
+  const years = [...new Set(D.history.map((p) => +p.d.slice(0, 4)))];
+  const y0 = Math.max(years[0], +D.asof.slice(0, 4) - 9), y1 = +D.asof.slice(0, 4);
+  const opts = (sel) => { sel.innerHTML = ""; for (let y = y1; y >= y0; y--) { const o = document.createElement("option"); o.value = y; o.textContent = y + "년"; sel.appendChild(o); } };
+  opts($("yFrom")); opts($("yTo"));
+  setQuick(3);
+  $("yFrom").addEventListener("change", fromSelect);
+  $("yTo").addEventListener("change", fromSelect);
+  $("quick").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setQuick(+b.dataset.y); });
+  $("scaleToggle").addEventListener("click", (e) => { const b = e.target.closest("button"); if (!b) return; scale = b.dataset.s; [...$("scaleToggle").children].forEach((x) => x.classList.toggle("on", x === b)); renderCharts(); });
 }
-function renderChecklist() {
-  let store = {};
-  try { store = JSON.parse(localStorage.getItem("dcaChecklist") || "{}"); } catch (_) {}
-  const box = $("checklist");
-  box.innerHTML = "";
-  for (let i = 0; i < 6; i++) {
-    const key = monthKey(i);
-    const [y, m] = key.split("-");
-    const row = document.createElement("div");
-    row.className = "checklist";
-    const checked = !!store[key];
-    row.innerHTML = `<input type="checkbox" id="m_${key}" ${checked ? "checked" : ""}>
-      <div class="m"><b>${y}년 ${parseInt(m)}월</b><span>${i === 0 ? "이번 달" : i + "개월 전"} 적립 매수</span></div>`;
-    box.appendChild(row);
-    row.querySelector("input").addEventListener("change", (e) => {
-      let s = {};
-      try { s = JSON.parse(localStorage.getItem("dcaChecklist") || "{}"); } catch (_) {}
-      s[key] = e.target.checked;
-      localStorage.setItem("dcaChecklist", JSON.stringify(s));
+function setQuick(n) {
+  const end = new Date(D.asof + "T00:00:00");
+  const start = new Date(end); start.setFullYear(start.getFullYear() - n);
+  range = { start: start.toISOString().slice(0, 10), end: D.asof };
+  $("yFrom").value = Math.max(start.getFullYear(), +$("yFrom").options[$("yFrom").options.length - 1].value);
+  $("yTo").value = end.getFullYear();
+  [...$("quick").children].forEach((b) => b.classList.toggle("on", +b.dataset.y === n));
+  if (D) renderCharts();
+}
+function fromSelect() {
+  let a = +$("yFrom").value, b = +$("yTo").value;
+  if (a > b) { [a, b] = [b, a]; $("yFrom").value = a; $("yTo").value = b; }
+  range = { start: a + "-01-01", end: b + "-12-31" };
+  [...$("quick").children].forEach((x) => x.classList.remove("on"));
+  renderCharts();
+}
+function rows() { return D.history.filter((p) => p.d >= range.start && p.d <= range.end); }
+
+function niceTicks(lo, hi, n) {
+  const span = hi - lo, raw = span / n, mag = Math.pow(10, Math.floor(Math.log10(raw)));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw) || raw;
+  const out = []; for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(6));
+  return out;
+}
+function xAxis(h, x, W, H, L, R, B, withVGrid, T) {
+  let s = "";
+  const first = {}; h.forEach((p, i) => { const k = p.d.slice(0, 4); if (!(k in first)) first[k] = i; });
+  const short = h.length < 110; // 약 2년 미만이면 분기 눈금
+  if (!short) {
+    Object.entries(first).forEach(([yr, i]) => {
+      if (i === 0) return;
+      if (withVGrid) s += `<line x1="${x(i)}" x2="${x(i)}" y1="${T}" y2="${H - B}" stroke="${cv("--line")}" stroke-dasharray="3 4"/>`;
+      s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${cv("--muted")}">${yr}</text>`;
     });
+  } else {
+    let lastQ = "";
+    h.forEach((p, i) => { const m = +p.d.slice(5, 7), q = p.d.slice(0, 4) + "-" + (Math.floor((m - 1) / 3)); if (q !== lastQ && m % 3 === 1 && i > 0) { lastQ = q;
+      if (withVGrid) s += `<line x1="${x(i)}" x2="${x(i)}" y1="${T}" y2="${H - B}" stroke="${cv("--line")}" stroke-dasharray="3 4"/>`;
+      s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${cv("--muted")}">${p.d.slice(2, 4)}.${p.d.slice(5, 7)}</text>`; } });
   }
+  return s;
 }
-renderChecklist();
+function attachHover(svgId, wrapId, tipId, h, x, yBox, render) {
+  const svg = $(svgId), wrap = $(wrapId), tip = $(tipId);
+  const move = (ev) => {
+    const r = svg.getBoundingClientRect(), vx = (ev.clientX - r.left) / r.width * CW;
+    let best = 0, bd = 1e9; h.forEach((p, i) => { const dd = Math.abs(x(i) - vx); if (dd < bd) { bd = dd; best = i; } });
+    const g = svg.querySelector(".hov"); if (g) g.remove();
+    const gg = document.createElementNS("http://www.w3.org/2000/svg", "g"); gg.setAttribute("class", "hov");
+    gg.innerHTML = `<line x1="${x(best)}" x2="${x(best)}" y1="${yBox[0]}" y2="${yBox[1]}" stroke="${cv("--text")}" stroke-opacity=".45"/>` + render.dots(best);
+    svg.appendChild(gg);
+    tip.innerHTML = render.tip(best); tip.classList.remove("hidden");
+    const tw = tip.offsetWidth, px = x(best) / CW * r.width;
+    tip.style.left = Math.max(0, Math.min(r.width - tw, px - tw / 2)) + "px";
+  };
+  const leave = () => { tip.classList.add("hidden"); const g = svg.querySelector(".hov"); if (g) g.remove(); };
+  svg.onpointermove = move; svg.onpointerdown = move; svg.onpointerleave = leave;
+}
 
-// ---- push notifications
+function renderCharts() { if (D) { drawScore(); drawPrice(); } }
+
+/* ---------- ① 점수 차트 ---------- */
+function drawScore() {
+  const h = rows(); if (h.length < 2) return;
+  const W = CW, H = 318, L = 38, R = 8, T = 68, B = 26, n = h.length;
+  const x = (i) => L + (W - L - R) * i / (n - 1);
+  const y = (v) => T + (H - T - B) * (1 - (v + 100) / 200);
+  const S = h.map((p) => p.s * 100);
+  let s = `<rect x="${L}" y="${y(100)}" width="${W - L - R}" height="${y(0) - y(100)}" fill="${cv("--zone-buy")}"/>`;
+  s += `<rect x="${L}" y="${y(SELL_AT)}" width="${W - L - R}" height="${y(-100) - y(SELL_AT)}" fill="${cv("--zone-sell")}"/>`;
+  [-100, -50, 50, 100].forEach((v) => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${cv("--line")}" stroke-dasharray="3 4"/>`;
+    s += `<text x="${L - 5}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${cv("--muted")}">${v > 0 ? "+" + v : v}</text>`;
+  });
+  s += `<line x1="${L}" x2="${W - R}" y1="${y(0)}" y2="${y(0)}" stroke="${cv("--buy")}" stroke-width="1.6"/>`;
+  s += `<text x="${L - 5}" y="${y(0) + 4}" font-size="11" font-weight="700" text-anchor="end" fill="${cv("--buy")}">0</text>`;
+  s += `<line x1="${L}" x2="${W - R}" y1="${y(SELL_AT)}" y2="${y(SELL_AT)}" stroke="${cv("--sell")}" stroke-width="1.6"/>`;
+  s += `<text x="${L - 5}" y="${y(SELL_AT) + 4}" font-size="11" font-weight="700" text-anchor="end" fill="${cv("--sell")}">-30</text>`;
+  s += xAxis(h, x, W, H, L, R, B, true, T);
+  s += `<path d="${S.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ")}" fill="none" stroke="${cv("--accent")}" stroke-width="2"/>`;
+  const iMax = S.indexOf(Math.max(...S)), iMin = S.indexOf(Math.min(...S)), cur = S[n - 1], mx = S[iMax], mn = S[iMin];
+  s += `<circle cx="${x(iMax)}" cy="${y(mx)}" r="4.5" fill="${cv("--peak")}" stroke="${cv("--card")}" stroke-width="2"/>`;
+  s += `<circle cx="${x(n - 1)}" cy="${y(cur)}" r="5" fill="${cv("--accent")}" stroke="${cv("--card")}" stroke-width="2"/>`;
+  const dc = disp(h[n - 1].s), dmx = Math.round(mx), pos = mx === mn ? 0 : (cur - mn) / (mx - mn) * 100;
+  const lines = [`기간 최고 ${sgn(dmx)} (${h[iMax].d})`, `현재 ${sgn(dc)} → 최고점보다 ${Math.round(mx - cur)}점 낮음`, `기간 최저~최고 범위 중 현재 위치 ${pos.toFixed(0)}%`];
+  const bw = 226, bh = 54, bx = L, by = 6;
+  s += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="8" fill="${cv("--card")}" fill-opacity=".92" stroke="${cv("--line")}"/>`;
+  lines.forEach((t, i) => { s += `<text x="${bx + 8}" y="${by + 16 + i * 15}" font-size="11" fill="${i === 0 ? cv("--peak") : cv("--text")}" font-weight="${i === 1 ? 700 : 500}">${t}</text>`; });
+  $("chartScore").innerHTML = s;
+  attachHover("chartScore", "wrapScore", "tipScore", h, x, [T, H - B], {
+    dots: (i) => `<circle cx="${x(i)}" cy="${y(S[i])}" r="5" fill="${cv("--accent")}" stroke="${cv("--card")}" stroke-width="2"/>`,
+    tip: (i) => `${h[i].d}<br><b>점수 ${sgn(disp(h[i].s))}</b> · ${({ SELL: "매도", BUY: "매수", HOLD: "관망" })[stateOf(h[i].s)]}`,
+  });
+}
+
+/* ---------- ② 가격 차트 (QLD, USD) ---------- */
+function drawPrice() {
+  const h = rows(); if (h.length < 2) return;
+  const W = CW, H = 338, L = 42, R = 8, T = 68, B = 26, n = h.length;
+  const q = h.map((p) => p.q / h[0].q * 100), u = h.map((p) => p.u / h[0].u * 100);
+  const all = q.concat(u), lo = Math.min(...all), hi = Math.max(...all);
+  const x = (i) => L + (W - L - R) * i / (n - 1);
+  const lg = scale === "log";
+  const tr = (v) => (lg ? Math.log(v) : v);
+  const a = lg ? tr(Math.min(lo, 100) * 0.9) : Math.min(lo, 100) - (hi - lo) * 0.05, b = lg ? tr(hi * 1.1) : hi + (hi - lo) * 0.08;
+  const y = (v) => T + (H - T - B) * (1 - (tr(v) - a) / (b - a));
+  let s = "";
+  let ticks;
+  if (lg) { ticks = []; for (let e = -1; e <= 6; e++) [1, 2, 5].forEach((m) => { const v = m * Math.pow(10, e); if (v >= Math.min(lo, 100) * 0.9 && v <= hi * 1.1) ticks.push(v); }); }
+  else ticks = niceTicks(Math.min(lo, 100), hi, 5);
+  ticks.forEach((v) => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${v === 100 ? cv("--muted") : cv("--line")}" stroke-dasharray="${v === 100 ? "" : "3 4"}"/>`;
+    s += `<text x="${L - 5}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${cv("--muted")}">${Math.round(v).toLocaleString("ko-KR")}</text>`;
+  });
+  s += xAxis(h, x, W, H, L, R, B, true, T);
+  const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+  s += `<path d="${path(u)}" fill="none" stroke="${cv("--usd")}" stroke-width="2"/>`;
+  s += `<path d="${path(q)}" fill="none" stroke="${cv("--qld")}" stroke-width="2.4"/>`;
+  const info = {};
+  [["QLD", q, "--qld"], ["USD", u, "--usd"]].forEach(([nm, arr, col]) => {
+    const pk = Math.max(...arr), ip = arr.indexOf(pk), cur = arr[n - 1], dd = (cur / pk - 1) * 100;
+    info[nm] = { dd, pk, ip };
+    s += `<circle cx="${x(ip)}" cy="${y(pk)}" r="4" fill="${cv(col)}" stroke="${cv("--card")}" stroke-width="2"/>`;
+    s += `<circle cx="${x(n - 1)}" cy="${y(cur)}" r="5" fill="${cv(col)}" stroke="${cv("--card")}" stroke-width="2"/>`;
+  });
+  const bx = L, by = 6, bw = 238, bh = 54;
+  s += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="8" fill="${cv("--card")}" fill-opacity=".92" stroke="${cv("--line")}"/>`;
+  s += `<text x="${bx + 8}" y="${by + 16}" font-size="11" fill="${cv("--muted")}">기간 내 고점 대비 현재 (● = 고점)</text>`;
+  s += `<text x="${bx + 8}" y="${by + 31}" font-size="12" font-weight="700" fill="${cv("--qld")}">QLD ${pct(info.QLD.dd)}  (고점 ${h[info.QLD.ip].d})</text>`;
+  s += `<text x="${bx + 8}" y="${by + 45}" font-size="12" font-weight="700" fill="${cv("--usd")}">USD ${pct(info.USD.dd)}  (고점 ${h[info.USD.ip].d})</text>`;
+  $("chartPrice").innerHTML = s;
+  $("scaleNote").textContent = lg ? "로그 눈금은 2배 오를 때마다 같은 간격으로 그려서, 오래 오른 종목도 한 화면에 비교됩니다." : "보통 눈금: 같은 숫자 차이가 같은 간격입니다. 기간이 길면 한쪽이 눌려 보일 수 있어요.";
+  $("qldNow").textContent = "$" + D.qld_now.toFixed(2);
+  $("usdNow").textContent = "$" + D.usd_now.toFixed(2);
+  $("qldDD").textContent = `기간 고점 대비 ${pct(info.QLD.dd)}`;
+  $("usdDD").textContent = `기간 고점 대비 ${pct(info.USD.dd)}`;
+  attachHover("chartPrice", "wrapPrice", "tipPrice", h, x, [T, H - B], {
+    dots: (i) => `<circle cx="${x(i)}" cy="${y(q[i])}" r="4.5" fill="${cv("--qld")}" stroke="${cv("--card")}" stroke-width="2"/><circle cx="${x(i)}" cy="${y(u[i])}" r="4.5" fill="${cv("--usd")}" stroke="${cv("--card")}" stroke-width="2"/>`,
+    tip: (i) => `${h[i].d}<br><span style="color:var(--qld)">●</span> QLD <b>${q[i].toFixed(0)}</b> ($${h[i].q.toFixed(2)})<br><span style="color:var(--usd)">●</span> USD <b>${u[i].toFixed(0)}</b> ($${h[i].u.toFixed(2)})`,
+  });
+}
+
+/* ---------- 변경 기록 ---------- */
+function renderChanges() {
+  const ul = $("changes"); ul.innerHTML = "";
+  (D.changes.length ? D.changes.slice(0, 12) : [{ d: "-", from: "", to: "최근 변경 없음", s: null }]).forEach((c) => {
+    const li = document.createElement("li");
+    li.innerHTML = `<span>${c.d}</span><span>${c.from ? c.from + " → " : ""}<b>${c.to}</b>${c.s != null ? " (" + sgn(Math.round(c.s * D.scale)) + "점)" : ""}</span>`;
+    ul.appendChild(li);
+  });
+}
+
+/* ---------- 4. 매매 기록 ---------- */
+let LOG = [];
+function loadLog() { try { LOG = JSON.parse(localStorage.getItem("tradeLog") || "[]"); } catch (_) { LOG = []; } }
+function saveLog() { try { localStorage.setItem("tradeLog", JSON.stringify(LOG)); } catch (_) {} }
+function priceOn(dateStr) {
+  const d = PR.dates; if (dateStr < d[0]) return null;
+  let lo = 0, hi = d.length - 1;
+  while (lo < hi) { const mid = (lo + hi + 1) >> 1; if (d[mid] <= dateStr) lo = mid; else hi = mid - 1; }
+  return { date: d[lo], qld: PR.qld[lo], usd: PR.usd[lo], krw: PR.krw[lo], exact: d[lo] === dateStr, latest: lo === d.length - 1 && d[lo] < dateStr };
+}
+function initLog() {
+  loadLog();
+  const last = PR.dates[PR.dates.length - 1];
+  $("logDate").max = new Date().toISOString().slice(0, 10);
+  $("logDate").value = last;
+  $("logAdd").onclick = addLog;
+  $("logCsv").onclick = async () => {
+    const head = "날짜,종목,구분,금액(만원),종가(USD),환율(원),수량";
+    const body = LOG.slice().sort((a, b) => a.date.localeCompare(b.date)).map((r) => [r.date, r.tk, r.type === "buy" ? "매수" : "매도", r.man, r.price, r.fx, r.shares.toFixed(4)].join(",")).join("\n");
+    try { await navigator.clipboard.writeText(head + "\n" + body); $("logMsg").textContent = "기록을 복사했습니다. 메모장이나 메신저에 붙여넣어 보관하세요."; } catch (_) { $("logMsg").textContent = "복사에 실패했습니다."; }
+  };
+  $("logClear").onclick = () => { if (confirm("기록을 모두 삭제할까요? 되돌릴 수 없습니다.")) { LOG = []; saveLog(); renderLog(); } };
+  renderLog();
+}
+function addLog() {
+  const date = $("logDate").value, man_ = parseFloat($("logAmt").value), tk = $("logTk").value, type = $("logType").value, msg = $("logMsg");
+  if (!date) { msg.textContent = "날짜를 선택해 주세요."; return; }
+  if (isNaN(man_) || man_ <= 0) { msg.textContent = "금액(만원)을 입력해 주세요."; return; }
+  const p = priceOn(date);
+  if (!p) { msg.textContent = "이 앱은 최근 10년 이내 날짜만 계산할 수 있어요."; return; }
+  const price = tk === "QLD" ? p.qld : p.usd, usd = man_ * 10000 / p.krw, shares = usd / price;
+  LOG.push({ id: Date.now(), date, pdate: p.date, tk, type, man: man_, price, fx: p.krw, shares });
+  saveLog();
+  $("logAmt").value = "";
+  msg.textContent = (p.exact ? "" : p.latest ? `아직 ${date} 종가가 없어 가장 최근 종가(${p.date})로 계산했어요. 종가는 평일 아침에 갱신됩니다. ` : `${date}은 휴장일이라 직전 거래일(${p.date}) 종가로 계산했어요. `) + "기록을 추가했습니다.";
+  renderLog();
+}
+function renderLog() {
+  const list = $("logList"), sum = $("logSummary");
+  list.innerHTML = "";
+  const has = LOG.length > 0;
+  $("logCsv").classList.toggle("hidden", !has); $("logClear").classList.toggle("hidden", !has); sum.classList.toggle("hidden", !has);
+  const sorted = LOG.slice().sort((a, b) => b.date.localeCompare(a.date) || b.id - a.id);
+  sorted.forEach((r) => {
+    const el = document.createElement("div"); el.className = "logitem";
+    el.innerHTML = `<div class="body"><div class="l1">${r.date} · ${r.tk} · <span class="${r.type === "buy" ? "tagbuy" : "tagsell"}">${r.type === "buy" ? "매수" : "매도"}</span> ${man(r.man)}만원</div>
+      <div class="l2">종가 $${r.price.toFixed(2)}${r.pdate !== r.date ? " (" + r.pdate + ")" : ""} · 환율 ${Math.round(r.fx).toLocaleString("ko-KR")}원 → <b>${r.shares.toFixed(4)}주</b></div></div>
+      <button class="del" aria-label="삭제">✕</button>`;
+    el.querySelector(".del").onclick = () => { LOG = LOG.filter((x) => x.id !== r.id); saveLog(); renderLog(); };
+    list.appendChild(el);
+  });
+  if (!has) return;
+  const last = { QLD: PR.qld[PR.qld.length - 1], USD: PR.usd[PR.usd.length - 1] }, fx = PR.krw[PR.krw.length - 1];
+  let html = "", totBuy = 0, totVal = 0, totSell = 0;
+  ["QLD", "USD"].forEach((tk) => {
+    const rs = LOG.filter((r) => r.tk === tk); if (!rs.length) return;
+    const b = rs.filter((r) => r.type === "buy"), s = rs.filter((r) => r.type === "sell");
+    const buyMan = b.reduce((a, r) => a + r.man, 0), buySh = b.reduce((a, r) => a + r.shares, 0), sellMan = s.reduce((a, r) => a + r.man, 0), sellSh = s.reduce((a, r) => a + r.shares, 0);
+    const hold = buySh - sellSh, avg = buySh ? b.reduce((a, r) => a + r.man * 10000 / r.fx, 0) / buySh : 0, valMan = hold * last[tk] * fx / 10000;
+    const ret = buyMan ? ((valMan + sellMan - buyMan) / buyMan) * 100 : 0;
+    totBuy += buyMan; totVal += valMan; totSell += sellMan;
+    html += `<div class="row"><b>${tk}</b><span>보유 ${hold.toFixed(4)}주 · 평균 매수가 $${avg.toFixed(2)}</span></div>
+      <div class="row"><span>매수 ${man(buyMan)}만원${sellMan ? " · 매도 " + man(sellMan) + "만원" : ""}</span><span>지금 평가 <b>${man(valMan)}만원</b> (<span class="${ret >= 0 ? "up" : "down"}">${pct(ret)}</span>)</span></div>`;
+  });
+  const tr = totBuy ? ((totVal + totSell - totBuy) / totBuy) * 100 : 0;
+  html += `<div class="row" style="border-top:1px solid var(--line);margin-top:4px;padding-top:6px"><b>합계</b><span>매수 ${man(totBuy)}만원 → 평가 ${man(totVal)}만원 <span class="${tr >= 0 ? "up" : "down"}">${pct(tr)}</span></span></div>`;
+  sum.innerHTML = html;
+}
+
+/* ---------- 알림 ---------- */
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
 const standalone = window.matchMedia("(display-mode: standalone)").matches || navigator.standalone;
 if (isIOS && !standalone) $("iosHint").classList.remove("hidden");
-
 function keyToBytes(b64) {
   const pad = "=".repeat((4 - (b64.length % 4)) % 4);
   const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
   return Uint8Array.from([...raw].map((ch) => ch.charCodeAt(0)));
 }
-
 $("subBtn").addEventListener("click", async () => {
   try {
-    if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
-      $("subMsg").textContent = "이 브라우저는 알림을 지원하지 않습니다. 안드로이드는 크롬, 아이폰은 홈 화면에 추가한 앱에서 시도해 주세요.";
-      return;
-    }
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) { $("subMsg").textContent = "이 브라우저는 알림을 지원하지 않습니다. 안드로이드는 크롬, 아이폰은 홈 화면에 추가한 앱에서 시도해 주세요."; return; }
     const perm = await Notification.requestPermission();
     if (perm !== "granted") { $("subMsg").textContent = "알림 권한이 허용되지 않았습니다."; return; }
     const reg = await navigator.serviceWorker.ready;
@@ -388,9 +636,7 @@ $("subBtn").addEventListener("click", async () => {
     $("subText").value = JSON.stringify(sub);
     $("subBox").classList.remove("hidden");
     $("subMsg").textContent = "이 기기의 알림 등록 코드를 만들었습니다.";
-  } catch (e) {
-    $("subMsg").textContent = "알림 등록에 실패했습니다: " + e.message;
-  }
+  } catch (e) { $("subMsg").textContent = "알림 등록에 실패했습니다: " + e.message; }
 });
 $("copyBtn").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("subText").value); $("copyBtn").textContent = "복사됨"; }
@@ -398,6 +644,7 @@ $("copyBtn").addEventListener("click", async () => {
 });
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
+window.addEventListener("resize", () => D && renderCharts());
 load();
 </script>
 </body>

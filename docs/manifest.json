@@ -1,11 +1,11 @@
 {
-  "name": "쫑우의 투자신호",
-  "short_name": "투자신호",
-  "description": "금리·달러 기준 주간 매도/재매수 신호",
+  "name": "쫑우 투자신호",
+  "short_name": "쫑우 투자신호",
+  "description": "금리·달러 기준 주간 매도/매수 신호",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#eef5fa",
+  "background_color": "#dde4e9",
   "theme_color": "#0B4C73",
   "lang": "ko",
   "icons": [

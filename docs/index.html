@@ -244,6 +244,13 @@
   footer { margin: 80px 0 24px; font-size: 12px; }
   button { padding: 16px; }
 
+  /* ===== 항목 구분 강화: 굵은 잉크 선 + 큰 번호 ===== */
+  .card { border-top: 2px solid var(--text); padding: 28px 0 8px; margin-top: 80px; }
+  .card.hero { border-top: 0; padding-top: 40px; margin-top: 0; }
+  h2 { font: 900 22px/1.2 var(--f-disp); letter-spacing: -.02em; margin: 0 0 36px; align-items: baseline; gap: 14px; }
+  h2 .idx { font: 900 34px/1 var(--f-disp); letter-spacing: -.03em; color: var(--sell); }
+  h2 .tag { align-self: center; }
+
   @media (max-width: 360px) { .badge { font-size: 44px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
 </head>

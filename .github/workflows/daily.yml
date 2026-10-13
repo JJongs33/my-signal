@@ -2,7 +2,8 @@ name: daily-signal
 
 on:
   schedule:
-    - cron: "0 11 * * 2-6"   # Tue-Sat 11:00 UTC = 20:00 Korea time, right after the previous US close: refresh data, notify on a zone crossing
+    - cron: "0 1 * * 2-6"    # Tue-Sat 01:00 UTC = 10:00 Korea time: morning run (new US close is in), notification
+    - cron: "0 12 * * 2-6"   # Tue-Sat 12:00 UTC = 21:00 Korea time: evening run (reminder before the US open), notification
   workflow_dispatch:          # "Run workflow" button: refresh data and send ONE test notification with the current state
     inputs:
       test_push:
@@ -22,12 +23,14 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - name: compute signal, update app data, notify on a crossing
+      - name: compute signal, update app data, notify
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.test_push }}" = "true" ]; then
             python signal_job.py --test-push
+          elif [ "${{ github.event.schedule }}" = "0 1 * * 2-6" ]; then
+            python signal_job.py --slot 아침
           else
-            python signal_job.py
+            python signal_job.py --slot 저녁
           fi
         env:
           VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}

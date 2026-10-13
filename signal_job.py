@@ -1,6 +1,7 @@
 """Job for the '쫑우 투자신호' app.
 
-Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US market close of the previous US day, GitHub Actions).
+Runs twice a day, Tuesday-Saturday, on GitHub Actions: 10:00 Korea time (the US close of the previous US day is in by then) and 21:00 Korea time
+(a reminder before the US market opens at 22:30).  There is no new price data between the two runs, so both compute the same score.
 
 1. Computes the rates + dxy score exactly as in the backtest:
      rates = clip( -(10y Treasury yield [1-day lag] - its 126-trading-day mean) / 0.5 , -1, 1 )
@@ -8,15 +9,14 @@ Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US m
      score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read EVERY trading day
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
-3. Sends a web-push notification on every day with new data EXCEPT when the state is HOLD and unchanged:
-     - state change (sell <-> hold <-> buy): always;
-     - inside the sell / buy zone: every day.
-   Message: "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on a change).
-   The state of the previous run is kept in data.json ("daily"), so a missed run never loses a state change.
+3. Sends a web-push notification on every run EXCEPT when the state is HOLD and was HOLD the day before:
+     "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on the first day of a new state).
+   The decision uses only the score history (no stored state), so a missed run never loses a state change.
 
-    python signal_job.py             # compute, write data, push on a state change / repeat day
-    python signal_job.py --no-push   # compute and write only
-    python signal_job.py --test-push # also send the current state once (to test the phone)
+    python signal_job.py                  # compute, write data, push (state changes and sell/buy days)
+    python signal_job.py --slot 아침      # same, the slot name is added to the message
+    python signal_job.py --no-push        # compute and write only
+    python signal_job.py --test-push      # also send the current state once (to test the phone)
 """
 import argparse
 import io
@@ -138,8 +138,8 @@ def next_action_in(run_days):
     return (CYCLE_DAYS - (run_days - 1) % CYCLE_DAYS) % CYCLE_DAYS
 
 
-def daily_info(sc, prev):
-    """-> (daily state dict, (kind, previous state)).  kind: None | 'enter' | 'stay'  (stay = inside sell/buy, no state change)."""
+def daily_info(sc, prev=None):
+    """-> (daily state dict, (kind, previous state)).  kind: 'enter' (first day of a new state) | 'stay' (inside sell/buy) | None (HOLD continuing)."""
     s = sc["score"].dropna()
     states = [state_of(v) for v in s.to_numpy()]
     cur, asof = states[-1], s.index[-1]
@@ -148,14 +148,9 @@ def daily_info(sc, prev):
         if st != cur:
             break
         run_days += 1
-    old = (prev or {}).get("daily") or {}
-    kind = None
-    if old.get("state") and str(asof.date()) > old.get("asof", ""):
-        if old["state"] != cur:
-            kind = "enter"
-        elif cur in ("SELL", "BUY"):
-            kind = "stay"
-    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, old.get("state"))
+    prev_state = states[-1 - run_days] if run_days < len(states) else None
+    kind = "enter" if run_days == 1 else ("stay" if cur in ("SELL", "BUY") else None)
+    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, prev_state)
 
 
 def alert_message(d, kind, prev_state):
@@ -191,6 +186,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-push", action="store_true")
     ap.add_argument("--test-push", action="store_true", help="also send the current state once, to test the phone")
+    ap.add_argument("--slot", default="", help="name of this run (e.g. 아침 / 저녁), added to the message")
     args = ap.parse_args()
     prev = None
     try:
@@ -214,6 +210,8 @@ def main():
         return
     if ev:
         title, body = alert_message(d, ev, prev_state)
+        if args.slot:
+            body += f" · {args.slot} 알림"
         print(title); print(body)
         push(title, body)
     elif args.test_push:

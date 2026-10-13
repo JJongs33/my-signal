@@ -197,10 +197,10 @@
   h2 { font-size: 15px; margin: 0 0 32px; gap: 14px; }
   h3 { margin: 40px 0 12px; font-size: 14px; }
   .fundtag { margin-bottom: 28px; font-size: 12px; }
-  .statelabel { font: 500 13px/1.4 var(--f-text); color: var(--muted); margin: 0 0 12px; letter-spacing: .02em; }
-  .badge { font-size: 72px; line-height: 1; letter-spacing: -.04em; }
-  .headrow { gap: 20px; }
-  .sicon { width: 40px; height: 40px; font-size: 16px; }
+  .statelabel { font: 700 17px/1.4 var(--f-text); color: var(--text); margin: 0 0 16px; letter-spacing: -.01em; }
+  .badge { font-size: 52px; line-height: 1; letter-spacing: -.04em; }
+  .headrow { gap: 16px; align-items: center; }
+  .sicon { width: auto; height: auto; border-radius: 2px; padding: 8px 12px; font: 600 13px/1 var(--f-mono); letter-spacing: .22em; text-transform: uppercase; box-shadow: 0 8px 24px 0 var(--shadow); }
   .action { font-size: 19px; line-height: 1.6; margin-top: 32px; font-weight: 500; }
   .action b { font-weight: 800; } .nb { white-space: nowrap; }
   .progress { background: transparent; padding: 0; margin-top: 32px; font-size: 14px; color: var(--muted); }
@@ -244,7 +244,7 @@
   footer { margin: 80px 0 24px; font-size: 12px; }
   button { padding: 16px; }
 
-  @media (max-width: 360px) { .badge { font-size: 56px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
+  @media (max-width: 360px) { .badge { font-size: 44px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -267,7 +267,7 @@
   <section class="card state hero" id="stateCard">
     <div class="fundtag" id="fundTag"></div>
     <div class="statelabel">현재 신호</div>
-    <div class="headrow"><span class="sicon" id="sicon">▼</span><div class="badge" id="badge">-</div></div>
+    <div class="headrow"><div class="badge" id="badge">-</div><span class="sicon" id="sicon">▼ SELL</span></div>
     <div class="action" id="action"></div>
     <div class="subaction" id="subaction"></div>
     <div class="progress hidden" id="progress"></div>
@@ -530,7 +530,7 @@ function renderState() {
   $("updated").textContent = `미국 종가 ${d.asof.slice(5)} · 갱신 ${up.toLocaleString("ko-KR", { month: "long", day: "numeric" })}`;
   $("stateCard").className = "card state hero " + d.state;
   $("badge").textContent = d.state_kr;
-  $("sicon").textContent = { SELL: "▼", BUY: "▲", HOLD: "■" }[d.state];
+  $("sicon").textContent = { SELL: "▼ SELL", BUY: "▲ BUY", HOLD: "■ HOLD" }[d.state];
   const rd = d.run_days || (d.run * 5);
   const acts = {
     SELL: `매주 1번 · 남은 보유 주식의 <span class="nb"><b>${d.sell_pct}%</b>를 팔아요.</span><br><b>화요일</b>을 추천해요.`,

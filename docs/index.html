@@ -22,14 +22,14 @@
     --bg: #f4f1ea; --card: #e8e4da; --field: #dfdacd; --text: #0a0708; --muted: #4a4441; --faint: #6b6460; --line: #d8d3c7; --line2: #b3aa99;
     --sell: #0d7096; --sell-bg: #d6e3e8; --buy: #96101c; --buy-bg: #ecdcd3; --hold: #6b6460; --hold-bg: #e3dfd3;
     --accent: #0a0708; --accent2: #0a0708; --zone-sell: rgba(13,112,150,.12); --zone-buy: rgba(150,16,28,.12);
-    --qld: #0a0708; --usd: #7a5c0e; --peak: #7a5c0e; --now: #0a0708;
+    --qld: #0a0708; --usd: #7a5c0e; --peak: #7a5c0e; --now: #0a0708; --s-dca: #c98a00; --s-rule: #7048c4;
     --on-accent: #f2efe9; --on-zone: #f2efe9; --shadow: rgba(10,7,8,.13);
   }
   :root[data-theme="dark"] {
     --bg: #0a0708; --card: #1d1819; --field: #2a2426; --text: #f2efe9; --muted: #a39b98; --faint: #8a8380; --line: #2a2426; --line2: #4a4441;
     --sell: #2a8fbe; --sell-bg: #11242e; --buy: #ef3340; --buy-bg: #2a1417; --hold: #8a8380; --hold-bg: #231e1f;
     --accent: #f2efe9; --accent2: #f2efe9; --zone-sell: rgba(42,143,190,.18); --zone-buy: rgba(239,51,64,.18);
-    --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9;
+    --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9; --s-dca: #e8b33a; --s-rule: #9f72ea;
     --on-accent: #0a0708; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
   }
   @media (prefers-color-scheme: dark) {
@@ -37,7 +37,7 @@
       --bg: #0a0708; --card: #1d1819; --field: #2a2426; --text: #f2efe9; --muted: #a39b98; --faint: #8a8380; --line: #2a2426; --line2: #4a4441;
       --sell: #2a8fbe; --sell-bg: #11242e; --buy: #ef3340; --buy-bg: #2a1417; --hold: #8a8380; --hold-bg: #231e1f;
       --accent: #f2efe9; --accent2: #f2efe9; --zone-sell: rgba(42,143,190,.18); --zone-buy: rgba(239,51,64,.18);
-      --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9;
+      --qld: #f2efe9; --usd: #e8b33a; --peak: #e8b33a; --now: #f2efe9; --s-dca: #e8b33a; --s-rule: #9f72ea;
       --on-accent: #0a0708; --on-zone: #0a0708; --shadow: rgba(0,0,0,.5);
     }
   }
@@ -327,9 +327,9 @@
 
   /* ===== 06 과거 성과 v23: 규칙(위 단계) > 항목(아래 단계) ===== */
   .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line2); margin-bottom: 14px; }
-  .rules .rb { padding: 14px 14px 16px; } .rules .rb + .rb { border-left: 1px solid var(--line2); }
+  .rules .rb { padding: 14px 14px 16px; border-top: 4px solid var(--s-dca); } .rules .rb + .rb { border-left: 1px solid var(--line2); } .rules .rb.r { border-top-color: var(--s-rule); }
   .rules .rb b { display: block; font: 800 16px/1.3 var(--f-text); margin-bottom: 4px; }
-  .rules .rb span { font-size: 12px; line-height: 1.55; color: var(--muted); }
+  .rules .rb span { display: block; font-size: 12px; line-height: 1.6; color: var(--muted); }
   .rules .rb.r { background: var(--field); } .rules .rb.r b { color: var(--text); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
   .subh { font: 800 17px/1.3 var(--f-disp); letter-spacing: -.01em; margin: 44px 0 16px; color: var(--text); }
   .pcn { display: flex; align-items: baseline; gap: 12px; margin: 28px 0 8px; flex-wrap: wrap; }
@@ -338,7 +338,8 @@
   table.perf4 { width: 100%; border-collapse: collapse; font-size: 14px; }
   .perf4 th { font: 700 12px/1.35 var(--f-text); color: var(--muted); text-align: center; padding: 0 4px 10px; border-left: 1px solid var(--line2); }
   .perf4 th:first-child { text-align: left; border-left: 0; padding-left: 0; } .perf4 th:nth-child(2) { border-left: 0; }
-  .perf4 th.r { color: var(--text); font-weight: 900; box-shadow: inset 0 -2px 0 var(--text); }
+  .perf4 th { box-shadow: inset 0 -3px 0 var(--s-dca); } .perf4 th:first-child, .perf4 th:nth-child(2) { box-shadow: none; }
+  .perf4 th.r { color: var(--text); font-weight: 900; box-shadow: inset 0 -3px 0 var(--s-rule); }
   .perf4 td { padding: 11px 6px; text-align: center; vertical-align: top; border-top: 1px dotted var(--line2); border-left: 1px solid var(--line2); font-variant-numeric: tabular-nums; line-height: 1.35; }
   .perf4 tr.p1 td { border-top: 1px solid var(--line2); }
   .perf4 td.per { text-align: left; padding-left: 0; border-left: 0; border-top: 1px solid var(--line2); width: 74px; }
@@ -466,16 +467,21 @@
   <section class="card">
     <h2><span class="idx">06</span>과거 성과</h2>
     <div class="rules">
-      <div class="rb"><b>적립식 규칙</b><span>매월 첫 거래일에 정해 둔 금액만 사요</span></div>
-      <div class="rb r"><b>쫑 규칙</b><span>적립식 규칙 + 쫑지표 신호로 매주 매도·매수</span></div>
+      <div class="rb"><b>적립식 규칙</b><span>매월 첫 거래일에<br>정해 둔 금액만 사요</span></div>
+      <div class="rb r"><b>쫑 규칙</b><span>적립식 규칙 +<br>쫑지표 신호로<br>매수 매도(주 1회)</span></div>
     </div>
     <div class="note">시작 0원, 매월 100만원 · 세금·거래비용 반영</div>
 
     <h3 class="subh">연평균 수익률 추이</h3>
     <div class="seg" id="perfMode"><button data-m="irr" class="on">2000년부터 누적 연평균</button><button data-m="yr">연도별 수익률</button></div>
     <div id="perfCharts"></div>
-    <div class="legend"><span><i class="sw" style="background:var(--faint)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--text)"></i>쫑 규칙</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--s-dca)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--s-rule)"></i>쫑 규칙</span></div>
     <div class="note" id="perfChartNote"></div>
+
+    <h3 class="subh">누적 수익률 추이</h3>
+    <div id="cumCharts"></div>
+    <div class="legend"><span><i class="sw" style="background:var(--s-dca)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--s-rule)"></i>쫑 규칙</span></div>
+    <div class="note">2000년부터 낸 돈 대비 지금까지의 수익률이에요. 세로 눈금은 로그(2배·10배 단위)라서 초반 변화도 보여요.</div>
 
     <h3 class="subh">10년 구간별 비교</h3>
     <div id="perfBox"></div>
@@ -533,7 +539,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 23</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 24</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -556,8 +562,8 @@ const PERF = {
 };
 const PCH = {
   years: ["2000", "2001", "2002", "2003", "2004", "2005", "2006", "2007", "2008", "2009", "2010", "2011", "2012", "2013", "2014", "2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026.10"],
-  QLD: { dca_irr: [-90.0, -57.8, -59.4, -5.7, 2.2, 1.2, 2.4, 7.7, -22.9, -1.5, 4.3, 3.6, 7.3, 14.0, 16.1, 16.0, 15.5, 19.0, 16.8, 20.3, 23.7, 25.3, 17.5, 21.5, 22.4, 22.8, 23.7], rule_irr: [-85.2, -50.9, -51.4, -2.3, 6.0, 2.2, 2.0, 7.3, -7.4, 8.3, 13.1, 10.4, 12.6, 16.5, 17.6, 16.9, 16.3, 18.5, 18.0, 20.4, 23.8, 24.5, 20.3, 23.3, 23.7, 24.2, 24.5], dca_yr: [-74.3, -68.0, -68.5, 104.2, 15.2, -3.0, 5.2, 29.0, -72.9, 121.2, 36.9, 0.0, 34.8, 82.1, 37.6, 14.7, 10.0, 70.3, -8.3, 81.7, 88.9, 54.7, -60.5, 117.7, 42.8, 30.4, 38.1], rule_yr: [-67.7, -61.7, -57.1, 96.2, 20.3, -7.7, 1.8, 28.1, -46.7, 111.5, 44.1, -0.8, 33.0, 57.8, 34.4, 17.2, 15.6, 50.7, 13.9, 73.1, 88.9, 38.0, -25.1, 97.7, 38.7, 43.0, 25.4] },
-  USD: { dca_irr: [-91.7, -58.0, -75.1, -4.9, -17.2, -7.6, -10.1, -7.1, -44.7, -11.7, -5.7, -7.5, -8.1, 1.3, 8.2, 6.5, 10.5, 15.1, 11.1, 16.3, 19.1, 22.9, 13.7, 20.6, 24.7, 26.2, 28.3], rule_irr: [-87.1, -50.2, -70.4, -4.4, -11.4, -6.5, -10.7, -7.7, -23.2, -1.0, 3.9, 0.2, -1.8, 4.6, 10.1, 9.1, 12.5, 15.9, 14.6, 18.4, 21.0, 23.5, 18.9, 24.3, 27.7, 29.8, 31.3], dca_yr: [-63.8, -50.1, -79.8, 161.1, -35.5, 12.3, -16.1, 3.3, -79.8, 137.4, 19.4, -14.9, -10.2, 77.7, 78.1, -7.5, 56.8, 81.7, -26.9, 110.4, 68.2, 104.3, -68.6, 228.8, 139.6, 62.1, 73.4], rule_yr: [-55.5, -41.7, -75.3, 145.9, -24.0, 2.9, -21.1, 2.5, -54.6, 127.6, 29.9, -14.5, -9.6, 58.9, 68.2, 5.1, 60.5, 68.5, 1.5, 101.3, 68.2, 73.4, -30.4, 190.1, 129.5, 101.7, 60.8] },
+  QLD: { dca_irr: [-90.0, -57.8, -59.4, -5.7, 2.2, 1.2, 2.4, 7.7, -22.9, -1.5, 4.3, 3.6, 7.3, 14.0, 16.1, 16.0, 15.5, 19.0, 16.8, 20.3, 23.7, 25.3, 17.5, 21.5, 22.4, 22.8, 23.7], rule_irr: [-85.2, -50.9, -51.4, -2.3, 6.0, 2.2, 2.0, 7.3, -7.4, 8.3, 13.1, 10.4, 12.6, 16.5, 17.6, 16.9, 16.3, 18.5, 18.0, 20.4, 23.8, 24.5, 20.3, 23.3, 23.7, 24.2, 24.5], dca_yr: [-74.3, -68.0, -68.5, 104.2, 15.2, -3.0, 5.2, 29.0, -72.9, 121.2, 36.9, 0.0, 34.8, 82.1, 37.6, 14.7, 10.0, 70.3, -8.3, 81.7, 88.9, 54.7, -60.5, 117.7, 42.8, 30.4, 38.1], rule_yr: [-67.7, -61.7, -57.1, 96.2, 20.3, -7.7, 1.8, 28.1, -46.7, 111.5, 44.1, -0.8, 33.0, 57.8, 34.4, 17.2, 15.6, 50.7, 13.9, 73.1, 88.9, 38.0, -25.1, 97.7, 38.7, 43.0, 25.4], dca_cum: [-64.2, -53.5, -66.6, -11.1, 5.7, 3.6, 8.9, 37.0, -61.8, -7.1, 27.7, 25.1, 63.5, 186.7, 276.4, 311.6, 332.9, 603.5, 515.3, 968.7, 1830.4, 2756.0, 981.4, 2162.3, 3006.6, 3798.7, 5121.5], rule_cum: [-58.5, -47.7, -60.1, -4.7, 16.2, 6.9, 7.5, 34.4, -27.9, 53.8, 113.2, 92.5, 138.9, 251.9, 327.9, 350.8, 371.1, 561.7, 608.2, 982.0, 1854.3, 2480.3, 1538.3, 2896.1, 3728.4, 4884.6, 5891.0] },
+  USD: { dca_irr: [-91.7, -58.0, -75.1, -4.9, -17.2, -7.6, -10.1, -7.1, -44.7, -11.7, -5.7, -7.5, -8.1, 1.3, 8.2, 6.5, 10.5, 15.1, 11.1, 16.3, 19.1, 22.9, 13.7, 20.6, 24.7, 26.2, 28.3], rule_irr: [-87.1, -50.2, -70.4, -4.4, -11.4, -6.5, -10.7, -7.7, -23.2, -1.0, 3.9, 0.2, -1.8, 4.6, 10.1, 9.1, 12.5, 15.9, 14.6, 18.4, 21.0, 23.5, 18.9, 24.3, 27.7, 29.8, 31.3], dca_yr: [-63.8, -50.1, -79.8, 161.1, -35.5, 12.3, -16.1, 3.3, -79.8, 137.4, 19.4, -14.9, -10.2, 77.7, 78.1, -7.5, 56.8, 81.7, -26.9, 110.4, 68.2, 104.3, -68.6, 228.8, 139.6, 62.1, 73.4], rule_yr: [-55.5, -41.7, -75.3, 145.9, -24.0, 2.9, -21.1, 2.5, -54.6, 127.6, 29.9, -14.5, -9.6, 58.9, 68.2, 5.1, 60.5, 68.5, 1.5, 101.3, 68.2, 73.4, -30.4, 190.1, 129.5, 101.7, 60.8], dca_cum: [-66.4, -53.6, -77.6, -9.6, -35.7, -20.6, -29.8, -24.5, -81.8, -43.0, -26.5, -35.1, -39.6, 9.4, 91.2, 72.2, 162.8, 359.0, 221.6, 550.3, 949.8, 1954.1, 520.6, 1862.7, 4420.8, 6951.9, 11752.9], rule_cum: [-60.7, -47.0, -74.5, -8.7, -25.3, -17.9, -31.3, -26.4, -62.2, -4.9, 24.4, 1.2, -10.7, 39.0, 125.2, 117.1, 222.0, 400.1, 375.4, 736.1, 1247.3, 2136.1, 1226.3, 3424.5, 7230.8, 12804.5, 19788.3] },
 };
 let perfMode = "irr";
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
@@ -601,7 +607,7 @@ function renderPerf() {
     return `<div class="pfund"><b>${f}</b><span>${o.sub}</span></div>
       <table class="perf4"><tr><th>구간</th><th></th><th>적립식 규칙</th><th class="r">쫑 규칙</th></tr>${rows}</table>`;
   }).join("");
-  drawPerf();
+  drawPerf(); drawCum();
 }
 function drawPerf() {
   const box = $("perfCharts"); if (!box) return;
@@ -615,12 +621,30 @@ function drawPerf() {
     [0, 5, 10, 15, 20].forEach((i) => { if (i < nn) g += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${cv("--muted")}">${yrs[i]}</text>`; });
     g += `<text x="${x(nn - 1)}" y="${H - 6}" font-size="11" text-anchor="end" fill="${cv("--muted")}">26.10</text>`;
     const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
-    g += `<defs><clipPath id="cp${f}"><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}"/></clipPath></defs><g clip-path="url(#cp${f})"><path d="${path(a)}" fill="none" stroke="${cv("--faint")}" stroke-width="2" stroke-linejoin="round"/><path d="${path(b)}" fill="none" stroke="${cv("--text")}" stroke-width="2.8" stroke-linejoin="round"/></g>`;
+    g += `<defs><clipPath id="cp${f}"><rect x="${L}" y="${T}" width="${W - L - R}" height="${H - T - B}"/></clipPath></defs><g clip-path="url(#cp${f})"><path d="${path(a)}" fill="none" stroke="${cv("--s-dca")}" stroke-width="2.4" stroke-linejoin="round"/><path d="${path(b)}" fill="none" stroke="${cv("--s-rule")}" stroke-width="2.8" stroke-linejoin="round"/></g>`;
     const ea = a[nn - 1], eb = b[nn - 1], sgn1 = (v) => (v > 0 ? "+" : "") + Math.round(v) + "%";
-    g += `<circle cx="${x(nn - 1)}" cy="${y(ea)}" r="3.4" fill="${cv("--faint")}"/><circle cx="${x(nn - 1)}" cy="${y(eb)}" r="4" fill="${cv("--text")}"/>`;
+    g += `<circle cx="${x(nn - 1)}" cy="${y(ea)}" r="3.6" fill="${cv("--s-dca")}"/><circle cx="${x(nn - 1)}" cy="${y(eb)}" r="4.2" fill="${cv("--s-rule")}"/>`;
     return `<div class="pcn"><b>${f}</b><span>쫑 규칙 ${sgn1(eb)} · 적립식 규칙 ${sgn1(ea)} <i>(2026.10 기준)</i></span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${f} 연평균 수익률 추이">${g}</svg>`;
   }).join("");
   $("perfChartNote").textContent = irr ? "2000년부터 지금까지 쌓은 돈 전체의 연평균 수익률이에요. 2000~2002년은 -50% 아래라 그래프 밖으로 나가요." : "해마다의 수익률이에요. 큰 하락이 있던 2000~2002, 2008, 2022년에 쫑 규칙이 덜 빠졌어요.";
+}
+function drawCum() {
+  const box = $("cumCharts"); if (!box) return;
+  const yrs = PCH.years, W = 360, H = 210, L = 62, R = 12, T = 16, B = 26, nn = yrs.length, lg = (r) => Math.log10(Math.max(0.05, 1 + r / 100));
+  const lo = lg(-60), hi = lg(30000), x = (i) => L + (W - L - R) * i / (nn - 1), y = (r) => T + (H - T - B) * (1 - (lg(r) - lo) / (hi - lo));
+  const big = (v) => { const a = Math.abs(v), r = a >= 1000 ? Math.round(a / 100) * 100 : a >= 100 ? Math.round(a / 10) * 10 : Math.round(a); return (v > 0 ? "+" : v < 0 ? "-" : "") + r.toLocaleString("ko-KR") + "%"; };
+  const ticks = [-50, 0, 100, 1000, 10000];
+  box.innerHTML = ["QLD", "USD"].map((f) => {
+    const d = PCH[f], a = d.dca_cum, b = d.rule_cum;
+    let g = "";
+    ticks.forEach((v) => { g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${cv(v === 0 ? "--muted" : "--line2")}" stroke-width="${v === 0 ? 1.2 : .7}" ${v === 0 ? "" : 'stroke-dasharray="3 4"'}/><text x="${L - 6}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${cv("--muted")}">${big(v)}</text>`; });
+    [0, 5, 10, 15, 20].forEach((i) => { g += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${cv("--muted")}">${yrs[i]}</text>`; });
+    g += `<text x="${x(nn - 1)}" y="${H - 6}" font-size="11" text-anchor="end" fill="${cv("--muted")}">26.10</text>`;
+    const path = (arr) => arr.map((v, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(v).toFixed(1)).join(" ");
+    g += `<path d="${path(a)}" fill="none" stroke="${cv("--s-dca")}" stroke-width="2.4" stroke-linejoin="round"/><path d="${path(b)}" fill="none" stroke="${cv("--s-rule")}" stroke-width="2.8" stroke-linejoin="round"/>`;
+    g += `<circle cx="${x(nn - 1)}" cy="${y(a[nn - 1])}" r="3.6" fill="${cv("--s-dca")}"/><circle cx="${x(nn - 1)}" cy="${y(b[nn - 1])}" r="4.2" fill="${cv("--s-rule")}"/>`;
+    return `<div class="pcn"><b>${f}</b><span>쫑 규칙 ${big(b[nn - 1])} · 적립식 규칙 ${big(a[nn - 1])} <i>(2026.10 기준)</i></span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${f} 누적 수익률 추이">${g}</svg>`;
+  }).join("");
 }
 $("perfMode").addEventListener("click", (e) => { const bt = e.target.closest("button"); if (!bt) return; perfMode = bt.dataset.m; [...$("perfMode").children].forEach((x) => x.classList.toggle("on", x === bt)); drawPerf(); });
 
@@ -840,7 +864,7 @@ function drawSpark() {
   s += `<circle cx="${x(v.length - 1)}" cy="${y(v[v.length - 1])}" r="3.8" fill="${cv(D.state === "SELL" ? "--sell" : D.state === "BUY" ? "--buy" : "--hold")}" stroke="${cv("--bg")}" stroke-width="1.6"/>`;
   el.innerHTML = s;
 }
-function renderCharts() { if (D) { drawScore(); drawPrice(); drawSpark(); drawPerf(); } }
+function renderCharts() { if (D) { drawScore(); drawPrice(); drawSpark(); drawPerf(); drawCum(); } }
 
 /* ---------- ① 점수 차트 ---------- */
 function drawScore() {

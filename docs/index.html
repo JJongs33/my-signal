@@ -10,20 +10,30 @@
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="쫑우 투자신호">
+<script>try{var __t=localStorage.getItem("theme");if(__t==="light"||__t==="dark")document.documentElement.setAttribute("data-theme",__t)}catch(e){}</script>
 <style>
   :root {
-    /* 지중해 블루 + 회색기 도는 연한 바탕 */
-    --bg: #dde4e9; --card: #eff3f5; --field: #e1e8ec; --text: #12262f; --muted: #587080; --line: #c8d2d9;
-    --sell: #b4532a; --sell-bg: #f5e5da; --buy: #0d7a68; --buy-bg: #daeee8; --hold: #64798a; --hold-bg: #e2e8ed;
-    --accent: #0b4c73; --accent2: #0e8fb0; --zone-sell: rgba(180,83,42,.13); --zone-buy: rgba(13,122,104,.12);
-    --qld: #0b4c73; --usd: #b8821f; --peak: #8a5a12; --now: #d4163c;
+    /* 지중해 블루 + 뚜렷한 회색 톤 바탕 (밝은 모드) */
+    --bg: #c6cfd6; --card: #e3e8ec; --field: #d2dae0; --text: #10232c; --muted: #4f687a; --line: #b6c1c9;
+    --sell: #b4532a; --sell-bg: #f0dccf; --buy: #0d7a68; --buy-bg: #d0e7e0; --hold: #5f7587; --hold-bg: #d6dee4;
+    --accent: #0b4c73; --accent2: #0e8fb0; --zone-sell: rgba(180,83,42,.14); --zone-buy: rgba(13,122,104,.13);
+    --qld: #0b4c73; --usd: #a87718; --peak: #7d5210; --now: #d4163c;
+    --on-accent: #ffffff; --on-zone: #ffffff;
+  }
+  :root[data-theme="dark"] {
+    --bg: #071826; --card: #0e2a3e; --field: #0a2030; --text: #e7f1f8; --muted: #86a7bd; --line: #1c3b52;
+    --sell: #f0885c; --sell-bg: #2a1810; --buy: #34d6b6; --buy-bg: #0e2a24; --hold: #8fa7ba; --hold-bg: #15293a;
+    --accent: #38bdf8; --accent2: #22d3ee; --zone-sell: rgba(240,136,92,.12); --zone-buy: rgba(52,214,182,.10);
+    --qld: #38bdf8; --usd: #f2c14e; --peak: #f2c14e; --now: #ff6b86;
+    --on-accent: #04202e; --on-zone: #07131c;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]):not([data-theme="dark"]) {
       --bg: #071826; --card: #0e2a3e; --field: #0a2030; --text: #e7f1f8; --muted: #86a7bd; --line: #1c3b52;
       --sell: #f0885c; --sell-bg: #2a1810; --buy: #34d6b6; --buy-bg: #0e2a24; --hold: #8fa7ba; --hold-bg: #15293a;
       --accent: #38bdf8; --accent2: #22d3ee; --zone-sell: rgba(240,136,92,.12); --zone-buy: rgba(52,214,182,.10);
       --qld: #38bdf8; --usd: #f2c14e; --peak: #f2c14e; --now: #ff6b86;
+      --on-accent: #04202e; --on-zone: #07131c;
     }
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -54,7 +64,6 @@
   svg { width: 100%; height: auto; display: block; touch-action: pan-y; }
   button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 16px; width: 100%; cursor: pointer; }
   [data-theme] { }
-  @media (prefers-color-scheme: dark) { button { color: #04202e; } }
   button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-top: 8px; }
   input, select { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--field); color: var(--text); min-height: 44px; }
   label.field { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
@@ -66,7 +75,6 @@
   .zonebar { position: relative; display: flex; height: 38px; border-radius: 10px; overflow: hidden; margin: 28px 0 4px; }
   .zonebar .z { display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; }
   .zonebar .z.sell { background: var(--sell); flex: 70; } .zonebar .z.hold { background: var(--hold); flex: 30; } .zonebar .z.buy { background: var(--buy); flex: 100; }
-  @media (prefers-color-scheme: dark) { .zonebar .z { color: #07131c; } }
   .zonewrap { position: relative; }
   .marker { position: absolute; left: 0; right: 0; top: -28px; height: 28px; z-index: 2; }
   .mlabel { position: absolute; top: 0; font-size: 12px; font-weight: 800; transform: translateX(-50%); white-space: nowrap; }
@@ -105,7 +113,6 @@
   .seg { display: flex; gap: 6px; margin-top: 8px; }
   .seg button { flex: 1; padding: 8px 4px; font-size: 13px; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 10px; }
   .seg button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
-  @media (prefers-color-scheme: dark) { .seg button.on { color: #04202e; } }
   .chartwrap { position: relative; margin-top: 10px; }
   .tip { position: absolute; top: 4px; pointer-events: none; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 5px 9px; font-size: 12px; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,.18); z-index: 3; }
   .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; flex-wrap: wrap; }
@@ -114,7 +121,6 @@
   .toggle button { width: auto; padding: 4px 10px; font-size: 12px; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 0; }
   .toggle button:first-child { border-radius: 8px 0 0 8px; } .toggle button:last-child { border-radius: 0 8px 8px 0; }
   .toggle button.on { background: var(--accent); color: #fff; border-color: var(--accent); }
-  @media (prefers-color-scheme: dark) { .toggle button.on { color: #04202e; } }
 
   ul.changes { list-style: none; padding: 0; margin: 0; font-size: 14px; }
   ul.changes li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); }
@@ -130,7 +136,6 @@
   .headrow { display: flex; align-items: center; gap: 12px; }
   .sicon { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; color: #fff; background: var(--hold); flex: none; }
   .SELL .sicon { background: var(--sell); } .BUY .sicon { background: var(--buy); } .HOLD .sicon { background: var(--hold); }
-  @media (prefers-color-scheme: dark) { .sicon { color: #07131c; } }
   .subaction { font-size: 14px; color: var(--muted); margin-top: 6px; }
   .progress { margin-top: 12px; background: var(--card); border-radius: 12px; padding: 10px 12px; font-size: 13px; }
   .progress .pbar { display: flex; gap: 3px; margin: 8px 0 6px; }
@@ -148,6 +153,15 @@
   .yb i { width: 100%; background: var(--sell); border-radius: 4px 4px 0 0; opacity: .88; }
   .yb i.cur { background: repeating-linear-gradient(45deg, var(--sell), var(--sell) 4px, transparent 4px, transparent 7px); border: 1px solid var(--sell); }
   .yb .v, .yb .y { font-size: 11px; color: var(--muted); } .yb .v { margin-bottom: 2px; color: var(--text); font-weight: 700; } .yb .y { margin-top: 3px; }
+
+  /* text colors that sit on colored backgrounds follow the theme */
+  button { color: var(--on-accent); }
+  .zonebar .z { color: var(--on-zone); }
+  .sicon { color: var(--on-zone); }
+  .seg button.on, .toggle button.on { color: var(--on-accent); }
+  button.secondary { color: var(--accent); }
+  .seg button:not(.on), .toggle button:not(.on) { color: var(--text); }
+  .themebtn { width: auto; margin-left: auto; padding: 8px 12px; font-size: 13px; background: var(--field); color: var(--text); border: 1px solid var(--line); border-radius: 10px; white-space: nowrap; }
 </style>
 </head>
 <body>
@@ -158,6 +172,7 @@
       <h1>쫑우 투자신호</h1>
       <div class="sub" id="updated">불러오는 중…</div>
     </div>
+    <button class="themebtn" id="themeBtn" aria-label="화면 색상 선택">🌗 자동</button>
   </header>
 
   <!-- 1. 이번 주 신호 -->
@@ -741,6 +756,26 @@ $("copyBtn").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("subText").value); $("copyBtn").textContent = "복사됨"; }
   catch { $("subText").select(); document.execCommand("copy"); $("copyBtn").textContent = "복사됨"; }
 });
+
+
+/* ---------- screen theme: auto (follows the phone) / light / dark ---------- */
+const THEMES = ["auto", "light", "dark"], TLABEL = { auto: "🌗 자동", light: "☀️ 밝게", dark: "🌙 어둡게" };
+function curTheme() { try { return localStorage.getItem("theme") || "auto"; } catch (_) { return "auto"; } }
+function applyTheme() {
+  const t = curTheme();
+  if (t === "auto") document.documentElement.removeAttribute("data-theme"); else document.documentElement.setAttribute("data-theme", t);
+  $("themeBtn").textContent = TLABEL[t];
+  const dark = t === "dark" || (t === "auto" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  document.querySelector('meta[name="theme-color"]').setAttribute("content", dark ? "#071826" : "#0B4C73");
+  if (D) renderCharts();
+}
+$("themeBtn").addEventListener("click", () => {
+  const next = THEMES[(THEMES.indexOf(curTheme()) + 1) % THEMES.length];
+  try { localStorage.setItem("theme", next); } catch (_) {}
+  applyTheme();
+});
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", applyTheme);
+applyTheme();
 
 if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js");
 window.addEventListener("resize", () => D && renderCharts());

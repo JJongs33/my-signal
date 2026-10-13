@@ -1,4 +1,4 @@
-"""Weekly job for the '내 투자 신호' app (runs on GitHub Actions every Saturday 08:00 KST).
+"""Weekly job for the '쫑우의 투자신호' app (runs on GitHub Actions every Saturday 08:00 KST).
 
 1. Computes the rates + dxy score exactly as in the backtest:
      rates = clip( -(10y Treasury yield [1-day lag] - its 126-trading-day mean) / 0.5 , -1, 1 )
@@ -54,12 +54,14 @@ def compute():
     full = ndx.index
     y = fred("DGS10").reindex(full, method="ffill").shift(1)
     dxy = close("DX-Y.NYB").reindex(full, method="ffill")
+    qld = close("QLD").reindex(full, method="ffill")
     sc = pd.DataFrame(index=full)
     sc["rates"] = (-(y - y.rolling(126).mean()) / 0.5).clip(-1, 1)
     sc["dxy"] = (-(dxy / dxy.rolling(100).mean() - 1) / 0.03).clip(-1, 1)
     sc["score"] = (sc["rates"] + sc["dxy"]) / 2
     sc["y10"], sc["y10_mean"] = y, y.rolling(126).mean()
     sc["dxy_lvl"], sc["dxy_mean"] = dxy, dxy.rolling(100).mean()
+    sc["ndx"], sc["qld"] = ndx, qld
     iso = sc.index.isocalendar()
     wk = sc.groupby([iso.year.values, iso.week.values]).tail(1).dropna(subset=["score"])
     return wk
@@ -76,6 +78,9 @@ def build(wk):
         else:
             break
     hist = wk.iloc[-157:]
+    ndx0, qld0 = hist["ndx"].iloc[0], hist["qld"].iloc[0]
+    price_hist = [{"d": str(d.date()), "n": round(float(v / ndx0 * 100), 2), "q": round(float(w / qld0 * 100), 2)}
+                  for d, v, w in zip(hist.index, hist["ndx"], hist["qld"])]
     changes = []
     st = wk["state"].to_numpy()
     for i in range(1, len(wk)):
@@ -90,6 +95,8 @@ def build(wk):
         "prev_state_kr": NAMES[prev["state"]], "prev_score": r(prev["score"]),
         "threshold": THRESHOLD, "buy_level": BUY_LEVEL, "sell_pct": SELL_PCT, "buy_pct": BUY_PCT,
         "history": [{"d": str(d.date()), "s": round(float(v), 3)} for d, v in hist["score"].items()],
+        "price_history": price_hist,
+        "ndx_now": round(float(row["ndx"]), 1), "qld_now": round(float(row["qld"]), 2),
         "changes": changes[::-1],
     }
     return data

@@ -3,31 +3,35 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>내 투자 신호</title>
-<meta name="theme-color" content="#155e75">
+<title>쫑우의 투자신호</title>
+<meta name="theme-color" content="#0B4C73">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-180.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="투자신호">
+<meta name="apple-mobile-web-app-title" content="쫑우의 투자신호">
 <style>
   :root {
-    --bg: #f4f6f8; --card: #ffffff; --text: #14202b; --muted: #5d6b78; --line: #dde3e9;
-    --sell: #c2410c; --sell-bg: #fff1e8; --buy: #15803d; --buy-bg: #eafaf0; --hold: #475569; --hold-bg: #eef2f6;
-    --accent: #155e75; --zone-sell: rgba(194,65,12,.10); --zone-buy: rgba(21,128,61,.10);
+    /* Mediterranean (Aegean) blue & white, warm terracotta accent */
+    --bg: #eef5fa; --card: #ffffff; --text: #0b2a3d; --muted: #5b7a90; --line: #d7e6f0;
+    --sell: #c2572e; --sell-bg: #fdede4; --buy: #0f8a72; --buy-bg: #e5f6f1; --hold: #5b7a90; --hold-bg: #eef2f6;
+    --accent: #0b4c73; --accent2: #0ea5c7; --zone-sell: rgba(194,87,46,.10); --zone-buy: rgba(15,138,114,.10);
+    --qld: #0b4c73; --ndx: #8fb6cc;
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0e141a; --card: #17212b; --text: #e6edf3; --muted: #93a1ae; --line: #2a3744;
-      --sell: #fb923c; --sell-bg: #2a1a10; --buy: #4ade80; --buy-bg: #10261a; --hold: #a3b1bf; --hold-bg: #1d2731;
-      --accent: #38bdf8; --zone-sell: rgba(251,146,60,.12); --zone-buy: rgba(74,222,128,.10);
+      --bg: #071826; --card: #0e2a3e; --text: #e7f1f8; --muted: #86a7bd; --line: #1c3b52;
+      --sell: #f0885c; --sell-bg: #2a1810; --buy: #34d6b6; --buy-bg: #0e2a24; --hold: #8fa7ba; --hold-bg: #15293a;
+      --accent: #38bdf8; --accent2: #22d3ee; --zone-sell: rgba(240,136,92,.12); --zone-buy: rgba(52,214,182,.10);
+      --qld: #38bdf8; --ndx: #4f6f84;
     }
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
-         padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom)); }
+         padding: env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom)); }
   main { max-width: 560px; margin: 0 auto; }
-  header { padding: 18px 2px 8px; }
+  header { padding: 18px 2px 8px; display: flex; align-items: center; gap: 10px; }
+  header img { width: 30px; height: 30px; border-radius: 8px; }
   h1 { font-size: 20px; margin: 0; }
   .sub { color: var(--muted); font-size: 13px; }
   .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px; margin: 12px 0; }
@@ -39,7 +43,8 @@
   .SELL .badge { color: var(--sell); } .BUY .badge { color: var(--buy); } .HOLD .badge { color: var(--hold); }
   .action { font-size: 17px; font-weight: 600; margin-top: 4px; }
   .meta { color: var(--muted); font-size: 13px; margin-top: 8px; }
-  h2 { font-size: 15px; margin: 0 0 10px; color: var(--muted); font-weight: 600; }
+  h2 { font-size: 15px; margin: 0 0 10px; color: var(--muted); font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  h2 .ico { font-size: 15px; }
   .gauge { position: relative; height: 34px; margin: 6px 0 2px; }
   .gauge .bar { position: absolute; top: 12px; left: 0; right: 0; height: 10px; border-radius: 5px;
                 background: linear-gradient(90deg, var(--sell) 0 35%, var(--hold) 35% 50%, var(--buy) 50% 100%); opacity: .35; }
@@ -55,21 +60,40 @@
   ul.changes li { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); }
   ul.changes li:last-child { border-bottom: 0; }
   details summary { cursor: pointer; font-weight: 600; }
-  .rule { font-size: 14px; } .rule td { padding: 4px 6px; vertical-align: top; } .rule td:first-child { white-space: nowrap; color: var(--muted); }
-  button { font: inherit; font-weight: 600; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 16px; width: 100%; cursor: pointer; }
+  .rule { font-size: 14px; width: 100%; } .rule td { padding: 4px 6px; vertical-align: top; } .rule td:first-child { white-space: nowrap; color: var(--muted); }
+  button { font: inherit; font-weight: 700; background: var(--accent); color: #fff; border: 0; border-radius: 12px; padding: 12px 16px; width: 100%; cursor: pointer; }
   button.secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); margin-top: 8px; }
+  input[type=number] { font: inherit; width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+  label.field { display: block; font-size: 13px; color: var(--muted); margin: 10px 0 4px; }
   textarea { width: 100%; min-height: 110px; font: 12px/1.4 ui-monospace, Menlo, Consolas, monospace; border-radius: 10px; border: 1px solid var(--line);
              background: var(--bg); color: var(--text); padding: 8px; margin-top: 10px; }
   .note { color: var(--muted); font-size: 13px; margin-top: 8px; }
   .hidden { display: none; }
   footer { color: var(--muted); font-size: 12px; text-align: center; margin-top: 18px; }
+  .result { margin-top: 12px; background: var(--bg); border-radius: 12px; padding: 12px 14px; font-size: 15px; }
+  .result b { font-size: 19px; }
+  .legend { display: flex; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .legend span { display: inline-flex; align-items: center; gap: 5px; }
+  .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; }
+  .checklist { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+  .checklist:last-child { border-bottom: 0; }
+  .checklist input { width: 20px; height: 20px; accent-color: var(--accent); }
+  .checklist .m { flex: 1; } .checklist .m b { display: block; font-size: 14px; } .checklist .m span { color: var(--muted); font-size: 12px; }
+  .perf-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+  .perf-table th, .perf-table td { text-align: right; padding: 7px 4px; border-bottom: 1px solid var(--line); }
+  .perf-table th:first-child, .perf-table td:first-child { text-align: left; color: var(--muted); font-weight: 500; }
+  .perf-table td.hi { color: var(--buy); font-weight: 700; }
+  .tag { display: inline-block; font-size: 11px; background: var(--hold-bg); color: var(--muted); border-radius: 6px; padding: 2px 7px; margin-left: 6px; }
 </style>
 </head>
 <body>
 <main>
   <header>
-    <h1>내 투자 신호</h1>
-    <div class="sub" id="updated">불러오는 중…</div>
+    <img src="icon-192.png" alt="">
+    <div>
+      <h1>쫑우의 투자신호</h1>
+      <div class="sub" id="updated">불러오는 중…</div>
+    </div>
   </header>
 
   <section class="card state" id="stateCard">
@@ -79,7 +103,37 @@
   </section>
 
   <section class="card">
-    <h2>점수 (금리 + 달러) ÷ 2</h2>
+    <h2><span class="ico">🧮</span>이번 주 매매 금액 계산기</h2>
+    <label class="field">현재 QLD(또는 국내 2배 상품) 평가금액 (만원)</label>
+    <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
+    <label class="field">현재 보유 현금 (만원, 이전에 매도해 둔 돈)</label>
+    <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
+    <div class="result" id="calcResult">금액을 입력하면 이번 주에 사고팔 금액을 계산해 드립니다.</div>
+    <div class="note">입력한 금액은 이 기기의 브라우저에만 저장되고, 서버로 전송되지 않습니다.</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="ico">✅</span>매월 적립 체크리스트</h2>
+    <div class="note" style="margin-top:-4px;margin-bottom:6px">신호와 관계없이 매월 첫 거래일에 적립금을 전액 매수했는지 기록합니다.</div>
+    <div id="checklist"></div>
+    <div class="note">체크 상태는 이 기기에만 저장됩니다 (최근 6개월 표시).</div>
+  </section>
+
+  <section class="card">
+    <h2><span class="ico">📈</span>나스닥100 · QLD 가격 (최근 3년)</h2>
+    <svg id="priceChart" viewBox="0 0 520 220" role="img" aria-label="나스닥100과 QLD 가격 추이"></svg>
+    <div class="legend">
+      <span><i class="sw" style="background:var(--qld)"></i>QLD (시작=100)</span>
+      <span><i class="sw" style="background:var(--ndx)"></i>나스닥100 (시작=100)</span>
+    </div>
+    <div class="grid" style="margin-top:12px">
+      <div class="kv"><span>나스닥100 지수</span><b id="ndxNow">-</b></div>
+      <div class="kv"><span>QLD 가격</span><b id="qldNow">-</b></div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2><span class="ico">📊</span>점수 (금리 + 달러) ÷ 2</h2>
     <div class="gauge" id="gauge">
       <div class="bar"></div>
       <div class="tick" style="left:35%"></div>
@@ -94,14 +148,26 @@
   </section>
 
   <section class="card">
-    <h2>최근 3년 점수</h2>
+    <h2><span class="ico">🕒</span>최근 3년 점수</h2>
     <svg id="chart" viewBox="0 0 520 200" role="img" aria-label="최근 3년 점수 추이"></svg>
     <div class="note">위쪽 초록 영역은 재매수(0 이상), 아래쪽 주황 영역은 매도(-0.30 이하) 구간입니다.</div>
   </section>
 
   <section class="card">
-    <h2>신호가 바뀐 기록</h2>
+    <h2><span class="ico">📜</span>신호가 바뀐 기록</h2>
     <ul class="changes" id="changes"></ul>
+  </section>
+
+  <section class="card">
+    <h2><span class="ico">🗂️</span>과거 시뮬레이션 성과 요약<span class="tag">참고용</span></h2>
+    <div class="note" style="margin-top:-4px">QLD, 매달 100만원 적립 기준 (세금·수수료는 가정에 따라 다를 수 있음)</div>
+    <table class="perf-table">
+      <tr><th>기간</th><th>월초 매수만</th><th>이 규칙 적용</th><th>최대 하락폭</th></tr>
+      <tr><td>2008~2025</td><td>연 25.1%</td><td class="hi">연 27.5%</td><td>-80% → -66%</td></tr>
+      <tr><td>2000~2025</td><td>연 16.8%</td><td class="hi">연 18.8%</td><td>-99% → -97%</td></tr>
+      <tr><td>2026 (1~10월)</td><td>+38.8%</td><td>+29.5%</td><td>-23% → -23%</td></tr>
+    </table>
+    <div class="note">이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 월초 매수보다 낮았습니다 (예: 2013년 -10%p, 2017년 -18%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다.</div>
   </section>
 
   <section class="card">
@@ -119,7 +185,7 @@
   </section>
 
   <section class="card">
-    <h2>알림</h2>
+    <h2><span class="ico">🔔</span>알림</h2>
     <div id="iosHint" class="note hidden">아이폰은 먼저 Safari의 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 홈 화면의 앱을 열어서 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
@@ -137,6 +203,7 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const fmt = (x) => (x >= 0 ? "+" : "") + Number(x).toFixed(2);
+const won = (x) => Math.round(x).toLocaleString("ko-KR");
 
 async function load() {
   try {
@@ -167,7 +234,10 @@ function render(d) {
   $("ratesNote").textContent = `10년물 ${d.y10.toFixed(2)}% (평균 ${d.y10_mean.toFixed(2)}%)`;
   $("dxy").textContent = fmt(d.dxy);
   $("dxyNote").textContent = `달러지수 ${d.dxy_lvl.toFixed(1)} (평균 ${d.dxy_mean.toFixed(1)})`;
+  $("ndxNow").textContent = d.ndx_now.toLocaleString("ko-KR");
+  $("qldNow").textContent = "$" + d.qld_now.toFixed(2);
   drawChart(d);
+  drawPriceChart(d);
   const ul = $("changes");
   ul.innerHTML = "";
   (d.changes.length ? d.changes.slice(0, 12) : [{ d: "-", from: "", to: "최근 3년 변경 없음", s: "" }]).forEach((c) => {
@@ -175,6 +245,7 @@ function render(d) {
     li.innerHTML = `<span>${c.d}</span><span>${c.from ? c.from + " → " : ""}<b>${c.to}</b>${c.s !== "" ? " (" + fmt(c.s) + ")" : ""}</span>`;
     ul.appendChild(li);
   });
+  runCalculator(d);
 }
 
 function drawChart(d) {
@@ -200,6 +271,97 @@ function drawChart(d) {
   });
   $("chart").innerHTML = s;
 }
+
+function drawPriceChart(d) {
+  const W = 520, H = 220, L = 38, R = 8, T = 10, B = 24;
+  const h = d.price_history;
+  if (!h || !h.length) { $("priceChart").innerHTML = ""; return; }
+  const n = h.length;
+  const vals = h.flatMap((p) => [p.n, p.q]);
+  const vMin = Math.min(100, ...vals), vMax = Math.max(...vals);
+  const pad = (vMax - vMin) * 0.08 || 10;
+  const lo = vMin - pad, hi = vMax + pad;
+  const x = (i) => L + (W - L - R) * i / Math.max(1, n - 1);
+  const y = (v) => T + (H - T - B) * (1 - (v - lo) / (hi - lo));
+  const css = getComputedStyle(document.documentElement);
+  const c = (v) => css.getPropertyValue(v).trim();
+  let s = "";
+  [100, vMax].forEach((v) => {
+    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="${c("--line")}"/>`;
+    s += `<text x="${L - 4}" y="${y(v) + 4}" font-size="11" text-anchor="end" fill="${c("--muted")}">${Math.round(v)}</text>`;
+  });
+  const pathOf = (key) => h.map((p, i) => (i ? "L" : "M") + x(i).toFixed(1) + " " + y(p[key]).toFixed(1)).join(" ");
+  s += `<path d="${pathOf("n")}" fill="none" stroke="${c("--ndx")}" stroke-width="2"/>`;
+  s += `<path d="${pathOf("q")}" fill="none" stroke="${c("--qld")}" stroke-width="2.5"/>`;
+  s += `<circle cx="${x(n - 1)}" cy="${y(h[n - 1].q)}" r="5" fill="${c("--qld")}"/>`;
+  const years = {};
+  h.forEach((p, i) => { const yr = p.d.slice(0, 4); if (!(yr in years)) years[yr] = i; });
+  Object.entries(years).forEach(([yr, i]) => {
+    if (i > 2) s += `<text x="${x(i)}" y="${H - 6}" font-size="11" text-anchor="middle" fill="${c("--muted")}">${yr}</text>`;
+  });
+  $("priceChart").innerHTML = s;
+}
+
+// ---- 1. trade amount calculator (per-device only, localStorage)
+let lastSignal = null;
+function runCalculator(d) {
+  lastSignal = d;
+  try {
+    const saved = JSON.parse(localStorage.getItem("calc") || "{}");
+    if (saved.holding != null) $("calcHolding").value = saved.holding;
+    if (saved.cash != null) $("calcCash").value = saved.cash;
+  } catch (_) {}
+  updateCalc();
+}
+function updateCalc() {
+  const holding = parseFloat($("calcHolding").value), cash = parseFloat($("calcCash").value);
+  try { localStorage.setItem("calc", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
+  const box = $("calcResult");
+  if (!lastSignal || isNaN(holding) && isNaN(cash)) { box.textContent = "금액을 입력하면 이번 주에 사고팔 금액을 계산해 드립니다."; return; }
+  const h = isNaN(holding) ? 0 : holding, c = isNaN(cash) ? 0 : cash;
+  if (lastSignal.state === "SELL") {
+    const amt = h * lastSignal.sell_pct / 100;
+    box.innerHTML = `이번 주 <b style="color:var(--sell)">${won(amt)}만원</b> 매도 (보유금액의 ${lastSignal.sell_pct}%)<br>매도 후 예상 보유 ${won(h - amt)}만원, 현금 ${won(c + amt)}만원`;
+  } else if (lastSignal.state === "BUY") {
+    const amt = c * lastSignal.buy_pct / 100;
+    box.innerHTML = c > 0
+      ? `이번 주 <b style="color:var(--buy)">${won(amt)}만원</b> 재매수 (현금의 ${lastSignal.buy_pct}%)<br>재매수 후 예상 보유 ${won(h + amt)}만원, 현금 ${won(c - amt)}만원`
+      : `재매수 신호지만 쌓인 현금이 없어 할 일이 없습니다. (월 적립금은 평소대로 매수)`;
+  } else {
+    box.textContent = "관망 구간입니다. 이번 주는 매도도 재매수도 하지 않습니다.";
+  }
+}
+$("calcHolding").addEventListener("input", updateCalc);
+$("calcCash").addEventListener("input", updateCalc);
+
+// ---- 2. monthly DCA checklist (per-device only, localStorage)
+function monthKey(offset) {
+  const now = new Date(); now.setMonth(now.getMonth() - offset);
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}`;
+}
+function renderChecklist() {
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem("dcaChecklist") || "{}"); } catch (_) {}
+  const box = $("checklist");
+  box.innerHTML = "";
+  for (let i = 0; i < 6; i++) {
+    const key = monthKey(i);
+    const [y, m] = key.split("-");
+    const row = document.createElement("div");
+    row.className = "checklist";
+    const checked = !!store[key];
+    row.innerHTML = `<input type="checkbox" id="m_${key}" ${checked ? "checked" : ""}>
+      <div class="m"><b>${y}년 ${parseInt(m)}월</b><span>${i === 0 ? "이번 달" : i + "개월 전"} 적립 매수</span></div>`;
+    box.appendChild(row);
+    row.querySelector("input").addEventListener("change", (e) => {
+      let s = {};
+      try { s = JSON.parse(localStorage.getItem("dcaChecklist") || "{}"); } catch (_) {}
+      s[key] = e.target.checked;
+      localStorage.setItem("dcaChecklist", JSON.stringify(s));
+    });
+  }
+}
+renderChecklist();
 
 // ---- push notifications
 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);

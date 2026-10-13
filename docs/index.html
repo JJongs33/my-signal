@@ -297,11 +297,12 @@
   .pfund b { font: 900 22px/1 var(--f-disp); letter-spacing: -.02em; }
   .pfund span { font: 400 12px/1 var(--f-mono); color: var(--faint); }
   table.perf2 { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .perf2 th { font: 500 11px/1.4 var(--f-text); color: var(--faint); text-align: right; padding: 0 0 8px; }
+  .perf2 th { font: 500 11px/1.4 var(--f-text); color: var(--faint); text-align: right; padding: 0 0 8px 10px; border-left: 1px solid var(--line2); vertical-align: bottom; }
+  .perf2 th:first-child { border-left: 0; padding-left: 0; }
   .perf2 th:first-child { text-align: left; }
-  .perf2 td { padding: 11px 0; text-align: right; border-bottom: 1px solid var(--line2); line-height: 1.35; vertical-align: top; font-variant-numeric: tabular-nums; }
-  .perf2 td:first-child { text-align: left; color: var(--muted); white-space: nowrap; padding-right: 8px; }
-  .perf2 tr.ph td { text-align: left; padding: 22px 0 8px; font: 500 12px/1.4 var(--f-mono); color: var(--text); border-bottom: 0; letter-spacing: .02em; }
+  .perf2 td { padding: 11px 0 11px 10px; text-align: right; border-left: 1px solid var(--line2); border-bottom: 1px solid var(--line2); line-height: 1.35; vertical-align: top; font-variant-numeric: tabular-nums; }
+  .perf2 td:first-child { text-align: left; color: var(--muted); white-space: nowrap; padding: 11px 8px 11px 0; border-left: 0; }
+  .perf2 tr.ph td { border-left: 0; text-align: left; padding: 22px 0 8px; font: 500 12px/1.4 var(--f-mono); color: var(--text); border-bottom: 0; letter-spacing: .02em; }
   .perf2 tr.rule td { font-weight: 800; color: var(--text); }
   .perf2 tr.rule td:first-child { color: var(--sell); }
   .perf2 em { display: block; font: 600 11px/1.4 var(--f-mono); font-style: normal; }
@@ -426,9 +427,9 @@
       <div><b>적립식 (기준)</b><span>매월 첫 거래일에 정해 둔 금액만 사는 방식</span></div>
       <div><b>쫑 규칙</b><span>적립식 + 쫑지표 신호로 매주 매도·매수</span></div>
     </div>
-    <div class="note">시작 1억 + 매월 100만원, 세금(22%)·거래비용 반영.<br><b>연평균</b> = 납입 시점을 반영한 연 수익률 · <b>총수익률</b> = 최종 평가금액 ÷ 총 납입금 − 1</div>
+    <div class="note">약 7년 구간마다 새로 시작 · 시작 1억 + 매월 100만원 · 세금(22%)·거래비용 반영<br><b>연평균</b> 납입 시점을 반영한 연 수익률 · <b>총수익률</b> 최종 평가금액 ÷ 총 납입금 − 1 (4자리 이상은 100 단위 반올림)<br><b>하락 평균</b> 계좌가 전고점보다 10% 넘게 빠졌던 구간들의 저점 평균, 아래 숫자는 그런 구간의 횟수</div>
     <div id="perfBox"></div>
-    <div class="note">큰 하락은 줄였고, 꾸준히 오른 해에는 졌어요. USD의 2007년 이전은 가상 가격이고, 앞으로는 이보다 낮을 수 있어요.</div>
+    <div class="note">큰 하락은 줄였고, 꾸준히 오른 구간(2014~2020)에는 비슷하거나 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격입니다. 앞으로는 이보다 낮을 수 있어요.</div>
   </section>
 
   <!-- 참고 -->
@@ -469,7 +470,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 18</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 19</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -482,13 +483,15 @@ const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
 const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
 const PERF = {
   QLD: { sub: "나스닥 100 · 2배", rows: [
-    { p: "2008~2025", paid: 3.2, a: [25.1, 27.5], t: [2597, 3637], f: [85, 118], m: [-80, -66] },
-    { p: "2000~2025", paid: 4.1, a: [16.8, 18.8], t: [2296, 3472], f: [99, 147], m: [-99, -97] },
-    { p: "2026 (1~10월)", c: [38.8, 29.5], m: [-23, -23] } ] },
+    { p: "2000~2006", paid: 1.8, a: [-12, -10], t: [-47, -43], f: [1.0, 1.0], dd: [[-40, 4], [-38, 4]] },
+    { p: "2007~2013", paid: 1.8, a: [16, 21], t: [135, 201], f: [4.3, 5.5], dd: [[-29, 6], [-24, 9]] },
+    { p: "2014~2020", paid: 1.8, a: [34, 34], t: [484, 476], f: [11, 11], dd: [[-24, 12], [-22, 11]] },
+    { p: "2021~2026.10", paid: 1.7, a: [23, 28], t: [168, 239], f: [4.6, 5.8], dd: [[-29, 8], [-21, 9]] } ] },
   USD: { sub: "반도체 · 2배", rows: [
-    { p: "2008~2025", paid: 3.2, a: [31.3, 37.1], t: [6005, 12614], f: [193, 402], m: [-84, -69] },
-    { p: "2000~2025", paid: 4.1, a: [19.7, 23.3], t: [4176, 8692], f: [176, 362], m: [-100, -99] },
-    { p: "2026 (1~10월)", c: [66.6, 59.4], m: [-39, -28] } ] },
+    { p: "2000~2006", paid: 1.8, a: [-20, -19], t: [-65, -64], f: [0.6, 0.7], dd: [[-42, 3], [-41, 3]] },
+    { p: "2007~2013", paid: 1.8, a: [2, 8], t: [14, 54], f: [2.1, 2.8], dd: [[-39, 3], [-33, 5]] },
+    { p: "2014~2020", paid: 1.8, a: [39, 42], t: [624, 723], f: [13, 15], dd: [[-23, 18], [-22, 17]] },
+    { p: "2021~2026.10", paid: 1.7, a: [55, 67], t: [834, 1300], f: [16, 23], dd: [[-28, 13], [-20, 18]] } ] },
 };
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
 
@@ -522,19 +525,14 @@ async function load() {
 }
 
 function renderPerf() {
-  const n = (x) => Math.round(x).toLocaleString("ko-KR");
-  const diff = (a, b) => { const d = b - a; return `<em class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "+" : ""}${d.toFixed(1)}%p</em>`; };
+  const n = (x) => x.toLocaleString("ko-KR"), sg = (x) => (x > 0 ? "+" : "") + n(x);
+  const diff = (a, b) => { const d = b - a; return `<em class="${d >= 0 ? "up" : "down"}">${d >= 0 ? "+" : ""}${d}%p</em>`; };
   $("perfBox").innerHTML = Object.entries(PERF).map(([f, o]) => {
-    const rows = o.rows.map((r) => {
-      if (r.c) return `<tr class="ph"><td colspan="4">${r.p} · 세전 누적</td></tr>
-        <tr><td>적립식 (기준)</td><td>-</td><td>+${r.c[0]}%</td><td>${r.m[0]}%</td></tr>
-        <tr class="rule"><td>쫑 규칙</td><td>-</td><td>+${r.c[1]}%</td><td>${r.m[1]}%</td></tr>`;
-      return `<tr class="ph"><td colspan="4">${r.p} · 총 납입 ${r.paid}억</td></tr>
-        <tr><td>적립식 (기준)</td><td>${r.a[0]}%</td><td>+${n(r.t[0])}%<div class="sub2">최종 ${r.f[0]}억</div></td><td>${r.m[0]}%</td></tr>
-        <tr class="rule"><td>쫑 규칙</td><td>${r.a[1]}% ${diff(r.a[0], r.a[1])}</td><td>+${n(r.t[1])}%<div class="sub2">최종 ${r.f[1]}억</div></td><td>${r.m[1]}%</td></tr>`;
-    }).join("");
+    const rows = o.rows.map((r) => `<tr class="ph"><td colspan="4">${r.p} · 총 납입 ${r.paid}억</td></tr>
+        <tr><td>적립식 (기준)</td><td>${r.a[0]}%</td><td>${sg(r.t[0])}%<div class="sub2">최종 ${r.f[0]}억</div></td><td>${r.dd[0][0]}%<div class="sub2">${r.dd[0][1]}번</div></td></tr>
+        <tr class="rule"><td>쫑 규칙</td><td>${r.a[1]}% ${diff(r.a[0], r.a[1])}</td><td>${sg(r.t[1])}%<div class="sub2">최종 ${r.f[1]}억</div></td><td>${r.dd[1][0]}%<div class="sub2">${r.dd[1][1]}번</div></td></tr>`).join("");
     return `<div class="pfund"><b>${f}</b><span>${o.sub}</span></div>
-      <table class="perf2"><tr><th></th><th>연평균</th><th>총수익률</th><th>최대 하락</th></tr>${rows}</table>`;
+      <table class="perf2"><tr><th></th><th>연평균</th><th>총수익률</th><th>하락 평균<br>(−10%↓ 횟수)</th></tr>${rows}</table>`;
   }).join("");
 }
 

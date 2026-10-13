@@ -1,7 +1,7 @@
 // Service worker for "쫑우 투자신호": offline fallback + push notifications.
 // Strategy: always try the network first (so a new version of the app and fresh data show up right away),
 // and use the saved copy only when the phone is offline.
-const CACHE = "signal-v10";
+const CACHE = "signal-v11";
 const SHELL = ["./", "index.html", "config.js", "manifest.json", "icon-192.png", "icon-512.png", "icon-180.png", "data.json", "prices.json"];
 
 self.addEventListener("install", (e) => {

@@ -186,7 +186,64 @@
   .fundtag b { color: var(--text); font-weight: 600; }
   .kv.sel { border-left: 3px solid var(--sell); }
 
-  @media (max-width: 360px) { .badge { font-size: 38px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
+  /* ===== 여백 중심 레이아웃 (레퍼런스처럼: 카드 없이 가는 선과 넓은 여백) ===== */
+  body { padding-left: 24px; padding-right: 24px; font-size: 16px; line-height: 1.75; }
+  header { padding: 40px 0 24px; border-bottom: 1px solid var(--line); margin-bottom: 0; }
+  h1 { font-size: 22px; }
+  .fundsw { margin: 0; padding: 20px 0 8px; }
+  .card { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 64px 0 8px; margin: 0; }
+  .card.hero { border-top: 0; padding-top: 48px; padding-bottom: 24px; }
+  .state { border-top: 0; }
+  h2 { font-size: 15px; margin: 0 0 32px; gap: 14px; }
+  h3 { margin: 40px 0 12px; font-size: 14px; }
+  .fundtag { margin-bottom: 20px; font-size: 12px; }
+  .badge { font-size: 72px; line-height: 1; letter-spacing: -.04em; }
+  .headrow { gap: 20px; }
+  .sicon { width: 40px; height: 40px; font-size: 16px; }
+  .action { font-size: 19px; line-height: 1.6; margin-top: 32px; font-weight: 500; }
+  .action b { font-weight: 800; } .nb { white-space: nowrap; }
+  .progress { background: transparent; padding: 0; margin-top: 32px; font-size: 14px; color: var(--muted); }
+  .progress .pbar { margin: 0 0 12px; }
+  .meta { border-top: 0; margin-top: 24px; padding-top: 0; font: 400 12px/1.6 var(--f-mono); color: var(--faint); letter-spacing: .02em; }
+  .note { font-size: 14px; line-height: 1.75; margin-top: 16px; }
+  .kv { background: transparent; padding: 20px 0 0; border-top: 1px solid var(--line); }
+  .grid { gap: 24px; }
+  .zonebar { margin: 40px 0 6px; height: 36px; }
+  .marker { top: -24px; }
+  .zticks { margin-bottom: 24px; }
+  .crit { background: transparent; border: 0; border-top: 1px solid var(--line); border-radius: 0; padding: 20px 0; margin: 0; gap: 0; }
+  .crit .sym { display: none; }
+  .crit b { font-size: 16px; } .crit span.d { font-size: 14px; margin-top: 4px; }
+  .crit.now { border-left: 0; box-shadow: inset 3px 0 0 var(--now); padding-left: 16px; }
+  .crit.SELL.now, .crit.BUY.now, .crit.HOLD.now { border-color: var(--line); }
+  details.more { border-top: 1px solid var(--line); padding: 20px 0; }
+  details.more:last-child { border-bottom: 0; }
+  details.more > summary { font-size: 15px; font-weight: 600; list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  details.more > summary::-webkit-details-marker { display: none; }
+  details.more > summary::after { content: "+"; font: 400 20px/1 var(--f-mono); color: var(--faint); }
+  details.more[open] > summary::after { content: "–"; }
+  details.more > :not(summary) { margin-top: 16px; }
+  details.more.first { border-top: 0; padding-top: 0; }
+  .refitem .d, details.more .d { font-size: 14px; color: var(--muted); line-height: 1.75; }
+  .result { background: transparent; border-top: 1px solid var(--line); border-radius: 0; padding: 24px 0 0; margin-top: 28px; font-size: 15px; }
+  .result b { font-size: 28px; font-weight: 900; letter-spacing: -.02em; display: block; line-height: 1.3; }
+  .result .formula { margin-top: 4px; }
+  label.field { margin: 24px 0 8px; }
+  input, select { min-height: 52px; }
+  .logitem { background: transparent; border-top: 1px solid var(--line); border-radius: 0; padding: 16px 0; margin: 0; }
+  .summary { background: transparent; border-top: 1px solid var(--line); border-radius: 0; padding: 20px 0 0; margin: 24px 0 8px; }
+  ul.changes li { padding: 16px 0; }
+  .perf-table { margin-top: 20px; font-size: 14px; }
+  .perf-table th, .perf-table td { padding: 14px 4px; }
+  .seg { margin-top: 20px; }
+  .range { margin-top: 0; }
+  .legend { margin-top: 16px; }
+  .chartwrap { margin-top: 20px; }
+  .ybars { margin-top: 20px; }
+  footer { margin: 80px 0 24px; font-size: 12px; }
+  button { padding: 16px; }
+
+  @media (max-width: 360px) { .badge { font-size: 56px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -206,7 +263,7 @@
   </nav>
 
   <!-- 1. 지금 신호 -->
-  <section class="card state" id="stateCard">
+  <section class="card state hero" id="stateCard">
     <div class="fundtag" id="fundTag"></div>
     <div class="headrow"><span class="sicon" id="sicon">▼</span><div class="badge" id="badge">-</div></div>
     <div class="action" id="action"></div>
@@ -217,7 +274,7 @@
 
   <!-- 2. 점수 기준표 -->
   <section class="card">
-    <h2><span class="idx">01</span>점수 기준표 <span class="tag block">금리·달러로 만든 -100 ~ +100 점수</span></h2>
+    <h2><span class="idx">01</span>점수 기준표</h2>
     <div class="zonewrap">
       <div class="marker"><span class="mlabel" id="mlabel">현재 -</span></div>
       <div class="nowline" id="nowline" style="left:50%"></div>
@@ -226,22 +283,20 @@
         <span style="left:0%;transform:none">-100</span><span style="left:35%">-30</span><span style="left:50%">0</span><span style="left:100%;transform:translateX(-100%)">+100</span>
       </div>
     </div>
-    <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
-      <span class="d">남은 보유 주식의 <span class="amt">5%</span>를 팔아 현금으로 보관. 매주 1번 반복.</span></div></div>
-    <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
-      <span class="d">아무것도 하지 않음.</span></div></div>
-    <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
-      <span class="d">모아 둔 현금의 <span class="amt">25%</span>를 매수. 매주 1번 반복.</span></div></div>
-    <details style="margin-top:12px">
+    <div class="crit SELL" id="critSELL"><div><b>-30 이하 · 매도 <span class="nowtag hidden">지금</span></b>
+      <span class="d">매주 보유 주식의 <span class="amt">5%</span></span></div></div>
+    <div class="crit HOLD" id="critHOLD"><div><b>-29 ~ -1 · 관망 <span class="nowtag hidden">지금</span></b>
+      <span class="d">아무것도 하지 않아요</span></div></div>
+    <div class="crit BUY" id="critBUY"><div><b>0 이상 · 매수 <span class="nowtag hidden">지금</span></b>
+      <span class="d">매주 모아 둔 현금의 <span class="amt">25%</span></span></div></div>
+    <details class="more">
       <summary>점수는 어떻게 계산되나요?</summary>
       <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2</b></div>
-      <div class="note">• <b>금리 점수</b>: 미국 10년물 금리가 최근 6개월 평균보다 높으면 마이너스, 낮으면 플러스<br>
-        • <b>달러 점수</b>: 달러지수가 최근 100일 평균보다 강하면 마이너스, 약하면 플러스</div>
-      <div class="note">각각 -100 ~ +100으로 제한한 뒤 평균을 냅니다. 금리와 달러가 오르면 성장주에 불리하다는 이유로 만든 기준입니다.</div>
-      <div class="note"><b>금리와 달러는 1:1로 섞었습니다.</b> 1:3, 1:2, 2:1, 3:1도 시험했는데 1:1이 가장 좋았습니다. 값을 정밀하게 맞춘 것이 아니라 단순하고 안정적인 값을 고른 것이고, 기준 -30과 0, 6개월·100일 같은 숫자도 소수의 후보 중에서 골랐습니다. 앞으로의 실제 결과로 계속 확인이 필요합니다.</div>
-      <div class="grid" style="margin-top:10px">
-        <div class="kv"><span>지금 금리 점수</span><b id="rates">-</b><span id="ratesNote"></span></div>
-        <div class="kv"><span>지금 달러 점수</span><b id="dxy">-</b><span id="dxyNote"></span></div>
+      <div class="note">금리: 10년물 금리가 6개월 평균보다 높으면 −, 낮으면 +<br>달러: 달러지수가 100일 평균보다 강하면 −, 약하면 +</div>
+      <div class="note">두 지표는 1:1로 섞었고, QLD·USD가 같은 점수를 씁니다.</div>
+      <div class="grid" style="margin-top:20px">
+        <div class="kv"><span>금리 점수</span><b id="rates">-</b><span id="ratesNote"></span></div>
+        <div class="kv"><span>달러 점수</span><b id="dxy">-</b><span id="dxyNote"></span></div>
       </div>
     </details>
   </section>
@@ -253,35 +308,31 @@
     <div id="calcSell" class="hidden">
       <label class="field">보유 <span id="calcName">QLD</span> 평가금액 (만원)</label>
       <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
-      <div class="help">증권사 앱의 '평가금액'을 적으세요. 그 5%가 한 번에 팔 금액입니다.</div>
     </div>
     <div id="calcBuy" class="hidden">
       <label class="field">모아 둔 현금 (만원)</label>
       <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
-      <div class="help">매도하고 아직 쓰지 않은 현금을 적으세요. 그 25%가 한 번에 살 금액입니다.</div>
     </div>
     <div class="result" id="calcResult"></div>
-    <div class="note">입력한 금액은 이 폰에만 저장됩니다.</div>
   </section>
 
   <!-- 4. 매매 기록 -->
   <section class="card">
     <h2><span class="idx">03</span>매매 기록</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">날짜와 금액을 넣으면 그날 종가로 주식 수를 계산해 쌓아 둡니다.</div>
     <div class="form-row">
       <div><label class="field" style="margin-top:0">날짜</label><input type="date" id="logDate"></div>
       <div><label class="field" style="margin-top:0">금액 (만원)</label><input type="number" id="logAmt" inputmode="decimal" placeholder="예: 100"></div>
     </div>
-    <div class="form-row" style="margin-top:2px">
+    <div class="form-row" style="margin-top:4px">
       <div><label class="field">종목</label><select id="logTk"><option value="QLD">QLD</option><option value="USD">USD (반도체 2배)</option></select></div>
       <div><label class="field">구분</label><select id="logType"><option value="buy">매수</option><option value="sell">매도</option></select></div>
     </div>
-    <button id="logAdd" style="margin-top:12px">기록 추가</button>
+    <button id="logAdd" style="margin-top:20px">기록 추가</button>
     <div class="note" id="logMsg"></div>
     <div class="summary hidden" id="logSummary"></div>
     <div id="logList"></div>
-    <div class="grid" style="margin-top:10px"><button class="secondary hidden" id="logCsv">기록 복사 (백업)</button><button class="secondary hidden" id="logClear">전체 삭제</button></div>
-    <div class="note">기록은 이 폰에만 저장됩니다. 앱을 지우면 사라지니 가끔 '기록 복사'로 백업하세요. 휴장일은 직전 거래일 종가를 씁니다.</div>
+    <div class="grid" style="margin-top:16px"><button class="secondary hidden" id="logCsv">기록 복사 (백업)</button><button class="secondary hidden" id="logClear">전체 삭제</button></div>
+    <div class="note">기록은 이 폰에만 저장돼요. 가끔 백업해 두세요.</div>
   </section>
 
   <!-- 5. 차트 -->
@@ -294,18 +345,18 @@
       <button data-y="1">1년</button><button data-y="3" class="on">3년</button><button data-y="5">5년</button><button data-y="10">10년</button>
     </div>
 
-    <h3>① 점수</h3>
+    <h3>점수</h3>
     <div class="chartwrap" id="wrapScore"><svg id="chartScore" viewBox="0 0 360 240" role="img" aria-label="점수 추이 차트"></svg><div class="tip hidden" id="tipScore"></div></div>
-    <div class="legend"><span><i class="sw" style="background:var(--zone-buy);border:1px solid var(--buy)"></i>매수 구간 (0 이상)</span><span><i class="sw" style="background:var(--zone-sell);border:1px solid var(--sell)"></i>매도 구간 (-30 이하)</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--zone-buy);border:1px solid var(--buy)"></i>매수 (0 이상)</span><span><i class="sw" style="background:var(--zone-sell);border:1px solid var(--sell)"></i>매도 (-30 이하)</span></div>
 
-    <h3 style="display:flex;align-items:center">② 가격 (시작일 = 100)
+    <h3 style="display:flex;align-items:center">가격 (시작일 = 100)
       <span class="toggle" id="scaleToggle"><button data-s="lin">보통</button><button data-s="log" class="on">로그</button></span></h3>
     <div class="chartwrap" id="wrapPrice"><svg id="chartPrice" viewBox="0 0 360 250" role="img" aria-label="QLD와 USD 가격 추이 차트"></svg><div class="tip hidden" id="tipPrice"></div></div>
-    <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD (반도체 2배)</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD</span></div>
     <div class="note" id="scaleNote"></div>
-    <div class="grid" style="margin-top:12px">
-      <div class="kv" id="kvQ"><span>QLD 지금 가격</span><b id="qldNow">-</b><span id="qldDD"></span></div>
-      <div class="kv" id="kvU"><span>USD 지금 가격</span><b id="usdNow">-</b><span id="usdDD"></span></div>
+    <div class="grid" style="margin-top:20px">
+      <div class="kv" id="kvQ"><span>QLD</span><b id="qldNow">-</b><span id="qldDD"></span></div>
+      <div class="kv" id="kvU"><span>USD</span><b id="usdNow">-</b><span id="usdDD"></span></div>
     </div>
   </section>
 
@@ -317,10 +368,10 @@
 
   <!-- 7. 과거 성과 -->
   <section class="card">
-    <h2><span class="idx">06</span>과거 성과 <span class="tag">시뮬레이션</span></h2>
-    <div class="note" style="margin-top:-4px" id="perfNote"></div>
+    <h2><span class="idx">06</span>과거 성과</h2>
+    <div class="note" style="margin-top:-8px" id="perfNote"></div>
     <table class="perf-table">
-      <tr><th>기간</th><th>적립식 매수</th><th>이 규칙</th><th>최대 하락</th></tr>
+      <tr><th>기간</th><th>적립식</th><th>이 규칙</th><th>최대 하락</th></tr>
       <tbody id="perfBody"></tbody>
     </table>
     <div class="note" id="perfText"></div>
@@ -329,42 +380,42 @@
   <!-- 참고 -->
   <section class="card">
     <h2><span class="idx">07</span>참고</h2>
-    <div class="refitem"><b>적립식 매수(매월초)는 그대로</b>
-      <div class="d">매월 첫 거래일에 정해 둔 적립식 매수액을 그대로 매수합니다. 점수와 상관없고, 매도·매수 신호는 이미 보유한 주식과 모아 둔 현금에만 적용됩니다.</div></div>
-    <div class="refitem"><b>언제 확인하나</b>
-      <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 한국 시간 저녁 8시에 알려 줍니다. 신호가 켜지면 그날 밤 미국 장에서 실행하고, 같은 구간이 이어지면 5거래일(약 1주)마다 반복합니다.</div></div>
-    <div class="refitem"><b>신호가 이어지면 얼마나 쌓이나</b>
+    <details class="more first"><summary>적립식 매수(매월초)는 그대로</summary>
+      <div class="d">매월 첫 거래일에 정해 둔 적립식 매수액은 그대로 사요. 신호는 보유 주식과 모아 둔 현금에만 적용돼요.</div></details>
+    <details class="more"><summary>언제 확인하고 실행하나요?</summary>
+      <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 저녁 8시(한국)에 알려 줘요. 실제 매도·매수는 매주 1번이에요.</div></details>
+    <details class="more"><summary>신호가 이어지면 얼마나 쌓이나요?</summary>
       <table class="perf-table">
-        <tr><th>반복 횟수</th><th>매도 누적<br>(보유 주식 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
-        <tr><td>1회</td><td>5%</td><td>25%</td></tr><tr><td>2회</td><td>10%</td><td>44%</td></tr><tr><td>4회</td><td>19%</td><td>68%</td></tr>
-        <tr><td>6회</td><td>26%</td><td>82%</td></tr><tr><td>8회</td><td>34%</td><td>90%</td></tr><tr><td>11회</td><td>43%</td><td>96%</td></tr><tr><td>14회</td><td>51%</td><td>98%</td></tr>
+        <tr><th>반복</th><th>매도 누적<br>(보유 주식)</th><th>매수 누적<br>(현금)</th></tr>
+        <tr><td>1주</td><td>5%</td><td>25%</td></tr><tr><td>2주</td><td>10%</td><td>44%</td></tr><tr><td>4주</td><td>19%</td><td>68%</td></tr>
+        <tr><td>8주</td><td>34%</td><td>90%</td></tr><tr><td>14주</td><td>51%</td><td>98%</td></tr>
       </table>
-      <div class="d">매수는 남은 현금의 25%씩 나눠서 삽니다. 관망 구간이 되면 남은 현금은 그대로 두고, 매도 구간이 되면 다시 팝니다.</div></div>
-    <div class="refitem"><b>매도 신호가 켜졌던 기간 (과거 10년)</b><div id="refStats"></div></div>
-    <div class="refitem"><b>매수 신호가 켜졌던 기간 (과거 10년)</b><div id="refStatsBuy"></div></div>
-    <div class="refitem"><b>매도 횟수를 제한하지 않는 이유</b>
-      <div class="d">매도 횟수를 '연 16주', '연 11주'로 제한해 보니 효과가 거의 사라졌습니다 (QLD 2008~2025, 적립식 대비 제한 없음 +4.7%p → 연 16주 +0.8%p → 연 11주 -0.2%p). 매도가 필요한 해는 2022년처럼 길게(44주) 이어지고, 필요 없는 해는 0주라서, 제한하면 정작 필요할 때 일찍 끝납니다.</div></div>
-    <div class="refitem"><b>매도해서 생긴 현금</b>
-      <div class="d">MMF·단기채·예금처럼 이자가 붙는 곳에 두는 것으로 시험했습니다.</div></div>
-    <div class="refitem"><b>시험 조건과 한계</b>
-      <div class="d">성과표는 세금(22%)과 거래비용 0.1%를 반영했고, 환전 비용은 넣지 않았습니다. <span id="riskNote"></span> 규칙은 과거 자료에서 골랐으니 앞으로는 다를 수 있습니다.</div></div>
+      <div class="d">매번 "남은 것"의 비율이라 5%씩 5번 팔아도 25%가 아니라 23%예요.</div></details>
+    <details class="more"><summary>매도 신호가 켜졌던 기간 (10년)</summary><div id="refStats"></div></details>
+    <details class="more"><summary>매수 신호가 켜졌던 기간 (10년)</summary><div id="refStatsBuy"></div></details>
+    <details class="more"><summary>매도 횟수를 제한하지 않는 이유</summary>
+      <div class="d">'연 16주'처럼 제한하면 정작 폭락 때 일찍 끝나서 효과가 거의 사라졌어요.</div></details>
+    <details class="more"><summary>매도해서 생긴 현금은?</summary>
+      <div class="d">MMF·단기채처럼 이자가 붙는 곳에 두는 것으로 시험했어요.</div></details>
+    <details class="more"><summary>시험 조건과 한계</summary>
+      <div class="d">세금 22%와 거래비용 0.1%를 반영했고 환전 비용은 뺐어요. <span id="riskNote"></span> 과거 자료로 고른 규칙이라 앞으로는 다를 수 있어요.</div></details>
   </section>
 
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">매 거래일 저녁 8시(한국 시간)에 확인해서, 상태가 바뀌었거나 매도·매수 구간이면 알려 줍니다. 관망이 이어지는 동안은 알림이 없습니다. 알림에는 현재 구간과 점수가 나옵니다 (예: 매도 구간입니다. 점수는 -88). 예약 실행이라 몇 분 늦을 수 있어요.</div>
-    <div id="iosHint" class="note hidden">아이폰은 Safari 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 앱을 열어 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
+    <div class="note" style="margin-top:-8px;margin-bottom:20px">상태가 바뀔 때와 매도·매수 구간인 날, 저녁 8시(한국)에 알려 드려요. 관망이 이어지면 알림이 없어요.</div>
+    <div id="iosHint" class="note hidden">아이폰은 Safari 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 앱에서 아래 버튼을 눌러 주세요.</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
-      <div class="note">아래 코드를 복사해 GitHub 저장소 Secrets의 <b>PUSH_SUBSCRIPTIONS</b>에 넣으면 알림이 옵니다.</div>
+      <div class="note">아래 코드를 GitHub 저장소 Secrets의 <b>PUSH_SUBSCRIPTIONS</b>에 넣으면 알림이 와요.</div>
       <textarea id="subText" readonly></textarea>
       <button class="secondary" id="copyBtn">코드 복사</button>
     </div>
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 데이터 시뮬레이션에 기반한 개인용 알림이며 투자 조언이 아닙니다.</footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.</footer>
 </main>
 
 <script src="config.js"></script>
@@ -376,14 +427,14 @@ const man = (x) => Math.round(x).toLocaleString("ko-KR");
 const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
 const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
 const FUNDS = {
-  QLD: { name: "QLD", sub: "나스닥 100 · 2배", calc: "QLD", risk: "2배 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.",
-    perfNote: "QLD · 시작 1억 + 매월 100만원 · 세금·비용 반영 · 비교 대상은 적립식 매수(매월초)",
-    perf: [["2008~2025", "연 25.1%", "연 27.5%", "-80% → -66%", true], ["2000~2025", "연 16.8%", "연 18.8%", "-99% → -97%", true], ["2026 (1~10월)", "+38.8%", "+29.5%", "-23% → -23%", false]],
-    perfText: "큰 하락(2008·2022년)을 줄여서 이겼고, 꾸준히 오른 해(2013·2017·2023년)에는 졌습니다. 과거에 가장 좋았던 규칙을 골랐기 때문에 앞으로는 이보다 낮을 수 있습니다." },
-  USD: { name: "USD", sub: "반도체 · 2배", calc: "USD", risk: "반도체 2배 상품은 -80% 이상 빠질 수 있고, QLD보다 훨씬 크게 흔들립니다.",
-    perfNote: "USD(반도체 2배) · 시작 1억 + 매월 100만원 · 세금·비용 반영 · 2007년 이전은 반도체 지수로 만든 가상 가격",
-    perf: [["2008~2025", "연 31.3%", "연 37.1%", "-84% → -69%", true], ["2000~2025", "연 19.7%", "연 23.3%", "-100% → -99%", true], ["2026 (1~10월)", "+66.6%", "+59.5%", "-39% → -28%", false]],
-    perfText: "같은 규칙을 USD에 적용한 결과입니다. 큰 하락을 줄여서 이겼고, 오르기만 한 해(2013·2021·2023년)에는 졌습니다. 등락이 커서 해마다 차이가 큽니다. 과거 최고 규칙을 골랐기 때문에 앞으로는 더 낮을 수 있습니다." },
+  QLD: { name: "QLD", sub: "나스닥 100 · 2배", calc: "QLD", risk: "2배 상품은 큰 하락장에서 -60% 이상 빠질 수 있어요.",
+    perfNote: "QLD · 1억 + 매월 100만원 · 세후",
+    perf: [["2008~2025", "연 25.1%", "연 27.5%", "-80% → -66%", true], ["2000~2025", "연 16.8%", "연 18.8%", "-99% → -97%", true], ["2026", "+38.8%", "+29.5%", "-23% → -23%", false]],
+    perfText: "큰 하락은 줄였고, 꾸준히 오른 해에는 졌어요. 앞으로는 이보다 낮을 수 있어요." },
+  USD: { name: "USD", sub: "반도체 · 2배", calc: "USD", risk: "반도체 2배는 -80% 이상 빠질 수 있고 QLD보다 훨씬 크게 흔들려요.",
+    perfNote: "USD · 1억 + 매월 100만원 · 세후 · 2007년 이전은 가상 가격",
+    perf: [["2008~2025", "연 31.3%", "연 37.1%", "-84% → -69%", true], ["2000~2025", "연 19.7%", "연 23.3%", "-100% → -99%", true], ["2026", "+66.6%", "+59.5%", "-39% → -28%", false]],
+    perfText: "큰 하락은 줄였고, 오르기만 한 해에는 졌어요. 등락이 커서 해마다 차이가 큽니다." },
 };
 let FUND = "QLD";
 try { const f = localStorage.getItem("fund"); if (f && FUNDS[f]) FUND = f; } catch (_) {}
@@ -421,7 +472,7 @@ async function load() {
 function renderFund() {
   const f = FUNDS[FUND];
   [...$("fundSw").children].forEach((b) => b.classList.toggle("on", b.dataset.f === FUND));
-  $("fundTag").innerHTML = `<b>${f.name}</b> · ${f.sub} · 신호는 QLD·USD 공통`;
+  $("fundTag").innerHTML = `<b>${f.name}</b> · ${f.sub}`;
   document.querySelectorAll(".fname").forEach((e) => { e.textContent = f.name; });
   $("calcName").textContent = f.calc;
   $("riskNote").textContent = f.risk;
@@ -474,18 +525,18 @@ function weekStats() {
 
 function renderState() {
   const d = D, up = new Date(d.updated), ws = weekStats();
-  $("updated").textContent = `미국 종가 ${d.asof} · 갱신 ${up.toLocaleString("ko-KR", { month: "long", day: "numeric", hour: "numeric", minute: "2-digit" })}`;
-  $("stateCard").className = "card state " + d.state;
+  $("updated").textContent = `미국 종가 ${d.asof.slice(5)} · 갱신 ${up.toLocaleString("ko-KR", { month: "long", day: "numeric" })}`;
+  $("stateCard").className = "card state hero " + d.state;
   $("badge").textContent = d.state_kr;
   $("sicon").textContent = { SELL: "▼", BUY: "▲", HOLD: "■" }[d.state];
   const rd = d.run_days || (d.run * 5);
   const acts = {
-    SELL: [`매주 1번, 남은 보유 주식의 <b>${d.sell_pct}%</b>를 매도해 현금으로 보관하세요. <b>화요일</b>을 추천해요.`, `매도 구간이 이어지는 동안 매주 반복해요. 매번 그때 남은 보유 주식의 ${d.sell_pct}%.`],
-    BUY: [`매주 1번, 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요. <b>화요일</b>을 추천해요.`, `매수 구간이 이어지는 동안 매주 반복해요. 매번 그때 남은 현금의 ${d.buy_pct}%. 현금이 없으면 할 일 없음.`],
-    HOLD: ["매도도 매수도 하지 않아요.", "지금 상태를 유지하세요."],
+    SELL: `매주 1번 · 남은 보유 주식의 <span class="nb"><b>${d.sell_pct}%</b>를 팔아요.</span><br><b>화요일</b>을 추천해요.`,
+    BUY: `매주 1번 · 모아 둔 현금의 <span class="nb"><b>${d.buy_pct}%</b>를 사요.</span><br><b>화요일</b>을 추천해요.`,
+    HOLD: "매도도 매수도 하지 않아요.",
   };
-  $("action").innerHTML = acts[d.state][0];
-  $("subaction").innerHTML = acts[d.state][1];
+  $("action").innerHTML = acts[d.state];
+  $("subaction").innerHTML = "";
 
   const pg = $("progress");
   if (d.state === "HOLD") pg.classList.add("hidden");
@@ -495,12 +546,11 @@ function renderState() {
     const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
     const cells = Math.min(24, Math.max(run, Math.round(S.avg)));
     let bar = ""; for (let i = 0; i < cells; i++) bar += `<i class="${i < Math.min(run, cells) ? "on" : ""}"></i>`;
-    const l1 = isS ? `이번 구간 <b>${run}번째 주</b> · 매주 ${d.sell_pct}%씩 팔았다면 처음 보유 주식의 약 <b>${cum.toFixed(0)}%</b>가 현금이에요`
-                   : `이번 구간 <b>${run}번째 주</b> · 매주 ${d.buy_pct}%씩 샀다면 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 썼어요`;
-    const l2 = `칸 하나 = 5거래일(약 1주). 과거 ${isS ? "매도" : "매수"} 구간은 평균 ${S.avg.toFixed(0)}주, 최장 ${S.max}주 이어졌어요.`;
-    pg.innerHTML = `<div>${l1}</div><div class="pbar">${bar}</div><div class="plabel">${l2}</div>`;
+    const l1 = isS ? `${run}번째 주 · 처음 보유 주식의 약 <b>${cum.toFixed(0)}%</b>가 현금`
+                   : `${run}번째 주 · 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 사용`;
+    pg.innerHTML = `<div class="pbar">${bar}</div><div>${l1}</div>`;
   }
-  $("meta").textContent = `${d.state_kr} ${rd}거래일째 · 점수 ${sgn(disp(d.score))} (지난주 ${sgn(Math.round(d.prev_score * d.scale))})`;
+  $("meta").textContent = `점수 ${sgn(disp(d.score))} · ${d.state_kr} ${rd}거래일째`;
 
   const pos = (Math.max(-100, Math.min(100, disp(d.score))) + 100) / 2;
   $("mlabel").style.left = Math.min(86, Math.max(14, pos)) + "%";
@@ -525,8 +575,8 @@ function refBlock(kind) {
   const bars = ys.map(([y, v]) => `<div class="yb ${isS ? "" : "buy"}"><span class="v">${v[key]}</span><i class="${y === cy ? "cur" : ""}" style="height:${Math.max(2, v[key] / mx * 60)}px"></i><span class="y">${y.slice(2)}${y === cy ? "*" : ""}</span></div>`).join("");
   const full = Object.values(ws.years).filter((v) => v.w >= 50).map((v) => v[key]);
   const S = isS ? ws.sell : ws.buy, avg = isS ? ws.avgYear : ws.avgYearBuy;
-  return `<div class="d">연도별 ${name} 신호가 켜진 주 수 (* 올해는 ${ws.thisW}주 중)</div><div class="ybars">${bars}</div>
-    <div class="d" style="margin-top:8px">${name} 구간 ${S.n}번 · 평균 ${S.avg.toFixed(1)}주, 중앙값 ${S.med}주, 최장 ${S.max}주<br>한 해 평균 약 ${avg.toFixed(0)}주(${(avg / 52 * 100).toFixed(0)}%) · 해마다 ${Math.min(...full)}~${Math.max(...full)}주로 크게 달랐어요.</div>`;
+  return `<div class="d">연도별 ${name} 신호가 켜진 주 수</div><div class="ybars">${bars}</div>
+    <div class="d" style="margin-top:12px">${name} 구간 ${S.n}번 · 평균 ${S.avg.toFixed(0)}주 · 최장 ${S.max}주<br>한 해 평균 ${avg.toFixed(0)}주 (해마다 ${Math.min(...full)}~${Math.max(...full)}주)</div>`;
 }
 function renderRef() {
   $("refStats").innerHTML = refBlock("sell");
@@ -548,17 +598,17 @@ function renderCalc() {
 function updateCalc() {
   const box = $("calcResult"), st = D.state;
   try { localStorage.setItem("calc2", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
-  if (st === "HOLD") { box.innerHTML = "지금은 <b>관망</b>이라 사고팔 금액이 없어요."; return; }
+  if (st === "HOLD") { box.innerHTML = "지금은 관망이에요."; return; }
   if (st === "SELL") {
     const h = parseFloat($("calcHolding").value);
-    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 넣으면 <b>매도 금액</b>을 계산해요."; return; }
+    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 넣어 보세요."; return; }
     const amt = h * D.sell_pct / 100;
-    box.innerHTML = `<b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% · 매도 후 평가금액 ${man(h - amt)}만원</div>`;
+    box.innerHTML = `<b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}%</div>`;
   } else {
     const c = parseFloat($("calcCash").value);
-    if (isNaN(c) || c <= 0) { box.innerHTML = "현금을 넣으면 <b>매수 금액</b>을 계산해요.<div class='formula'>현금이 없으면 할 일 없음.</div>"; return; }
+    if (isNaN(c) || c <= 0) { box.innerHTML = "현금을 넣어 보세요.<div class='formula'>현금이 없으면 할 일 없어요.</div>"; return; }
     const amt = c * D.buy_pct / 100;
-    box.innerHTML = `<b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% · 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
+    box.innerHTML = `<b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}%</div>`;
   }
 }
 $("calcHolding").addEventListener("input", () => D && updateCalc());
@@ -707,7 +757,7 @@ function drawPrice() {
   s += `<text x="${bx + 8}" y="${by + 15}" font-size="11" font-weight="700" fill="${cv("--qld")}">QLD 고점 대비 ${pct(info.QLD.dd)}  (고점 ${h[info.QLD.ip].d})</text>`;
   s += `<text x="${bx + 8}" y="${by + 31}" font-size="11" font-weight="700" fill="${cv("--usd")}">USD 고점 대비 ${pct(info.USD.dd)}  (고점 ${h[info.USD.ip].d})</text>`;
   $("chartPrice").innerHTML = s;
-  $("scaleNote").textContent = lg ? "로그: 2배 오를 때마다 같은 간격이라 오래 오른 종목도 한눈에 비교돼요." : "보통: 같은 숫자 차이가 같은 간격이에요. 기간이 길면 한쪽이 눌려 보여요.";
+  $("scaleNote").textContent = lg ? "로그: 2배 오를 때마다 같은 간격" : "보통: 같은 숫자 차이가 같은 간격";
   $("qldNow").textContent = "$" + D.qld_now.toFixed(2);
   $("usdNow").textContent = "$" + D.usd_now.toFixed(2);
   $("qldDD").textContent = `기간 고점 대비 ${pct(info.QLD.dd)}`;

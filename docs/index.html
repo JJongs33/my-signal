@@ -196,7 +196,8 @@
   .state { border-top: 0; }
   h2 { font-size: 15px; margin: 0 0 32px; gap: 14px; }
   h3 { margin: 40px 0 12px; font-size: 14px; }
-  .fundtag { margin-bottom: 20px; font-size: 12px; }
+  .fundtag { margin-bottom: 28px; font-size: 12px; }
+  .statelabel { font: 500 13px/1.4 var(--f-text); color: var(--muted); margin: 0 0 12px; letter-spacing: .02em; }
   .badge { font-size: 72px; line-height: 1; letter-spacing: -.04em; }
   .headrow { gap: 20px; }
   .sicon { width: 40px; height: 40px; font-size: 16px; }
@@ -265,6 +266,7 @@
   <!-- 1. 지금 신호 -->
   <section class="card state hero" id="stateCard">
     <div class="fundtag" id="fundTag"></div>
+    <div class="statelabel">현재 신호</div>
     <div class="headrow"><span class="sicon" id="sicon">▼</span><div class="badge" id="badge">-</div></div>
     <div class="action" id="action"></div>
     <div class="subaction" id="subaction"></div>

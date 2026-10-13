@@ -10,8 +10,8 @@ Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US m
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
 3. Sends a web-push notification on every day with new data EXCEPT when the state is HOLD and unchanged:
      - state change (sell <-> hold <-> buy): always;
-     - inside the sell / buy zone: every day.  On the 1st day and then every 5th trading day the message says "act tonight"
-       (sell 5% of the holding / buy 25% of the cash pile - the tested rule); on the other days it says "no action today, next in N days".
+     - inside the sell / buy zone: every day.
+   Message: "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on a change).
    The state of the previous run is kept in data.json ("daily"), so a missed run never loses a state change.
 
     python signal_job.py             # compute, write data, push on a state change / repeat day
@@ -122,7 +122,7 @@ def message(d):
     sc_ = d["scale"]
     f = lambda x: f"{round(x * sc_):+d}"
     if d["state"] == "SELL":
-        head = f"매도 {d['run']}주째: 다음 거래일에 보유분의 {d['sell_pct']}% 매도 -> 현금 보관"
+        head = f"매도 {d['run']}주째: 다음 거래일에 보유 주식의 {d['sell_pct']}% 매도 -> 현금 보관"
     elif d["state"] == "BUY":
         head = f"매수: 매도로 쌓인 현금이 있으면 그 {d['buy_pct']}% 매수 (없으면 할 일 없음)"
     else:
@@ -159,27 +159,13 @@ def daily_info(sc, prev):
 
 
 def alert_message(d, kind, prev_state):
-    """-> (title, body)."""
-    sc_ = d["scale"]
-    score = f"{round(d['score'] * sc_):+d}"
-    st, rd = d["state"], d["run_days"]
-    left, n = next_action_in(rd), (rd - 1) // CYCLE_DAYS + 1
-    tail = f" (기준일 {d['asof']})"
-    if st in ("SELL", "BUY"):
-        word, amt, what = ("매도", d["sell_pct"], "보유분") if st == "SELL" else ("매수", d["buy_pct"], "모아 둔 현금")
-        todo = f"오늘 밤 미국 장에서 {what}의 {amt}%를 {word}하세요." + (" 현금이 없으면 할 일 없음." if st == "BUY" else "")
-        later = "" if left else f" 이후 5거래일마다 {word}합니다."
-        if left == 0:
-            title = f"{word} 신호가 켜졌어요" if kind == "enter" else f"오늘 밤 {word} {n}번째"
-            body = f"점수 {score}" + (f": {word} 구간으로 바뀌었습니다. " if kind == "enter" else f": {word} 구간 {rd}일째입니다. ") + todo + (later if kind == "enter" else "")
-        else:
-            title = f"{word} 구간으로 바뀌었어요" if kind == "enter" else f"{word} 구간 {rd}일째"
-            body = f"점수 {score}: " + ("구간이 바뀌었습니다. " if kind == "enter" else "") + f"오늘은 {word}하지 않아요. 다음 {word}는 {left}거래일 뒤입니다."
-        return title, body + tail
-    came = {"SELL": "매도", "BUY": "매수"}.get(prev_state, "")
-    stop = f"{came}를 멈추세요. " if came else ""
-    rest = "모아 둔 현금은 그대로 두세요. " if prev_state == "SELL" else ""
-    return ("관망 구간이 됐어요", f"점수 {score}: 관망 구간(-29~-1)입니다. {stop}{rest}아무것도 하지 않아도 됩니다." + tail)
+    """-> (title, body), e.g. ('매도 구간입니다', '점수는 -88 · 관망에서 바뀜')."""
+    score = f"{round(d['score'] * d['scale']):+d}"
+    word = NAMES[d["state"]]
+    body = f"점수는 {score}"
+    if kind == "enter" and prev_state and prev_state != d["state"]:
+        body += f" · {NAMES[prev_state]}에서 바뀜"
+    return f"{word} 구간입니다", body
 
 
 def push(title, body):
@@ -231,7 +217,7 @@ def main():
         print(title); print(body)
         push(title, body)
     elif args.test_push:
-        push("테스트 알림", f"지금 상태: {d['state_kr']} (점수 {round(d['score'] * SCALE):+d}). 점수가 매도·매수 구간으로 넘어가는 날 저녁 8시(한국 시간)에 알림이 옵니다.")
+        push("테스트 알림", f"{d['state_kr']} 구간입니다. 점수는 {round(d['score'] * SCALE):+d}")
     else:
         print("no state change / repeat day today: no notification")
 

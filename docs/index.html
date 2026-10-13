@@ -335,7 +335,7 @@
       <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 한국 시간 저녁 8시에 알려 줍니다. 신호가 켜지면 그날 밤 미국 장에서 실행하고, 같은 구간이 이어지면 5거래일(약 1주)마다 반복합니다.</div></div>
     <div class="refitem"><b>신호가 이어지면 얼마나 쌓이나</b>
       <table class="perf-table">
-        <tr><th>반복 횟수</th><th>매도 누적<br>(보유분 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
+        <tr><th>반복 횟수</th><th>매도 누적<br>(보유 주식 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
         <tr><td>1회</td><td>5%</td><td>25%</td></tr><tr><td>2회</td><td>10%</td><td>44%</td></tr><tr><td>4회</td><td>19%</td><td>68%</td></tr>
         <tr><td>6회</td><td>26%</td><td>82%</td></tr><tr><td>8회</td><td>34%</td><td>90%</td></tr><tr><td>11회</td><td>43%</td><td>96%</td></tr><tr><td>14회</td><td>51%</td><td>98%</td></tr>
       </table>
@@ -353,7 +353,7 @@
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">매 거래일 저녁 8시(한국 시간)에 확인해서, 상태가 바뀌었거나 매도·매수 구간이면 알려 줍니다. 관망이 이어지는 동안은 알림이 없습니다. 알림에 오늘 밤 할 일이 적혀 있고, 실제로 사고파는 날은 5거래일마다입니다. 예약 실행이라 몇 분 늦을 수 있어요.</div>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">매 거래일 저녁 8시(한국 시간)에 확인해서, 상태가 바뀌었거나 매도·매수 구간이면 알려 줍니다. 관망이 이어지는 동안은 알림이 없습니다. 알림에는 현재 구간과 점수가 나옵니다 (예: 매도 구간입니다. 점수는 -88). 예약 실행이라 몇 분 늦을 수 있어요.</div>
     <div id="iosHint" class="note hidden">아이폰은 Safari 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 앱을 열어 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
@@ -495,7 +495,7 @@ function renderState() {
     const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
     const cells = Math.min(24, Math.max(run, Math.round(S.avg)));
     let bar = ""; for (let i = 0; i < cells; i++) bar += `<i class="${i < Math.min(run, cells) ? "on" : ""}"></i>`;
-    const l1 = isS ? `이번 구간 <b>${run}번째 주</b> · 매주 ${d.sell_pct}%씩 팔았다면 처음 보유분의 약 <b>${cum.toFixed(0)}%</b>가 현금이에요`
+    const l1 = isS ? `이번 구간 <b>${run}번째 주</b> · 매주 ${d.sell_pct}%씩 팔았다면 처음 보유 주식의 약 <b>${cum.toFixed(0)}%</b>가 현금이에요`
                    : `이번 구간 <b>${run}번째 주</b> · 매주 ${d.buy_pct}%씩 샀다면 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 썼어요`;
     const l2 = `칸 하나 = 5거래일(약 1주). 과거 ${isS ? "매도" : "매수"} 구간은 평균 ${S.avg.toFixed(0)}주, 최장 ${S.max}주 이어졌어요.`;
     pg.innerHTML = `<div>${l1}</div><div class="pbar">${bar}</div><div class="plabel">${l2}</div>`;

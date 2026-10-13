@@ -293,7 +293,7 @@
   .card.hero + .card { margin-top: 32px; }
 
   /* ===== 과거 성과 표 ===== */
-  .legend2 { margin: -8px 0 4px; font-size: 14px; line-height: 1.7; }
+  .legend2 { margin: -8px 0 0; font-size: 14px; line-height: 1.7; }
   .legend2 div { padding: 10px 0; border-top: 1px solid var(--line2); }
   .legend2 div:last-child { border-bottom: 1px solid var(--line2); }
   .legend2 div { display: flex; gap: 14px; } .legend2 b { flex: none; min-width: 92px; }
@@ -301,6 +301,11 @@
   .pfund { display: flex; align-items: baseline; gap: 12px; margin: 44px 0 14px; }
   .pfund b { font: 900 22px/1 var(--f-disp); letter-spacing: -.02em; }
   .pfund span { font: 400 12px/1 var(--f-mono); color: var(--faint); }
+  .defs { margin: 0 0 8px; }
+  .defs > div:first-child { border-top: 0; }
+  .defs > div { display: flex; gap: 14px; padding: 11px 0; border-top: 1px solid var(--line2); font-size: 13px; line-height: 1.6; }
+  .defs > div:last-child { border-bottom: 1px solid var(--line2); }
+  .defs dt { flex: none; min-width: 64px; font-weight: 700; } .defs dd { margin: 0; color: var(--muted); }
   .key { display: flex; gap: 18px; font: 500 12px/1.4 var(--f-text); margin: 20px 0 0; }
   .key .ku { color: var(--muted); } .key .kr { color: var(--sell); font-weight: 800; }
   table.perf3 { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -316,6 +321,9 @@
   .perf3 em.up { color: var(--buy); } .perf3 em.down { color: var(--sell); }
   .perf3 .fin { font: 400 11px/1.4 var(--f-mono); color: var(--faint); margin-top: 6px; }
   .perf3 td:first-child .fin { margin-top: 4px; }
+
+  table.acc td { text-align: right; } table.acc td:first-child { text-align: left; } table.acc td span { display: block; font: 400 11px/1.4 var(--f-mono); color: var(--faint); }
+  table.acc th span { font-size: 10px; color: var(--faint); font-weight: 400; }
 
   @media (max-width: 360px) { .jscore { font-size: 76px; } h1 { font-size: 21px; } .form-row.three { grid-template-columns: 1fr; } }
 </style>
@@ -334,7 +342,7 @@
   <!-- 1. 쫑지표 (가장 먼저) -->
   <section class="card state hero" id="stateCard">
     <div class="jcap">JJONG INDEX<span class="jnew">NEW</span></div>
-    <div class="jname">쫑지표 <span>금리 + 달러</span></div>
+    <div class="jname">쫑지표 <span>[10년물 금리 + 달러지수]</span></div>
     <div class="jrow"><div class="jscore" id="jscore">-</div><svg id="spark" viewBox="0 0 150 64" role="img" aria-label="최근 점수 흐름"></svg></div>
     <div class="jstate"><span class="sicon" id="sicon">▼ SELL</span><span class="badge" id="badge">-</span></div>
     <div class="zonewrap">
@@ -435,7 +443,13 @@
       <div><b>적립식 (기준)</b><span>매월 첫 거래일에 정해 둔 금액만 사는 방식</span></div>
       <div><b>쫑 규칙</b><span>적립식 + 쫑지표 신호로 매주 매도·매수</span></div>
     </div>
-    <div class="note">약 10년 구간마다 새로 시작 · 시작 1억 + 매월 100만원 · 세금(22%)·거래비용 반영<br><b>연평균</b> 납입 시점을 반영한 연 수익률 · <b>총수익률</b> 최종 평가금액 ÷ 총 납입금 − 1 (세 자리는 10 단위, 네 자리 이상은 100 단위로 반올림)<br><b>하락 평균</b> 계좌가 전고점보다 10% 넘게 빠졌던 구간들의 저점 평균 (괄호는 그런 구간의 횟수)</div>
+    <dl class="defs">
+      <div><dt>구간</dt><dd>약 10년마다 새로 시작 · 시작 0원, 매월 100만원 · 세금·비용 반영</dd></div>
+      <div><dt>연평균</dt><dd>납입 시점을 반영한 1년 수익률</dd></div>
+      <div><dt>총수익률</dt><dd>(최종 금액 − 총 납입금) ÷ 총 납입금</dd></div>
+      <div><dt>하락 평균</dt><dd>전고점보다 10% 넘게 빠졌을 때의 평균 (아래 숫자는 그 횟수)</dd></div>
+      <div><dt>표시</dt><dd>세 자리는 10 단위, 네 자리 이상은 100 단위로 반올림</dd></div>
+    </dl>
     <div class="key"><span class="ku">윗줄 · 적립식 (기준)</span><span class="kr">아랫줄 · 쫑 규칙</span></div>
     <div id="perfBox"></div>
     <div class="note">큰 하락은 줄였지만, 꾸준히 오른 구간(QLD 2010~2019)에는 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격이고, 마지막 구간은 6년 10개월입니다. 앞으로는 이보다 낮을 수 있어요.</div>
@@ -447,14 +461,19 @@
     <details class="more first"><summary>적립식 매수(매월초)는 그대로</summary>
       <div class="d">매월 첫 거래일에 정해 둔 적립식 매수액은 그대로 사요. 신호는 보유 주식과 모아 둔 현금에만 적용돼요.</div></details>
     <details class="more"><summary>언제 확인하고 실행하나요?</summary>
-      <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 저녁 8시(한국)에 알려 줘요. 실제 매도·매수는 매주 1번이에요.</div></details>
+      <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 저녁 8시(한국)에 알려 줘요. 실제 매도·매수는 주 1회, <b>화요일</b>에 하는 것을 추천해요.</div></details>
     <details class="more"><summary>신호가 이어지면 얼마나 쌓이나요?</summary>
-      <table class="perf-table">
-        <tr><th>반복</th><th>매도 누적<br>(보유 주식)</th><th>매수 누적<br>(현금)</th></tr>
-        <tr><td>1주</td><td>5%</td><td>25%</td></tr><tr><td>2주</td><td>10%</td><td>44%</td></tr><tr><td>4주</td><td>19%</td><td>68%</td></tr>
-        <tr><td>8주</td><td>34%</td><td>90%</td></tr><tr><td>14주</td><td>51%</td><td>98%</td></tr>
+      <div class="d">매주 같은 비율로 이어서 한다고 보고, 1,000만원이 있을 때 지금까지 누적된 금액이에요.</div>
+      <table class="perf-table acc">
+        <tr><th></th><th>매도 누적<br><span>보유 주식 1,000만원일 때</span></th><th>매수 누적<br><span>모아 둔 현금 1,000만원일 때</span></th></tr>
+        <tr><td>1주째</td><td>50만원<span>(5%)</span></td><td>250만원<span>(25%)</span></td></tr>
+        <tr><td>2주째</td><td>98만원<span>(10%)</span></td><td>438만원<span>(44%)</span></td></tr>
+        <tr><td>4주째</td><td>185만원<span>(19%)</span></td><td>684만원<span>(68%)</span></td></tr>
+        <tr><td>8주째</td><td>337만원<span>(34%)</span></td><td>900만원<span>(90%)</span></td></tr>
+        <tr><td>14주째</td><td>512만원<span>(51%)</span></td><td>982만원<span>(98%)</span></td></tr>
+        <tr><td>20주째</td><td>642만원<span>(64%)</span></td><td>997만원<span>(100%)</span></td></tr>
       </table>
-      <div class="d">매번 "남은 것"의 비율이라 5%씩 5번 팔아도 25%가 아니라 23%예요.</div></details>
+      <div class="d">매번 "남은 것"의 5%·25%라서, 5%씩 5번 팔아도 25%가 아니라 23%예요. 매도가 20주 이상 이어진 적도 있어서 표를 20주까지 넣었어요.</div></details>
     <details class="more"><summary>매도 신호가 켜졌던 기간 (10년)</summary><div id="refStats"></div></details>
     <details class="more"><summary>매수 신호가 켜졌던 기간 (10년)</summary><div id="refStatsBuy"></div></details>
     <details class="more"><summary>매도 횟수를 제한하지 않는 이유</summary>
@@ -479,7 +498,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 21</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 22</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -492,13 +511,13 @@ const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
 const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
 const PERF = {
   QLD: { sub: "나스닥 100 · 2배", rows: [
-    { p: "2000~2009", paid: 2.2, a: [-9, -2], t: [-47, -14], f: [1.2, 1.9], dd: [[-40, 4], [-38, 4]] },
-    { p: "2010~2019", paid: 2.2, a: [29, 27], t: [750, 600], f: [19, 15], dd: [[-21, 18], [-18, 16]] },
-    { p: "2020~2026.10", paid: 1.8, a: [27, 32], t: [300, 400], f: [7.2, 9.1], dd: [[-31, 10], [-24, 11]] } ] },
+    { p: "2000~2009", paid: 1.2, a: [-1, 7], t: [-7, 41], f: [1.1, 1.7], dd: [[-40, 4], [-38, 4]] },
+    { p: "2010~2019", paid: 1.2, a: [30, 28], t: [390, 340], f: [5.9, 5.3], dd: [[-21, 18], [-19, 16]] },
+    { p: "2020~2026.10", paid: 0.8, a: [28, 32], t: [160, 200], f: [2.1, 2.4], dd: [[-31, 10], [-24, 11]] } ] },
   USD: { sub: "반도체 · 2배", rows: [
-    { p: "2000~2009", paid: 2.2, a: [-17, -9], t: [-68, -47], f: [0.7, 1.2], dd: [[-43, 3], [-42, 3]] },
-    { p: "2010~2019", paid: 2.2, a: [26, 28], t: [590, 650], f: [15, 17], dd: [[-25, 16], [-22, 16]] },
-    { p: "2020~2026.10", paid: 1.8, a: [55, 64], t: [1300, 1800], f: [25, 35], dd: [[-27, 18], [-21, 23]] } ] },
+    { p: "2000~2009", paid: 1.2, a: [-12, -2], t: [-43, -11], f: [0.7, 1.1], dd: [[-43, 3], [-42, 3]] },
+    { p: "2010~2019", paid: 1.2, a: [31, 33], t: [420, 470], f: [6.2, 6.8], dd: [[-25, 16], [-23, 16]] },
+    { p: "2020~2026.10", paid: 0.8, a: [64, 72], t: [730, 960], f: [6.8, 8.7], dd: [[-27, 18], [-21, 22]] } ] },
 };
 const CW = 360;          // 차트 가로 크기(폰 화면 폭에 맞춰 글자가 줄어들지 않게)
 
@@ -612,9 +631,9 @@ function renderState() {
     const cells = Math.min(n, 12);
     let bar = ""; for (let i = 1; i <= cells; i++) bar += `<i class="${i === cells ? "now" : ""}"></i>`;
     pg.innerHTML = `<div class="yearbar">${bar}</div><div><b>올해 ${n}번째 ${name} 구간</b></div>
-      <div class="plabel">${run}주째 · 규칙대로 ${isS ? "팔았다면 보유 주식의" : "샀다면 모아 둔 현금의"} 약 ${cum.toFixed(0)}%${isS ? "가 현금" : "를 사용"}</div>`;
+      <div class="plabel">규칙대로 ${run}번 ${isS ? "팔았다면 처음 보유 주식의" : "샀다면 모아 둔 현금의"} 약 ${cum.toFixed(0)}%를 ${isS ? "판 거예요" : "쓴 거예요"}</div>`;
   }
-  $("meta").textContent = `점수 ${sgn(disp(d.score))} · ${d.state_kr} ${rd}거래일째`;
+  $("meta").textContent = `점수 ${sgn(disp(d.score))} · ${d.state_kr} 신호 ${rd}일째`;
 
   const pos = (Math.max(-100, Math.min(100, disp(d.score))) + 100) / 2;
   $("mlabel").style.left = Math.min(86, Math.max(14, pos)) + "%";

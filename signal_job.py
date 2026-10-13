@@ -8,12 +8,11 @@ Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US m
      score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read EVERY trading day
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
-3. Sends a web-push notification when
-     - the state CHANGES (sell <-> hold <-> buy), or
-     - the score STAYS in the sell zone / buy zone and it is the 5th trading day since the last action day (repeat reminder).
-   Nothing is sent while the state stays HOLD.  The state of the previous run is kept in data.json ("daily"), so a missed run never loses
-   an event.  Action rule that was tested: first action on the NEXT trading day after the crossing, then again every 5th trading day while
-   the score stays in the zone (sell 5% of the holding / buy 25% of the cash pile each time).
+3. Sends a web-push notification on every day with new data EXCEPT when the state is HOLD and unchanged:
+     - state change (sell <-> hold <-> buy): always;
+     - inside the sell / buy zone: every day.  On the 1st day and then every 5th trading day the message says "act tonight"
+       (sell 5% of the holding / buy 25% of the cash pile - the tested rule); on the other days it says "no action today, next in N days".
+   The state of the previous run is kept in data.json ("daily"), so a missed run never loses a state change.
 
     python signal_job.py             # compute, write data, push on a state change / repeat day
     python signal_job.py --no-push   # compute and write only
@@ -134,60 +133,53 @@ def message(d):
     return f"이번 주 신호: {d['state_kr']}", body
 
 
+def next_action_in(run_days):
+    """0 = act tonight (1st day of the stretch and every 5th trading day after it), else trading days until the next action day."""
+    return (CYCLE_DAYS - (run_days - 1) % CYCLE_DAYS) % CYCLE_DAYS
+
+
 def daily_info(sc, prev):
-    """Event detection on the daily score. prev = the previous data.json (dict) or None.
-    Event days since the previous run: a state change, or (inside sell/buy) every 5th trading day after the first day of the stretch."""
+    """-> (daily state dict, (kind, previous state)).  kind: None | 'enter' | 'stay'  (stay = inside sell/buy, no state change)."""
     s = sc["score"].dropna()
     states = [state_of(v) for v in s.to_numpy()]
-    runs, r = [], 0
-    for i, st in enumerate(states):
-        r = r + 1 if i and states[i - 1] == st else 1
-        runs.append(r)
-    cur, asof, run_days = states[-1], s.index[-1], runs[-1]
+    cur, asof = states[-1], s.index[-1]
+    run_days = 0
+    for st in states[::-1]:
+        if st != cur:
+            break
+        run_days += 1
     old = (prev or {}).get("daily") or {}
     kind = None
-    if old.get("state"):
-        for i in range(len(states)):
-            if str(s.index[i].date()) <= old.get("asof", ""):
-                continue
-            if runs[i] == 1:                                   # first day of a new state (also the first day after a skipped day)
-                ev = "enter"
-            elif states[i] in ("SELL", "BUY") and (runs[i] - 1) % CYCLE_DAYS == 0:
-                ev = "repeat"
-            else:
-                continue
-            kind = ev if i == len(states) - 1 else "catchup"   # event was on an earlier day (a run was missed): say where we are now
-            if ev == "enter" and old["state"] == states[i]:
-                kind = None                                     # not a real change
-    prev_state = old.get("state")
-    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, prev_state)
+    if old.get("state") and str(asof.date()) > old.get("asof", ""):
+        if old["state"] != cur:
+            kind = "enter"
+        elif cur in ("SELL", "BUY"):
+            kind = "stay"
+    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, old.get("state"))
 
 
-def alert_message(d, ev, prev_state):
-    """-> (title, body) for event ev in ('enter', 'repeat', 'catchup') with the current state d['state']."""
+def alert_message(d, kind, prev_state):
+    """-> (title, body)."""
     sc_ = d["scale"]
     score = f"{round(d['score'] * sc_):+d}"
-    st, rounds = d["state"], d["run"]
+    st, rd = d["state"], d["run_days"]
+    left, n = next_action_in(rd), (rd - 1) // CYCLE_DAYS + 1
     tail = f" (기준일 {d['asof']})"
-    if st == "SELL":
-        if ev == "repeat" or ev == "catchup":
-            return (f"매도 {rounds}번째 (5거래일마다)",
-                    f"점수 {score}: 매도 구간이 이어지고 있어요. 오늘 밤 미국 장에서 지금 남은 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요.{tail}")
-        return ("매도 신호가 켜졌어요",
-                f"점수 {score}: 매도 구간(-30 이하)으로 넘어갔습니다. 오늘 밤 미국 장에서 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요. "
-                f"구간이 이어지면 5거래일(약 1주)마다 다시 알려드려요.{tail}")
-    if st == "BUY":
-        if ev == "repeat" or ev == "catchup":
-            return (f"매수 {rounds}번째 (5거래일마다)",
-                    f"점수 {score}: 매수 구간이 이어지고 있어요. 오늘 밤 미국 장에서 남은 현금의 {d['buy_pct']}%를 매수하세요 (현금이 없으면 할 일 없음).{tail}")
-        return ("매수 신호가 켜졌어요",
-                f"점수 {score}: 매수 구간(0 이상)으로 넘어갔습니다. 매도로 모아 둔 현금이 있으면 오늘 밤 미국 장에서 그 {d['buy_pct']}%를 매수하세요 "
-                f"(현금이 없으면 할 일 없음). 구간이 이어지면 5거래일(약 1주)마다 다시 알려드려요.{tail}")
+    if st in ("SELL", "BUY"):
+        word, amt, what = ("매도", d["sell_pct"], "보유분") if st == "SELL" else ("매수", d["buy_pct"], "모아 둔 현금")
+        todo = f"오늘 밤 미국 장에서 {what}의 {amt}%를 {word}하세요." + (" 현금이 없으면 할 일 없음." if st == "BUY" else "")
+        later = "" if left else f" 이후 5거래일마다 {word}합니다."
+        if left == 0:
+            title = f"{word} 신호가 켜졌어요" if kind == "enter" else f"오늘 밤 {word} {n}번째"
+            body = f"점수 {score}" + (f": {word} 구간으로 바뀌었습니다. " if kind == "enter" else f": {word} 구간 {rd}일째입니다. ") + todo + (later if kind == "enter" else "")
+        else:
+            title = f"{word} 구간으로 바뀌었어요" if kind == "enter" else f"{word} 구간 {rd}일째"
+            body = f"점수 {score}: " + ("구간이 바뀌었습니다. " if kind == "enter" else "") + f"오늘은 {word}하지 않아요. 다음 {word}는 {left}거래일 뒤입니다."
+        return title, body + tail
     came = {"SELL": "매도", "BUY": "매수"}.get(prev_state, "")
     stop = f"{came}를 멈추세요. " if came else ""
     rest = "모아 둔 현금은 그대로 두세요. " if prev_state == "SELL" else ""
-    return ("관망 구간이 됐어요",
-            f"점수 {score}: 관망 구간(-29~-1)으로 돌아왔습니다. {stop}{rest}아무것도 하지 않아도 됩니다.{tail}")
+    return ("관망 구간이 됐어요", f"점수 {score}: 관망 구간(-29~-1)입니다. {stop}{rest}아무것도 하지 않아도 됩니다." + tail)
 
 
 def push(title, body):

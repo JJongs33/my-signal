@@ -1,7 +1,7 @@
 // Service worker for "쫑우 투자신호": offline fallback + push notifications.
 // Strategy: always try the network first (so a new version of the app and fresh data show up right away),
 // and use the saved copy only when the phone is offline.
-const CACHE = "signal-v7";
+const CACHE = "signal-v8";
 const SHELL = ["./", "index.html", "config.js", "manifest.json", "icon-192.png", "icon-512.png", "icon-180.png", "data.json", "prices.json"];
 
 self.addEventListener("install", (e) => {
@@ -29,9 +29,9 @@ self.addEventListener("fetch", (e) => {
 });
 
 self.addEventListener("push", (e) => {
-  let d = { title: "이번 주 신호", body: "앱을 열어 확인하세요.", url: "./" };
+  let d = { title: "쫑우 투자신호", body: "앱을 열어 확인하세요.", url: "./" };
   try { d = Object.assign(d, e.data.json()); } catch (_) {}
-  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "icon-192.png", badge: "icon-192.png", data: { url: d.url } }));
+  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "icon-192.png", badge: "icon-192.png", tag: "signal", renotify: true, data: { url: d.url } }));
 });
 
 self.addEventListener("notificationclick", (e) => {

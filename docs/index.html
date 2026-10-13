@@ -169,6 +169,7 @@
   .yb { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; min-width: 0; }
   .yb i { width: 100%; background: var(--sell); border-radius: 1px 1px 0 0; opacity: .88; }
   .yb i.cur { background: repeating-linear-gradient(45deg, var(--sell), var(--sell) 4px, transparent 4px, transparent 7px); border: 1px solid var(--sell); }
+  .yb.buy i { background: var(--buy); } .yb.buy i.cur { background: repeating-linear-gradient(45deg, var(--buy), var(--buy) 4px, transparent 4px, transparent 7px); border: 1px solid var(--buy); }
   .yb .v, .yb .y { font: 400 10px/1.2 var(--f-mono); color: var(--faint); } .yb .v { margin-bottom: 2px; color: var(--text); font-weight: 600; } .yb .y { margin-top: 3px; }
 
   .themebtn { width: auto; margin-left: auto; padding: 8px 12px; font-size: 12px; background: transparent; color: var(--text); border: 1px solid var(--line2); border-radius: 999px; white-space: nowrap; flex: none; }
@@ -204,7 +205,7 @@
     <button data-f="USD"><b>USD</b><span>반도체 · 2배</span></button>
   </nav>
 
-  <!-- 1. 이번 주 신호 -->
+  <!-- 1. 지금 신호 -->
   <section class="card state" id="stateCard">
     <div class="fundtag" id="fundTag"></div>
     <div class="headrow"><span class="sicon" id="sicon">▼</span><div class="badge" id="badge">-</div></div>
@@ -216,7 +217,7 @@
 
   <!-- 2. 점수 기준표 -->
   <section class="card">
-    <h2><span class="idx">01</span>점수 기준표 <span class="tag block">점수 = 매도·매수 신호의 세기 (-100 ~ +100)</span></h2>
+    <h2><span class="idx">01</span>점수 기준표 <span class="tag block">금리·달러로 만든 -100 ~ +100 점수</span></h2>
     <div class="zonewrap">
       <div class="marker"><span class="mlabel" id="mlabel">현재 -</span></div>
       <div class="nowline" id="nowline" style="left:50%"></div>
@@ -226,18 +227,18 @@
       </div>
     </div>
     <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
-      <span class="d">보유한 <span class="fname">QLD</span>의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 점수가 처음 -30 이하가 된 다음 거래일에 첫 매도, 구간이 이어지면 <u>5거래일(약 1주)마다</u> 반복 (매번 그때 남은 보유분의 5%)</span></div></div>
+      <span class="d">보유분의 <span class="amt">5%</span>를 팔아 현금으로 보관. 5거래일마다 반복.</span></div></div>
     <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
-      <span class="d">아무것도 하지 않음 (매도도 매수도 없음)</span></div></div>
+      <span class="d">아무것도 하지 않음.</span></div></div>
     <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
-      <span class="d">매도로 쌓아 둔 현금의 <span class="amt">25%</span>를 매수. 남은 75%는 현금으로 두고, 이 구간이 이어지면 <u>5거래일(약 1주)마다</u> 남은 현금의 25%씩 매수합니다 (1주 25% → 2주 44% → 4주 68% → 8주 90%)</span></div></div>
+      <span class="d">모아 둔 현금의 <span class="amt">25%</span>를 매수. 5거래일마다 반복.</span></div></div>
     <details style="margin-top:12px">
       <summary>점수는 어떻게 계산되나요?</summary>
-      <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2 × 100</b></div>
-      <div class="note">• <b>금리 점수</b>: 미국 10년물 금리가 최근 6개월 평균보다 높을수록 마이너스(매도 쪽), 낮을수록 플러스(매수 쪽)<br>
-        • <b>달러 점수</b>: 달러지수가 최근 100일 평균보다 강할수록 마이너스(매도 쪽), 약할수록 플러스(매수 쪽)<br>
-        각각 -100 ~ +100으로 제한한 뒤 평균을 냅니다. 금리가 오르고 달러가 강해지면 나스닥 같은 성장주에 불리하다는 이유로 만든 기준입니다.</div>
-      <div class="note"><b>가중치는 따로 없습니다 (금리 1 : 달러 1).</b> 시험 때 1:3, 1:2, 2:1, 3:1도 비교했는데 1:1이 가장 좋았습니다 (2008~2025, 기준값 -10 조건에서 적립식보다 높아진 폭: 1:1 +4.9%p, 1:2 +3.9%p, 1:3 +3.7%p, 2:1 +3.1%p, 3:1 +1.4%p). 다만 점수를 정밀하게 '최적화'했다기보다 <u>단순하고 안정적인 값을 고른 것</u>입니다. 매도 기준 -30과 매수 기준 0, 금리 0.5%p·달러 3%·126일·100일 같은 숫자도 소수의 후보 중에서 골랐고, 앞으로 쌓이는 실제 데이터로 계속 확인이 필요합니다.</div>
+      <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2</b></div>
+      <div class="note">• <b>금리 점수</b>: 미국 10년물 금리가 최근 6개월 평균보다 높으면 마이너스, 낮으면 플러스<br>
+        • <b>달러 점수</b>: 달러지수가 최근 100일 평균보다 강하면 마이너스, 약하면 플러스</div>
+      <div class="note">각각 -100 ~ +100으로 제한한 뒤 평균을 냅니다. 금리와 달러가 오르면 성장주에 불리하다는 이유로 만든 기준입니다.</div>
+      <div class="note"><b>금리와 달러는 1:1로 섞었습니다.</b> 1:3, 1:2, 2:1, 3:1도 시험했는데 1:1이 가장 좋았습니다. 값을 정밀하게 맞춘 것이 아니라 단순하고 안정적인 값을 고른 것이고, 기준 -30과 0, 6개월·100일 같은 숫자도 소수의 후보 중에서 골랐습니다. 앞으로의 실제 결과로 계속 확인이 필요합니다.</div>
       <div class="grid" style="margin-top:10px">
         <div class="kv"><span>지금 금리 점수</span><b id="rates">-</b><span id="ratesNote"></span></div>
         <div class="kv"><span>지금 달러 점수</span><b id="dxy">-</b><span id="dxyNote"></span></div>
@@ -245,28 +246,28 @@
     </details>
   </section>
 
-  <!-- 3. 이번 주 매매 금액 계산기 -->
+  <!-- 3. 계산기 -->
   <section class="card">
-    <h2><span class="idx">02</span>지금 얼마를 사고팔까요?</h2>
+    <h2><span class="idx">02</span>얼마를 사고팔까요?</h2>
     <div id="calcHold" class="hidden"></div>
     <div id="calcSell" class="hidden">
-      <label class="field">지금 계좌에 있는 <span id="calcName">QLD(또는 국내 2배 상품)</span>의 <b>평가금액</b> (만원)</label>
+      <label class="field">보유 <span id="calcName">QLD</span> 평가금액 (만원)</label>
       <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
-      <div class="help">증권사 앱에서 해당 종목의 <b>'평가금액'</b>(지금 팔면 받을 금액)을 적으세요. 지금은 <b>매도 신호</b>라서 이 금액의 5%를 팝니다. 현금은 입력하지 않아도 됩니다.</div>
+      <div class="help">증권사 앱의 '평가금액'을 적으세요. 그 5%가 한 번에 팔 금액입니다.</div>
     </div>
     <div id="calcBuy" class="hidden">
-      <label class="field">매도해서 모아 둔 <b>현금</b> (만원)</label>
+      <label class="field">모아 둔 현금 (만원)</label>
       <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
-      <div class="help">이전에 매도하고 아직 다시 사지 않은 <b>현금</b>을 적으세요. 지금은 <b>매수 신호</b>라서 그 현금의 25%를 삽니다. 평가금액은 입력하지 않아도 됩니다.</div>
+      <div class="help">매도하고 아직 쓰지 않은 현금을 적으세요. 그 25%가 한 번에 살 금액입니다.</div>
     </div>
     <div class="result" id="calcResult"></div>
-    <div class="note">입력한 금액은 이 기기의 브라우저에만 저장되고, 서버로 전송되지 않습니다.</div>
+    <div class="note">입력한 금액은 이 폰에만 저장됩니다.</div>
   </section>
 
   <!-- 4. 매매 기록 -->
   <section class="card">
     <h2><span class="idx">03</span>매매 기록</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">날짜와 금액을 넣으면 그날 종가로 몇 주를 얼마에 샀는지 자동 계산해서 쌓아 둡니다.</div>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">날짜와 금액을 넣으면 그날 종가로 주식 수를 계산해 쌓아 둡니다.</div>
     <div class="form-row">
       <div><label class="field" style="margin-top:0">날짜</label><input type="date" id="logDate"></div>
       <div><label class="field" style="margin-top:0">금액 (만원)</label><input type="number" id="logAmt" inputmode="decimal" placeholder="예: 100"></div>
@@ -280,7 +281,7 @@
     <div class="summary hidden" id="logSummary"></div>
     <div id="logList"></div>
     <div class="grid" style="margin-top:10px"><button class="secondary hidden" id="logCsv">기록 복사 (백업)</button><button class="secondary hidden" id="logClear">전체 삭제</button></div>
-    <div class="note">기록은 이 기기에만 저장됩니다. 앱을 지우거나 브라우저 데이터를 지우면 사라지니 가끔 "기록 복사"로 백업해 두세요. 종가는 미국 장 마감 기준이며, 휴장일·주말은 직전 거래일 종가를 씁니다. 주식 분할이 반영된 가격입니다.</div>
+    <div class="note">기록은 이 폰에만 저장됩니다. 앱을 지우면 사라지니 가끔 '기록 복사'로 백업하세요. 휴장일은 직전 거래일 종가를 씁니다.</div>
   </section>
 
   <!-- 5. 차트 -->
@@ -293,15 +294,15 @@
       <button data-y="1">1년</button><button data-y="3" class="on">3년</button><button data-y="5">5년</button><button data-y="10">10년</button>
     </div>
 
-    <h3>① 점수 (매도 -30 이하 · 매수 0 이상)</h3>
+    <h3>① 점수</h3>
     <div class="chartwrap" id="wrapScore"><svg id="chartScore" viewBox="0 0 360 240" role="img" aria-label="점수 추이 차트"></svg><div class="tip hidden" id="tipScore"></div></div>
-    <div class="legend"><span><i class="sw" style="background:var(--zone-buy);border:1px solid var(--buy)"></i>매수 구간(0 이상)</span><span><i class="sw" style="background:var(--zone-sell);border:1px solid var(--sell)"></i>매도 구간(-30 이하)</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--zone-buy);border:1px solid var(--buy)"></i>매수 구간 (0 이상)</span><span><i class="sw" style="background:var(--zone-sell);border:1px solid var(--sell)"></i>매도 구간 (-30 이하)</span></div>
 
     <h3 style="display:flex;align-items:center">② 가격 (시작일 = 100)
       <span class="toggle" id="scaleToggle"><button data-s="lin">보통</button><button data-s="log" class="on">로그</button></span></h3>
     <div class="chartwrap" id="wrapPrice"><svg id="chartPrice" viewBox="0 0 360 250" role="img" aria-label="QLD와 USD 가격 추이 차트"></svg><div class="tip hidden" id="tipPrice"></div></div>
     <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD (반도체 2배)</span></div>
-    <div class="note" id="scaleNote">로그 눈금은 2배 오를 때마다 같은 간격으로 그려서, 오래 오른 종목도 한 화면에 비교됩니다.</div>
+    <div class="note" id="scaleNote"></div>
     <div class="grid" style="margin-top:12px">
       <div class="kv" id="kvQ"><span>QLD 지금 가격</span><b id="qldNow">-</b><span id="qldDD"></span></div>
       <div class="kv" id="kvU"><span>USD 지금 가격</span><b id="usdNow">-</b><span id="usdDD"></span></div>
@@ -316,10 +317,10 @@
 
   <!-- 7. 과거 성과 -->
   <section class="card">
-    <h2><span class="idx">06</span>과거 시뮬레이션 성과 요약<span class="tag">참고용</span></h2>
+    <h2><span class="idx">06</span>과거 성과 <span class="tag">시뮬레이션</span></h2>
     <div class="note" style="margin-top:-4px" id="perfNote"></div>
     <table class="perf-table">
-      <tr><th>기간</th><th>적립식 매수(매월초)</th><th>이 규칙 적용</th><th>최대 하락폭</th></tr>
+      <tr><th>기간</th><th>적립식 매수</th><th>이 규칙</th><th>최대 하락</th></tr>
       <tbody id="perfBody"></tbody>
     </table>
     <div class="note" id="perfText"></div>
@@ -329,40 +330,41 @@
   <section class="card">
     <h2><span class="idx">07</span>참고</h2>
     <div class="refitem"><b>적립식 매수(매월초)는 그대로</b>
-      <div class="d">매월 첫 거래일에 적립금 전액을 매수합니다. 점수와 상관없이 계속 하고, 위의 매도·매수 신호는 이미 갖고 있는 보유분과 모아 둔 현금에만 적용됩니다.</div></div>
-    <div class="refitem"><b>언제 확인하고 언제 실행하나</b>
-      <div class="d">점수는 미국 장이 마감된 뒤 매 거래일 확인합니다. 점수가 매도(-30 이하)·관망·매수(0 이상) 사이에서 <b>구간이 바뀐 날</b>, 그리고 매도·매수 구간에 머무는 동안 <b>5거래일(약 1주)마다</b> 저녁 8시(한국 시간)에 알림이 옵니다. 알림을 받으면 그날 밤 미국 장(다음 거래일 종가 기준)에서 매도·매수하는 것으로 시험했습니다 (매일 사고팔지 않습니다). 시험 결과는 매주 금요일에만 확인하던 방식과 같거나 조금 더 좋았습니다.</div></div>
+      <div class="d">매월 첫 거래일에 정해 둔 적립식 매수액을 그대로 매수합니다. 점수와 상관없고, 매도·매수 신호는 이미 보유한 주식과 모아 둔 현금에만 적용됩니다.</div></div>
+    <div class="refitem"><b>언제 확인하나</b>
+      <div class="d">미국 장이 끝난 뒤 매 거래일 점수를 확인하고, 한국 시간 저녁 8시에 알려 줍니다. 신호가 켜지면 그날 밤 미국 장에서 실행하고, 같은 구간이 이어지면 5거래일(약 1주)마다 반복합니다.</div></div>
     <div class="refitem"><b>신호가 이어지면 얼마나 쌓이나</b>
       <table class="perf-table">
-        <tr><th>이어진 주</th><th>매도 누적<br>(보유분 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
-        <tr><td>1주</td><td>5%</td><td>25%</td></tr><tr><td>2주</td><td>10%</td><td>44%</td></tr><tr><td>4주</td><td>19%</td><td>68%</td></tr>
-        <tr><td>6주</td><td>26%</td><td>82%</td></tr><tr><td>8주</td><td>34%</td><td>90%</td></tr><tr><td>11주</td><td>43%</td><td>96%</td></tr><tr><td>14주</td><td>51%</td><td>98%</td></tr>
+        <tr><th>반복 횟수</th><th>매도 누적<br>(보유분 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
+        <tr><td>1회</td><td>5%</td><td>25%</td></tr><tr><td>2회</td><td>10%</td><td>44%</td></tr><tr><td>4회</td><td>19%</td><td>68%</td></tr>
+        <tr><td>6회</td><td>26%</td><td>82%</td></tr><tr><td>8회</td><td>34%</td><td>90%</td></tr><tr><td>11회</td><td>43%</td><td>96%</td></tr><tr><td>14회</td><td>51%</td><td>98%</td></tr>
       </table>
-      <div class="d">매수 때 현금의 25%만 사면 나머지 75%는 현금(MMF 등)으로 남고, 다음 주에 남은 현금의 25%를 또 삽니다. 한 번에 다 사지 않고 나눠서 사기 위한 방식입니다. 중간에 점수가 관망 구간(-29~-1)으로 내려오면 남은 현금은 그대로 두고, 매도 구간(-30 이하)이 되면 다시 팝니다.</div></div>
+      <div class="d">매수는 남은 현금의 25%씩 나눠서 삽니다. 관망 구간이 되면 남은 현금은 그대로 두고, 매도 구간이 되면 다시 팝니다.</div></div>
     <div class="refitem"><b>매도 신호가 켜졌던 기간 (과거 10년)</b><div id="refStats"></div></div>
-    <div class="refitem"><b>매도 주 수를 정해서 나눠 팔지 않는 이유</b>
-      <div class="d">'연 11주까지만', '연 16주까지만'처럼 매도 주 수를 미리 제한해 시험했더니 효과가 거의 사라졌습니다 (QLD 2008~2025에서 적립식보다 높아진 폭: 제한 없음 +4.7%p → 연 16주 +0.8%p → 연 11주 -0.2%p). 매도가 필요한 해는 2022년(44주)처럼 길게 이어지고, 필요 없는 해는 0주(2019·2020년)라서 평균에 맞춰 나누면 정작 필요할 때 일찍 끝나기 때문입니다. 그래서 <b>신호가 켜진 동안 매주</b> 5%씩 팝니다.</div></div>
+    <div class="refitem"><b>매수 신호가 켜졌던 기간 (과거 10년)</b><div id="refStatsBuy"></div></div>
+    <div class="refitem"><b>매도 횟수를 제한하지 않는 이유</b>
+      <div class="d">매도 횟수를 '연 16주', '연 11주'로 제한해 보니 효과가 거의 사라졌습니다 (QLD 2008~2025, 적립식 대비 제한 없음 +4.7%p → 연 16주 +0.8%p → 연 11주 -0.2%p). 매도가 필요한 해는 2022년처럼 길게(44주) 이어지고, 필요 없는 해는 0주라서, 제한하면 정작 필요할 때 일찍 끝납니다.</div></div>
     <div class="refitem"><b>매도해서 생긴 현금</b>
-      <div class="d">MMF·단기채·예금처럼 이자가 붙는 곳에 두는 것으로 시험했습니다 (미국 단기국채 금리 가정).</div></div>
-    <div class="refitem"><b>시험에 넣지 않은 것</b>
-      <div class="d">세금·수수료·환전 비용은 시험에 반영하지 않았습니다. <span id="riskNote">2배 레버리지 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.</span> 규칙은 과거 자료에서 고른 것이라 앞으로의 결과는 다를 수 있고, 이 앱은 투자 조언이 아닙니다.</div></div>
+      <div class="d">MMF·단기채·예금처럼 이자가 붙는 곳에 두는 것으로 시험했습니다.</div></div>
+    <div class="refitem"><b>시험 조건과 한계</b>
+      <div class="d">성과표는 세금(22%)과 거래비용 0.1%를 반영했고, 환전 비용은 넣지 않았습니다. <span id="riskNote"></span> 규칙은 과거 자료에서 골랐으니 앞으로는 다를 수 있습니다.</div></div>
   </section>
 
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">정해진 요일은 없습니다. 상태가 바뀔 때(매도·관망·매수)와, 매도·매수 구간이 이어지는 동안 5거래일(약 1주)마다 저녁 8시(한국 시간)에 알림이 옵니다. 관망이 이어지는 동안은 알림이 없습니다. 과거 10년으로 세어 보면 연 50번 안팎이고, 절반 가까이가 매수 구간의 반복 알림입니다 (모아 둔 현금이 없으면 할 일 없음). 예약 실행이라 몇 분 늦을 수 있어요.</div>
-    <div id="iosHint" class="note hidden">아이폰은 먼저 Safari의 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 홈 화면의 앱을 열어서 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">매 거래일 저녁 8시(한국 시간)에 확인해서, 상태가 바뀌었거나 매도·매수 구간이면 알려 줍니다. 관망이 이어지는 동안은 알림이 없습니다. 알림에 오늘 밤 할 일이 적혀 있고, 실제로 사고파는 날은 5거래일마다입니다. 예약 실행이라 몇 분 늦을 수 있어요.</div>
+    <div id="iosHint" class="note hidden">아이폰은 Safari 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 앱을 열어 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
-      <div class="note">아래 코드를 복사해 GitHub 저장소의 Secrets에 <b>PUSH_SUBSCRIPTIONS</b>라는 이름으로 넣으면 알림이 옵니다.</div>
+      <div class="note">아래 코드를 복사해 GitHub 저장소 Secrets의 <b>PUSH_SUBSCRIPTIONS</b>에 넣으면 알림이 옵니다.</div>
       <textarea id="subText" readonly></textarea>
       <button class="secondary" id="copyBtn">코드 복사</button>
     </div>
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 데이터 시뮬레이션에 기반한 개인용 규칙 알림이며 투자 조언이 아닙니다.</footer>
+  <footer>과거 데이터 시뮬레이션에 기반한 개인용 알림이며 투자 조언이 아닙니다.</footer>
 </main>
 
 <script src="config.js"></script>
@@ -374,14 +376,14 @@ const man = (x) => Math.round(x).toLocaleString("ko-KR");
 const pct = (x) => (x >= 0 ? "+" : "") + x.toFixed(1) + "%";
 const SELL_AT = -30, BUY_AT = 0; // 점수(×100) 기준
 const FUNDS = {
-  QLD: { name: "QLD", sub: "나스닥 100 · 2배", calc: "QLD(또는 국내 2배 상품)", risk: "2배 레버리지 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.",
-    perfNote: "QLD, 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b>",
+  QLD: { name: "QLD", sub: "나스닥 100 · 2배", calc: "QLD", risk: "2배 상품은 큰 하락장에서 -60% 이상 빠질 수 있습니다.",
+    perfNote: "QLD · 시작 1억 + 매월 100만원 · 세금·비용 반영 · 비교 대상은 적립식 매수(매월초)",
     perf: [["2008~2025", "연 25.1%", "연 27.5%", "-80% → -66%", true], ["2000~2025", "연 16.8%", "연 18.8%", "-99% → -97%", true], ["2026 (1~10월)", "+38.8%", "+29.5%", "-23% → -23%", false]],
-    perfText: "이 규칙의 장점은 2008년·2022년 같은 큰 하락을 줄이는 데서 나왔고, 꾸준히 오르기만 한 해에는 적립식 매수(매월초)보다 낮았습니다 (예: 2013년 -31%p, 2017년 -22%p, 2023년 -21%p). 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다." },
-  USD: { name: "USD", sub: "반도체 · 2배", calc: "USD(반도체 2배, 또는 국내 반도체 2배 상품)", risk: "반도체 2배 상품은 큰 하락장에서 -80% 이상 빠질 수 있고, 2배 나스닥(QLD)보다 훨씬 크게 흔들립니다.",
-    perfNote: "USD(반도체 2배), 매달 100만원 기준 · 비교 대상은 <b>적립식 매수(매월초)</b> · 2007년 이전은 반도체 지수로 만든 가상 가격",
+    perfText: "큰 하락(2008·2022년)을 줄여서 이겼고, 꾸준히 오른 해(2013·2017·2023년)에는 졌습니다. 과거에 가장 좋았던 규칙을 골랐기 때문에 앞으로는 이보다 낮을 수 있습니다." },
+  USD: { name: "USD", sub: "반도체 · 2배", calc: "USD", risk: "반도체 2배 상품은 -80% 이상 빠질 수 있고, QLD보다 훨씬 크게 흔들립니다.",
+    perfNote: "USD(반도체 2배) · 시작 1억 + 매월 100만원 · 세금·비용 반영 · 2007년 이전은 반도체 지수로 만든 가상 가격",
     perf: [["2008~2025", "연 31.3%", "연 37.1%", "-84% → -69%", true], ["2000~2025", "연 19.7%", "연 23.3%", "-100% → -99%", true], ["2026 (1~10월)", "+66.6%", "+59.5%", "-39% → -28%", false]],
-    perfText: "같은 점수 규칙을 USD에 그대로 적용한 결과입니다. 2008년·2022년 같은 큰 하락을 줄여 이긴 구조는 QLD와 같고, 오르기만 한 해에는 낮았습니다 (예: 2013년 -23%p, 2021년 -31%p, 2023년 -43%p). USD는 변동이 커서 해마다 차이도 크게 벌어집니다. 많은 후보 중 과거에 가장 좋았던 조합을 골랐다는 한계가 있어, 실제 결과는 이보다 낮을 수 있습니다. 투자 조언이 아닙니다." },
+    perfText: "같은 규칙을 USD에 적용한 결과입니다. 큰 하락을 줄여서 이겼고, 오르기만 한 해(2013·2021·2023년)에는 졌습니다. 등락이 커서 해마다 차이가 큽니다. 과거 최고 규칙을 골랐기 때문에 앞으로는 더 낮을 수 있습니다." },
 };
 let FUND = "QLD";
 try { const f = localStorage.getItem("fund"); if (f && FUNDS[f]) FUND = f; } catch (_) {}
@@ -419,7 +421,7 @@ async function load() {
 function renderFund() {
   const f = FUNDS[FUND];
   [...$("fundSw").children].forEach((b) => b.classList.toggle("on", b.dataset.f === FUND));
-  $("fundTag").innerHTML = `<b>${f.name}</b> · ${f.sub} · 신호(점수)는 QLD·USD 공통`;
+  $("fundTag").innerHTML = `<b>${f.name}</b> · ${f.sub} · 신호는 QLD·USD 공통`;
   document.querySelectorAll(".fname").forEach((e) => { e.textContent = f.name; });
   $("calcName").textContent = f.calc;
   $("riskNote").textContent = f.risk;
@@ -459,29 +461,30 @@ function weekStats() {
   }
   // the last (still running) stretch is not finished yet, so it is not part of the averages
   const years = {};
-  h.forEach((p, i) => { const y = p.d.slice(0, 4); (years[y] = years[y] || { w: 0, sell: 0 }).w++; if (st[i] === "SELL") years[y].sell++; });
+  h.forEach((p, i) => { const y = p.d.slice(0, 4); (years[y] = years[y] || { w: 0, sell: 0, buy: 0 }).w++; if (st[i] === "SELL") years[y].sell++; if (st[i] === "BUY") years[y].buy++; });
   const full = Object.values(years).filter((v) => v.w >= 50);
   const stat = (a) => {
     if (!a.length) return { n: 0, avg: 0, med: 0, max: 0 };
     const b = [...a].sort((x, y) => x - y), m = b.length >> 1;
     return { n: a.length, avg: a.reduce((x, y) => x + y, 0) / a.length, med: b.length % 2 ? b[m] : (b[m - 1] + b[m]) / 2, max: b[b.length - 1] };
   };
-  const ty = D.asof.slice(0, 4), t = years[ty] || { w: 0, sell: 0 };
-  return { sell: stat(runs.SELL), buy: stat(runs.BUY), years, avgYear: full.length ? full.reduce((a, v) => a + v.sell, 0) / full.length : 0, thisSell: t.sell, thisW: t.w, fullN: full.length };
+  const ty = D.asof.slice(0, 4), t = years[ty] || { w: 0, sell: 0, buy: 0 };
+  return { sell: stat(runs.SELL), buy: stat(runs.BUY), years, avgYear: full.length ? full.reduce((a, v) => a + v.sell, 0) / full.length : 0, avgYearBuy: full.length ? full.reduce((a, v) => a + v.buy, 0) / full.length : 0, thisSell: t.sell, thisBuy: t.buy, thisW: t.w, fullN: full.length };
 }
 
 function renderState() {
   const d = D, up = new Date(d.updated), ws = weekStats();
-  $("updated").textContent = `기준일 ${d.asof} (미국 종가) · 갱신 ${up.toLocaleString("ko-KR", { dateStyle: "medium", timeStyle: "short" })}`;
+  $("updated").textContent = `미국 종가 ${d.asof} · 갱신 ${up.toLocaleString("ko-KR", { month: "long", day: "numeric", hour: "numeric", minute: "2-digit" })}`;
   $("stateCard").className = "card state " + d.state;
   $("badge").textContent = d.state_kr;
   $("sicon").textContent = { SELL: "▼", BUY: "▲", HOLD: "■" }[d.state];
+  const rd = d.run_days || (d.run * 5), left = (5 - ((rd - 1) % 5)) % 5;   // 0 = act tonight, else trading days until the next action day
+  const sellTxt = left === 0 ? `오늘 밤 보유분의 <b>${d.sell_pct}%</b>를 매도해 현금으로 보관하세요.` : `오늘은 매도하지 않아요. 다음 매도는 <b>${left}거래일 뒤</b>예요.`;
+  const buyTxt = left === 0 ? `오늘 밤 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요.` : `오늘은 매수하지 않아요. 다음 매수는 <b>${left}거래일 뒤</b>예요.`;
   const acts = {
-    SELL: [`보유분의 <b>${d.sell_pct}%</b>를 매도하고, 그 돈은 현금(MMF·단기채 등)으로 보관하세요.`,
-           `신호가 켜져 있는 동안 <b>5거래일(약 1주)마다</b> 반복(매일 아님) · 매번 그때 남은 보유분의 ${d.sell_pct}%`],
-    BUY: [`매도로 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요.`,
-          `남은 ${100 - d.buy_pct}%는 현금으로 두고, 신호가 이어지면 <b>5거래일(약 1주)마다</b> 남은 현금의 ${d.buy_pct}%씩 매수 (현금이 없으면 할 일 없음)`],
-    HOLD: ["지금은 매도도 매수도 하지 않습니다.", "직전 상태를 그대로 유지하세요."],
+    SELL: [sellTxt, `매도 구간에서는 5거래일마다 팝니다. 매번 남은 보유분의 ${d.sell_pct}%.`],
+    BUY: [buyTxt, `매수 구간에서는 5거래일마다 삽니다. 매번 남은 현금의 ${d.buy_pct}%. 현금이 없으면 할 일 없음.`],
+    HOLD: ["매도도 매수도 하지 않아요.", "지금 상태를 유지하세요."],
   };
   $("action").innerHTML = acts[d.state][0];
   $("subaction").innerHTML = acts[d.state][1];
@@ -494,14 +497,12 @@ function renderState() {
     const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
     const cells = Math.min(24, Math.max(run, Math.round(S.avg)));
     let bar = ""; for (let i = 0; i < cells; i++) bar += `<i class="${i < Math.min(run, cells) ? "on" : ""}"></i>`;
-    const l1 = isS ? `이번 매도 구간 <b>${run}주째</b> → 처음 보유분의 약 <b>${cum.toFixed(0)}%</b>를 현금으로 바꿨어요 (${d.sell_pct}%씩 ${run}주)`
-                   : `이번 매수 구간 <b>${run}주째</b> → 쌓아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 매수했어요 (${d.buy_pct}%씩 ${run}주)`;
-    const l2 = isS ? `칸 하나가 1주예요. 과거 매도 구간은 평균 ${S.avg.toFixed(0)}주 이어졌고(중앙값 ${S.med}주, 최장 ${S.max}주), 올해는 지금까지 ${ws.thisSell}주 매도했어요 (한 해 평균 약 ${ws.avgYear.toFixed(0)}주)`
-                   : `칸 하나가 1주예요. 과거 매수 구간은 평균 ${S.avg.toFixed(0)}주 이어졌어요(중앙값 ${S.med}주, 최장 ${S.max}주)`;
+    const l1 = isS ? `<b>${run}회째</b> 매도 · 처음 보유분의 약 <b>${cum.toFixed(0)}%</b>를 현금으로 바꿨어요`
+                   : `<b>${run}회째</b> 매수 · 모아 둔 현금의 약 <b>${cum.toFixed(0)}%</b>를 썼어요`;
+    const l2 = `칸 하나 = 5거래일(약 1주). 과거 ${isS ? "매도" : "매수"} 구간은 평균 ${S.avg.toFixed(0)}주, 최장 ${S.max}주 이어졌어요.`;
     pg.innerHTML = `<div>${l1}</div><div class="pbar">${bar}</div><div class="plabel">${l2}</div>`;
   }
-  const changed = d.prev_state_kr !== d.state_kr ? ` · 지난주 ${d.prev_state_kr}에서 바뀜` : "";
-  $("meta").textContent = `${d.state_kr} ${d.run}주째 · 점수 ${sgn(disp(d.score))} (지난주 ${sgn(Math.round(d.prev_score * d.scale))})${changed} · 적립식 매수(매월초)는 그대로`;
+  $("meta").textContent = `${d.state_kr} ${rd}거래일째 · 점수 ${sgn(disp(d.score))} (지난주 ${sgn(Math.round(d.prev_score * d.scale))})`;
 
   const pos = (Math.max(-100, Math.min(100, disp(d.score))) + 100) / 2;
   $("mlabel").style.left = Math.min(86, Math.max(14, pos)) + "%";
@@ -518,15 +519,20 @@ function renderState() {
   $("dxyNote").textContent = `달러지수 ${d.dxy_lvl.toFixed(1)} / 100일 평균 ${d.dxy_mean.toFixed(1)} → ${d.dxy_lvl > d.dxy_mean ? "평균보다 강함(매도 쪽)" : "평균보다 약함(매수 쪽)"}`;
 }
 
-/* ---------- reference: how long sell stretches lasted ---------- */
-function renderRef() {
-  const ws = weekStats(), box = $("refStats"), cy = D.asof.slice(0, 4);
+/* ---------- reference: how long sell / buy stretches lasted ---------- */
+function refBlock(kind) {
+  const ws = weekStats(), isS = kind === "sell", cy = D.asof.slice(0, 4), key = isS ? "sell" : "buy", name = isS ? "매도" : "매수";
   const ys = Object.entries(ws.years).filter(([y, v]) => v.w >= 20 || y === cy).sort();
-  const mx = Math.max(1, ...ys.map(([, v]) => v.sell));
-  const bars = ys.map(([y, v]) => `<div class="yb"><span class="v">${v.sell}</span><i class="${y === cy ? "cur" : ""}" style="height:${Math.max(2, v.sell / mx * 60)}px"></i><span class="y">${y.slice(2)}${y === cy ? "*" : ""}</span></div>`).join("");
-  const top = Math.max(...Object.values(ws.years).filter((v) => v.w >= 50).map((v) => v.sell));
-  box.innerHTML = `<div class="d">연도별 매도 신호가 켜진 주 수 (* 올해는 ${ws.thisW}주 중)</div><div class="ybars">${bars}</div>
-    <div class="d" style="margin-top:8px">매도 구간(연속으로 켜진 기간) ${ws.sell.n}번: 평균 ${ws.sell.avg.toFixed(1)}주, 중앙값 ${ws.sell.med}주, 최장 ${ws.sell.max}주 · 한 해 평균 약 ${ws.avgYear.toFixed(0)}주(${(ws.avgYear / 52 * 100).toFixed(0)}%), 해마다 0주에서 ${top}주까지 크게 달랐습니다.</div>`;
+  const mx = Math.max(1, ...ys.map(([, v]) => v[key]));
+  const bars = ys.map(([y, v]) => `<div class="yb ${isS ? "" : "buy"}"><span class="v">${v[key]}</span><i class="${y === cy ? "cur" : ""}" style="height:${Math.max(2, v[key] / mx * 60)}px"></i><span class="y">${y.slice(2)}${y === cy ? "*" : ""}</span></div>`).join("");
+  const full = Object.values(ws.years).filter((v) => v.w >= 50).map((v) => v[key]);
+  const S = isS ? ws.sell : ws.buy, avg = isS ? ws.avgYear : ws.avgYearBuy;
+  return `<div class="d">연도별 ${name} 신호가 켜진 주 수 (* 올해는 ${ws.thisW}주 중)</div><div class="ybars">${bars}</div>
+    <div class="d" style="margin-top:8px">${name} 구간 ${S.n}번 · 평균 ${S.avg.toFixed(1)}주, 중앙값 ${S.med}주, 최장 ${S.max}주<br>한 해 평균 약 ${avg.toFixed(0)}주(${(avg / 52 * 100).toFixed(0)}%) · 해마다 ${Math.min(...full)}~${Math.max(...full)}주로 크게 달랐어요.</div>`;
+}
+function renderRef() {
+  $("refStats").innerHTML = refBlock("sell");
+  $("refStatsBuy").innerHTML = refBlock("buy");
 }
 
 /* ---------- 3. 계산기 ---------- */
@@ -544,17 +550,17 @@ function renderCalc() {
 function updateCalc() {
   const box = $("calcResult"), st = D.state;
   try { localStorage.setItem("calc2", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
-  if (st === "HOLD") { box.innerHTML = "지금은 <b>관망</b> 구간이라 사고팔 금액이 없습니다."; return; }
+  if (st === "HOLD") { box.innerHTML = "지금은 <b>관망</b>이라 사고팔 금액이 없어요."; return; }
   if (st === "SELL") {
     const h = parseFloat($("calcHolding").value);
-    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 입력하면 <b>매도할 금액</b>을 계산해 드려요."; return; }
+    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 넣으면 <b>매도 금액</b>을 계산해요."; return; }
     const amt = h * D.sell_pct / 100;
-    box.innerHTML = `지금 <b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% = ${man(amt)}만원 → 매도 후 남는 평가금액 ${man(h - amt)}만원</div>`;
+    box.innerHTML = `<b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% · 매도 후 평가금액 ${man(h - amt)}만원</div>`;
   } else {
     const c = parseFloat($("calcCash").value);
-    if (isNaN(c) || c <= 0) { box.innerHTML = "모아 둔 현금을 입력하면 <b>매수할 금액</b>을 계산해 드려요.<div class='formula'>현금이 없다면 할 일이 없습니다.</div>"; return; }
+    if (isNaN(c) || c <= 0) { box.innerHTML = "현금을 넣으면 <b>매수 금액</b>을 계산해요.<div class='formula'>현금이 없으면 할 일 없음.</div>"; return; }
     const amt = c * D.buy_pct / 100;
-    box.innerHTML = `지금 <b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% = ${man(amt)}만원 → 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
+    box.innerHTML = `<b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% · 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
   }
 }
 $("calcHolding").addEventListener("input", () => D && updateCalc());
@@ -703,7 +709,7 @@ function drawPrice() {
   s += `<text x="${bx + 8}" y="${by + 15}" font-size="11" font-weight="700" fill="${cv("--qld")}">QLD 고점 대비 ${pct(info.QLD.dd)}  (고점 ${h[info.QLD.ip].d})</text>`;
   s += `<text x="${bx + 8}" y="${by + 31}" font-size="11" font-weight="700" fill="${cv("--usd")}">USD 고점 대비 ${pct(info.USD.dd)}  (고점 ${h[info.USD.ip].d})</text>`;
   $("chartPrice").innerHTML = s;
-  $("scaleNote").textContent = lg ? "로그 눈금은 2배 오를 때마다 같은 간격으로 그려서, 오래 오른 종목도 한 화면에 비교됩니다." : "보통 눈금: 같은 숫자 차이가 같은 간격입니다. 기간이 길면 한쪽이 눌려 보일 수 있어요.";
+  $("scaleNote").textContent = lg ? "로그: 2배 오를 때마다 같은 간격이라 오래 오른 종목도 한눈에 비교돼요." : "보통: 같은 숫자 차이가 같은 간격이에요. 기간이 길면 한쪽이 눌려 보여요.";
   $("qldNow").textContent = "$" + D.qld_now.toFixed(2);
   $("usdNow").textContent = "$" + D.usd_now.toFixed(2);
   $("qldDD").textContent = `기간 고점 대비 ${pct(info.QLD.dd)}`;

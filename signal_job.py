@@ -1,17 +1,22 @@
 """Job for the '쫑우 투자신호' app.
 
-Weekly (GitHub Actions, every Monday 08:00 KST) and daily price refresh (Tue-Sat 07:00 KST, no push).
+Runs every evening at 20:00 Korea time, Tuesday-Saturday (= right after the US market close of the previous US day, GitHub Actions).
 
 1. Computes the rates + dxy score exactly as in the backtest:
      rates = clip( -(10y Treasury yield [1-day lag] - its 126-trading-day mean) / 0.5 , -1, 1 )
      dxy   = clip( -(US dollar index / its 100-trading-day mean - 1) / 0.03 , -1, 1 )
-     score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read at the last trading day of each week
+     score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read EVERY trading day
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
-3. Sends a web-push notification to every subscribed phone (secrets VAPID_PRIVATE_KEY and PUSH_SUBSCRIPTIONS).
+3. Sends a web-push notification ONLY when the score moves INTO the sell zone or INTO the buy zone (secrets VAPID_PRIVATE_KEY and
+   PUSH_SUBSCRIPTIONS).  Entering the same zone again within 7 days of the last alert is recorded but not announced (noise at the line).
+   The state of the previous run is kept in data.json ("daily"), so a missed run never loses a crossing.
+   Action rule that was tested: first action on the NEXT trading day after the crossing, then again every 5th trading day while the
+   score stays in the zone (sell 5% of the holding / buy 25% of the cash pile each time).
 
-    python signal_job.py            # compute, write data, push (if secrets are set)
-    python signal_job.py --no-push  # compute and write only
+    python signal_job.py             # compute, write data, push on a crossing
+    python signal_job.py --no-push   # compute and write only
+    python signal_job.py --test-push # also send the current state once (to test the phone)
 """
 import argparse
 import io
@@ -28,6 +33,8 @@ BUY_LEVEL = 0.0    # score at or above: buy with 25% of the cash from earlier sa
 SELL_PCT, BUY_PCT = 5, 25
 SCALE = 100        # the app shows score x 100
 HISTORY_WEEKS = 530  # about 10 years
+COOLDOWN_DAYS = 7    # no second alert for the same zone within this many calendar days
+CYCLE_DAYS = 5       # actions repeat every 5th trading day while the score stays in the zone
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA = os.path.join(HERE, "docs", "data.json")
 PRICES = os.path.join(HERE, "docs", "prices.json")
@@ -127,6 +134,42 @@ def message(d):
     return f"이번 주 신호: {d['state_kr']}", body
 
 
+def daily_info(sc, prev):
+    """Crossing detection on the daily score. prev = the previous data.json (dict) or None."""
+    s = sc["score"].dropna()
+    states = [state_of(v) for v in s.to_numpy()]
+    cur, asof = states[-1], s.index[-1]
+    run_days = 0
+    for st in states[::-1]:
+        if st != cur:
+            break
+        run_days += 1
+    old = (prev or {}).get("daily") or {}
+    last_alert = dict(old.get("last_alert") or {"SELL": None, "BUY": None})
+    alert = None
+    if old.get("state") and old["state"] != cur and str(asof.date()) > old.get("asof", ""):
+        if cur in ("SELL", "BUY"):
+            la = last_alert.get(cur)
+            if la is None or (asof - pd.Timestamp(la)).days > COOLDOWN_DAYS:
+                alert = cur
+                last_alert[cur] = str(asof.date())
+            else:
+                print(f"crossing into {cur} on {asof.date()} not announced (last {cur} alert {la}, within {COOLDOWN_DAYS} days)")
+    return {"state": cur, "asof": str(asof.date()), "run_days": run_days, "last_alert": last_alert}, alert
+
+
+def alert_message(d, kind):
+    sc_ = d["scale"]
+    score = f"{round(d['score'] * sc_):+d}"
+    if kind == "SELL":
+        return ("매도 신호가 켜졌어요",
+                f"점수 {score}: 매도 구간(-30 이하)으로 넘어갔습니다. 오늘 미국 장에서 보유분의 {d['sell_pct']}%를 매도해 현금으로 보관하세요. "
+                f"구간이 이어지면 5거래일(약 1주)마다 반복합니다. (기준일 {d['asof']})")
+    return ("매수 신호가 켜졌어요",
+            f"점수 {score}: 매수 구간(0 이상)으로 넘어갔습니다. 매도로 모아 둔 현금이 있으면 오늘 미국 장에서 그 {d['buy_pct']}%를 매수하세요 "
+            f"(현금이 없으면 할 일 없음). 구간이 이어지면 5거래일(약 1주)마다 반복합니다. (기준일 {d['asof']})")
+
+
 def push(title, body):
     key = os.environ.get("VAPID_PRIVATE_KEY", "").strip()
     subs_raw = os.environ.get("PUSH_SUBSCRIPTIONS", "").strip()
@@ -149,19 +192,36 @@ def push(title, body):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--no-push", action="store_true")
+    ap.add_argument("--test-push", action="store_true", help="also send the current state once, to test the phone")
     args = ap.parse_args()
+    prev = None
+    try:
+        with open(DATA, encoding="utf-8") as f:
+            prev = json.load(f)
+    except Exception:
+        pass
     wk, sc = compute()
     d = build(wk)
+    daily, alert = daily_info(sc, prev)
+    d["daily"] = daily
+    d["run"] = (daily["run_days"] - 1) // CYCLE_DAYS + 1   # action rounds: day 1, 6, 11, ... of the stretch
+    d["run_days"] = daily["run_days"]
     os.makedirs(os.path.dirname(DATA), exist_ok=True)
     with open(DATA, "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))
     with open(PRICES, "w", encoding="utf-8") as f:
         json.dump(build_prices(sc), f, separators=(",", ":"))
-    title, body = message(d)
-    print(title)
-    print(body)
-    if not args.no_push:
+    print(f"asof {d['asof']} state {d['state']} score {round(d['score'] * SCALE)} run_days {daily['run_days']} alert {alert}")
+    if args.no_push:
+        return
+    if alert:
+        title, body = alert_message(d, alert)
+        print(title); print(body)
         push(title, body)
+    elif args.test_push:
+        push("테스트 알림", f"지금 상태: {d['state_kr']} (점수 {round(d['score'] * SCALE):+d}). 점수가 매도·매수 구간으로 넘어가는 날 저녁 8시(한국 시간)에 알림이 옵니다.")
+    else:
+        print("no zone crossing today: no notification")
 
 
 if __name__ == "__main__":

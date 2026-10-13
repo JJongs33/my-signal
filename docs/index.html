@@ -226,11 +226,11 @@
       </div>
     </div>
     <div class="crit SELL" id="critSELL"><div class="sym">▼</div><div><b>-30 이하 → 매도 <span class="nowtag hidden">지금</span></b>
-      <span class="d">보유한 <span class="fname">QLD</span>의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 신호가 켜진 주마다 <u>매주 1번</u> 반복 (매번 그때 남은 보유분의 5%)</span></div></div>
+      <span class="d">보유한 <span class="fname">QLD</span>의 <span class="amt">5%</span>를 팔아서 현금으로 보관 · 점수가 처음 -30 이하가 된 다음 거래일에 첫 매도, 구간이 이어지면 <u>5거래일(약 1주)마다</u> 반복 (매번 그때 남은 보유분의 5%)</span></div></div>
     <div class="crit HOLD" id="critHOLD"><div class="sym">■</div><div><b>-29 ~ -1 → 관망 <span class="nowtag hidden">지금</span></b>
       <span class="d">아무것도 하지 않음 (매도도 매수도 없음)</span></div></div>
     <div class="crit BUY" id="critBUY"><div class="sym">▲</div><div><b>0 이상 → 매수 <span class="nowtag hidden">지금</span></b>
-      <span class="d">매도로 쌓아 둔 현금의 <span class="amt">25%</span>를 매수. 남은 75%는 현금으로 두고, 이 구간이 이어지면 <u>매주</u> 남은 현금의 25%씩 매수합니다 (1주 25% → 2주 44% → 4주 68% → 8주 90%)</span></div></div>
+      <span class="d">매도로 쌓아 둔 현금의 <span class="amt">25%</span>를 매수. 남은 75%는 현금으로 두고, 이 구간이 이어지면 <u>5거래일(약 1주)마다</u> 남은 현금의 25%씩 매수합니다 (1주 25% → 2주 44% → 4주 68% → 8주 90%)</span></div></div>
     <details style="margin-top:12px">
       <summary>점수는 어떻게 계산되나요?</summary>
       <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2 × 100</b></div>
@@ -247,17 +247,17 @@
 
   <!-- 3. 이번 주 매매 금액 계산기 -->
   <section class="card">
-    <h2><span class="idx">02</span>이번 주 얼마를 사고팔까요?</h2>
+    <h2><span class="idx">02</span>지금 얼마를 사고팔까요?</h2>
     <div id="calcHold" class="hidden"></div>
     <div id="calcSell" class="hidden">
       <label class="field">지금 계좌에 있는 <span id="calcName">QLD(또는 국내 2배 상품)</span>의 <b>평가금액</b> (만원)</label>
       <input type="number" id="calcHolding" inputmode="decimal" placeholder="예: 8500">
-      <div class="help">증권사 앱에서 해당 종목의 <b>'평가금액'</b>(지금 팔면 받을 금액)을 적으세요. 이번 주는 <b>매도 신호</b>라서 이 금액의 5%를 팝니다. 현금은 입력하지 않아도 됩니다.</div>
+      <div class="help">증권사 앱에서 해당 종목의 <b>'평가금액'</b>(지금 팔면 받을 금액)을 적으세요. 지금은 <b>매도 신호</b>라서 이 금액의 5%를 팝니다. 현금은 입력하지 않아도 됩니다.</div>
     </div>
     <div id="calcBuy" class="hidden">
       <label class="field">매도해서 모아 둔 <b>현금</b> (만원)</label>
       <input type="number" id="calcCash" inputmode="decimal" placeholder="예: 1500">
-      <div class="help">이전에 매도하고 아직 다시 사지 않은 <b>현금</b>을 적으세요. 이번 주는 <b>매수 신호</b>라서 그 현금의 25%를 삽니다. 평가금액은 입력하지 않아도 됩니다.</div>
+      <div class="help">이전에 매도하고 아직 다시 사지 않은 <b>현금</b>을 적으세요. 지금은 <b>매수 신호</b>라서 그 현금의 25%를 삽니다. 평가금액은 입력하지 않아도 됩니다.</div>
     </div>
     <div class="result" id="calcResult"></div>
     <div class="note">입력한 금액은 이 기기의 브라우저에만 저장되고, 서버로 전송되지 않습니다.</div>
@@ -331,7 +331,7 @@
     <div class="refitem"><b>적립식 매수(매월초)는 그대로</b>
       <div class="d">매월 첫 거래일에 적립금 전액을 매수합니다. 점수와 상관없이 계속 하고, 위의 매도·매수 신호는 이미 갖고 있는 보유분과 모아 둔 현금에만 적용됩니다.</div></div>
     <div class="refitem"><b>언제 확인하고 언제 실행하나</b>
-      <div class="d">미국 금요일 장 마감 후 점수를 계산하고, 월요일 아침(한국 시간)에 알림이 옵니다. 월요일 미국 장(다음 거래일 종가 기준)에 실행하는 것으로 시험했습니다. 신호 확인과 사고팔기는 <b>주 1회</b>이고 매일 사고팔지 않습니다.</div></div>
+      <div class="d">점수는 미국 장이 마감된 뒤 매 거래일 확인합니다. 점수가 매도(-30 이하)나 매수(0 이상) 구간으로 <b>처음 넘어간 날</b>, 그날 저녁 8시(한국 시간)에 알림이 옵니다. 알림을 받으면 그 다음 거래일 미국 장에서 첫 매도·매수를 하고, 구간에 머무는 동안은 <b>5거래일(약 1주)마다</b> 같은 비율로 반복하는 것으로 시험했습니다 (매일 사고팔지 않습니다). 시험 결과는 매주 금요일에만 확인하던 방식과 같거나 조금 더 좋았습니다.</div></div>
     <div class="refitem"><b>신호가 이어지면 얼마나 쌓이나</b>
       <table class="perf-table">
         <tr><th>이어진 주</th><th>매도 누적<br>(보유분 기준)</th><th>매수 누적<br>(현금 기준)</th></tr>
@@ -351,7 +351,7 @@
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
-    <div class="note" style="margin-top:-4px;margin-bottom:8px">매주 월요일 아침(한국 시간 8시)에 이번 주 신호가 도착합니다.</div>
+    <div class="note" style="margin-top:-4px;margin-bottom:8px">정해진 요일은 없습니다. 점수가 매도·매수 구간으로 넘어가는 날 저녁 8시(한국 시간)에 알림이 옵니다. 구간이 바뀌지 않으면 알림도 없고, 같은 구간에 7일 안에 다시 들어가면 알림을 한 번 건너뜁니다 (선 근처에서 오르내릴 때 알림이 잦아지지 않게). 예약 실행이라 몇 분 늦을 수 있어요.</div>
     <div id="iosHint" class="note hidden">아이폰은 먼저 Safari의 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 홈 화면의 앱을 열어서 아래 버튼을 눌러 주세요 (iOS 16.4 이상).</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
@@ -477,11 +477,11 @@ function renderState() {
   $("badge").textContent = d.state_kr;
   $("sicon").textContent = { SELL: "▼", BUY: "▲", HOLD: "■" }[d.state];
   const acts = {
-    SELL: [`이번 주 보유분의 <b>${d.sell_pct}%</b>를 매도하고, 그 돈은 현금(MMF·단기채 등)으로 보관하세요.`,
-           `신호가 켜져 있는 동안 <b>매주 1번</b>(매일 아님) · 매번 그때 남은 보유분의 ${d.sell_pct}%`],
-    BUY: [`매도로 모아 둔 현금의 <b>${d.buy_pct}%</b>를 이번 주 매수하세요.`,
-          `남은 ${100 - d.buy_pct}%는 현금으로 두고, 신호가 이어지면 <b>매주</b> 남은 현금의 ${d.buy_pct}%씩 매수 (현금이 없으면 할 일 없음)`],
-    HOLD: ["이번 주는 매도도 매수도 하지 않습니다.", "직전 상태를 그대로 유지하세요."],
+    SELL: [`보유분의 <b>${d.sell_pct}%</b>를 매도하고, 그 돈은 현금(MMF·단기채 등)으로 보관하세요.`,
+           `신호가 켜져 있는 동안 <b>5거래일(약 1주)마다</b> 반복(매일 아님) · 매번 그때 남은 보유분의 ${d.sell_pct}%`],
+    BUY: [`매도로 모아 둔 현금의 <b>${d.buy_pct}%</b>를 매수하세요.`,
+          `남은 ${100 - d.buy_pct}%는 현금으로 두고, 신호가 이어지면 <b>5거래일(약 1주)마다</b> 남은 현금의 ${d.buy_pct}%씩 매수 (현금이 없으면 할 일 없음)`],
+    HOLD: ["지금은 매도도 매수도 하지 않습니다.", "직전 상태를 그대로 유지하세요."],
   };
   $("action").innerHTML = acts[d.state][0];
   $("subaction").innerHTML = acts[d.state][1];
@@ -544,17 +544,17 @@ function renderCalc() {
 function updateCalc() {
   const box = $("calcResult"), st = D.state;
   try { localStorage.setItem("calc2", JSON.stringify({ holding: $("calcHolding").value, cash: $("calcCash").value })); } catch (_) {}
-  if (st === "HOLD") { box.innerHTML = "이번 주는 <b>관망</b> 구간이라 사고팔 금액이 없습니다."; return; }
+  if (st === "HOLD") { box.innerHTML = "지금은 <b>관망</b> 구간이라 사고팔 금액이 없습니다."; return; }
   if (st === "SELL") {
     const h = parseFloat($("calcHolding").value);
-    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 입력하면 이번 주 <b>매도할 금액</b>을 계산해 드려요."; return; }
+    if (isNaN(h) || h <= 0) { box.innerHTML = "평가금액을 입력하면 <b>매도할 금액</b>을 계산해 드려요."; return; }
     const amt = h * D.sell_pct / 100;
-    box.innerHTML = `이번 주 <b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% = ${man(amt)}만원 → 매도 후 남는 평가금액 ${man(h - amt)}만원</div>`;
+    box.innerHTML = `지금 <b style="color:var(--sell)">${man(amt)}만원 매도</b><div class="formula">${man(h)}만원 × ${D.sell_pct}% = ${man(amt)}만원 → 매도 후 남는 평가금액 ${man(h - amt)}만원</div>`;
   } else {
     const c = parseFloat($("calcCash").value);
-    if (isNaN(c) || c <= 0) { box.innerHTML = "모아 둔 현금을 입력하면 이번 주 <b>매수할 금액</b>을 계산해 드려요.<div class='formula'>현금이 없다면 이번 주는 할 일이 없습니다.</div>"; return; }
+    if (isNaN(c) || c <= 0) { box.innerHTML = "모아 둔 현금을 입력하면 <b>매수할 금액</b>을 계산해 드려요.<div class='formula'>현금이 없다면 할 일이 없습니다.</div>"; return; }
     const amt = c * D.buy_pct / 100;
-    box.innerHTML = `이번 주 <b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% = ${man(amt)}만원 → 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
+    box.innerHTML = `지금 <b style="color:var(--buy)">${man(amt)}만원 매수</b><div class="formula">${man(c)}만원 × ${D.buy_pct}% = ${man(amt)}만원 → 매수 후 남는 현금 ${man(c - amt)}만원</div>`;
   }
 }
 $("calcHolding").addEventListener("input", () => D && updateCalc());

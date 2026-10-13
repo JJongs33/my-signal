@@ -1,10 +1,14 @@
-name: weekly-signal
+name: daily-signal
 
 on:
   schedule:
-    - cron: "0 23 * * 0"     # Sunday 23:00 UTC = Monday 08:00 Korea time: weekly signal + push notification
-    - cron: "0 22 * * 1-5"   # Mon-Fri 22:00 UTC = Tue-Sat 07:00 Korea time: refresh prices only (no notification)
-  workflow_dispatch:          # "Run workflow" button: full run with notification (for tests)
+    - cron: "0 11 * * 2-6"   # Tue-Sat 11:00 UTC = 20:00 Korea time, right after the previous US close: refresh data, notify on a zone crossing
+  workflow_dispatch:          # "Run workflow" button: refresh data and send ONE test notification with the current state
+    inputs:
+      test_push:
+        description: "send a test notification"
+        type: boolean
+        default: true
 
 permissions:
   contents: write             # lets the job save docs/data.json and docs/prices.json back to the repository
@@ -18,10 +22,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - name: compute signal, update app data (push only on the weekly run)
+      - name: compute signal, update app data, notify on a crossing
         run: |
-          if [ "${{ github.event.schedule }}" = "0 22 * * 1-5" ]; then
-            python signal_job.py --no-push
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.test_push }}" = "true" ]; then
+            python signal_job.py --test-push
           else
             python signal_job.py
           fi

@@ -302,6 +302,7 @@
   .pfund b { font: 900 22px/1 var(--f-disp); letter-spacing: -.02em; }
   .pfund span { font: 400 12px/1 var(--f-mono); color: var(--faint); }
   .defs { margin: 0 0 8px; }
+  .defs.alerts { margin: 0 0 24px; } .defs.alerts > div:first-child { border-top: 1px solid var(--line2); }
   .defs > div:first-child { border-top: 0; }
   .defs > div { display: flex; gap: 14px; padding: 11px 0; border-top: 1px solid var(--line2); font-size: 13px; line-height: 1.6; }
   .defs > div:last-child { border-bottom: 1px solid var(--line2); }
@@ -528,18 +529,23 @@
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
-    <div class="note" style="margin-top:-8px;margin-bottom:20px">상태가 바뀔 때와 매도·매수 구간인 날, 아침 10시와 저녁 9시(한국)에 알려 드려요. 관망이 이어지면 알림이 없어요.</div>
+    <dl class="defs alerts">
+      <div><dt>시간</dt><dd>화~토 아침 10시 · 저녁 9시 (한국)</dd></div>
+      <div><dt>받는 날</dt><dd>구간이 바뀐 날, 매도·매수 구간인 날<br>(관망이 이어지면 알림 없음)</dd></div>
+      <div><dt>내용</dt><dd>"매도 구간입니다 · 점수는 -88"<br>끝에 아침·저녁 표시가 붙어요</dd></div>
+      <div><dt>점수 계산</dt><dd>화~토 아침 10시 (전날 미국 종가 기준). 저녁 9시는 같은 점수를 다시 알려 줘요</dd></div>
+    </dl>
     <div id="iosHint" class="note hidden">아이폰은 Safari 공유 버튼 → <b>홈 화면에 추가</b>로 설치한 뒤, 앱에서 아래 버튼을 눌러 주세요.</div>
     <button id="subBtn">알림 켜기</button>
     <div id="subBox" class="hidden">
-      <div class="note">아래 코드를 GitHub 저장소 Secrets의 <b>PUSH_SUBSCRIPTIONS</b>에 넣으면 알림이 와요.</div>
+      <div class="note">아래 코드를 앱을 만든 사람에게 보내 주세요. 등록되면 알림이 와요.</div>
       <textarea id="subText" readonly></textarea>
       <button class="secondary" id="copyBtn">코드 복사</button>
     </div>
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 25</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 26</span></footer>
 </main>
 
 <script src="config.js"></script>

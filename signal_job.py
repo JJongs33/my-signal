@@ -195,13 +195,16 @@ def push(title, body):
     subs = json.loads(subs_raw)
     subs = subs if isinstance(subs, list) else [subs]
     claim = os.environ.get("VAPID_SUB", "https://github.com")
-    for s in subs:
+    for i, s in enumerate(subs):
+        host = s.get("endpoint", "").split("/")[2] if "//" in s.get("endpoint", "") else "?"
         try:
             webpush(subscription_info=s, data=json.dumps({"title": title, "body": body, "url": "./"}, ensure_ascii=False),
                     vapid_private_key=key, vapid_claims={"sub": claim}, ttl=86400)
-            print("pushed to", s.get("endpoint", "")[:40], "...")
+            print(f"pushed to #{i} ({host})")
         except WebPushException as e:
-            print("push failed:", repr(e)[:200])
+            code = e.response.status_code if e.response is not None else None
+            hint = " -> this phone's registration expired: make a new code in the app (08 알림) and update PUSH_SUBSCRIPTIONS" if code in (404, 410) else ""
+            print(f"push failed #{i} ({host}): {code}{hint}")
 
 
 def main():

@@ -548,10 +548,11 @@
       <textarea id="subText" readonly></textarea>
       <button class="secondary" id="copyBtn">코드 복사</button>
     </div>
+    <button class="secondary" id="resubBtn">알림이 안 오면: 코드 새로 만들기</button>
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 29</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 30</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -1077,6 +1078,21 @@ $("subBtn").addEventListener("click", async () => {
     $("subBox").classList.remove("hidden");
     $("subMsg").textContent = "이 기기의 알림 등록 코드를 만들었습니다.";
   } catch (e) { $("subMsg").textContent = "알림 등록에 실패했습니다: " + e.message; }
+});
+$("resubBtn").addEventListener("click", async () => {   // an expired registration keeps returning the same dead code; drop it and make a new one
+  try {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) { $("subMsg").textContent = "이 브라우저는 알림을 지원하지 않습니다."; return; }
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { $("subMsg").textContent = "알림 권한이 허용되지 않았습니다. 폰 설정에서 이 앱의 알림을 허용해 주세요."; return; }
+    const reg = await navigator.serviceWorker.ready;
+    const old = await reg.pushManager.getSubscription();
+    if (old) await old.unsubscribe();
+    const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: keyToBytes(VAPID_PUBLIC_KEY) });
+    $("subText").value = JSON.stringify(sub);
+    $("subBox").classList.remove("hidden");
+    $("copyBtn").textContent = "코드 복사";
+    $("subMsg").textContent = "새 코드를 만들었습니다. 예전 코드는 더 이상 쓰이지 않으니, 새 코드를 앱을 만든 사람에게 보내 주세요.";
+  } catch (e) { $("subMsg").textContent = "새 코드 만들기에 실패했습니다: " + e.message; }
 });
 $("copyBtn").addEventListener("click", async () => {
   try { await navigator.clipboard.writeText($("subText").value); $("copyBtn").textContent = "복사됨"; }

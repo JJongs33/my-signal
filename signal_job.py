@@ -11,8 +11,8 @@ Runs twice a day, Tuesday-Saturday, on GitHub Actions: 10:00 Korea time (the US 
    Sell strength (added 2026-10-17, twoy_ff_deep.py): spread = 2-year Treasury yield - effective fed funds rate (both 1-day lag).
      If the spread is higher than 252 trading days ago (the market prices more hikes / fewer cuts than a year ago) the sell zone is
      'strong' and sells 5% a week; otherwise it is 'weak' and sells 2.5% a week.
-   Buy speed (added 2026-10-17, sizing_test.py): in a buy zone, buy 25% of the cash for the first 4 weeks (20 trading days),
-     then 50% while the buy zone continues.  A short bounce spends little of the cash; a lasting recovery uses it faster.
+   Buy speed (2026-10-17, sizing_test.py / buy_lower_test.py): in a buy zone, buy 20% of the cash for the first 4 weeks
+     (20 trading days), then 40% while the buy zone continues.  A short bounce spends little of the cash; a lasting recovery uses it faster.
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
 3. Sends a web-push notification on every run EXCEPT when the state is HOLD and was HOLD the day before:
      "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on the first day of a new state).
@@ -35,8 +35,8 @@ import yfinance as yf
 
 THRESHOLD = -0.30  # score at or below: sell 5% of the holding this week
 BUY_LEVEL = 0.0    # score at or above: buy with 25% of the cash from earlier sales
-SELL_PCT, BUY_PCT = 5, 25
-BUY_PCT_LATE, BUY_RAMP_DAYS = 50, 20   # after 20 trading days in a buy zone, buy 50% of the cash instead of 25%
+SELL_PCT, BUY_PCT = 5, 20
+BUY_PCT_LATE, BUY_RAMP_DAYS = 40, 20   # after 20 trading days in a buy zone, buy 40% of the cash instead of 20%
 SELL_PCT_WEAK = 2.5  # sell zone while the 2y - fed funds spread is not higher than a year ago
 FILTER_DAYS = 252    # 'a year ago' in trading days
 SCALE = 100        # the app shows score x 100

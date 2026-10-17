@@ -278,6 +278,8 @@
   #spark { width: 100%; max-width: 150px; height: 64px; flex: 1; }
   .jstate { display: flex; align-items: center; gap: 14px; margin-top: 22px; }
   .jstate .badge { font: 800 22px/1 var(--f-text); letter-spacing: -.02em; }
+  .jstate .strength { font: 500 13px/1 var(--f-text); letter-spacing: 0; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
+  .jstate .strength b { font-weight: 800; color: var(--text); margin-left: 3px; }
   .hero .zonebar { margin: 36px 0 6px; }
   .hero .mlabel { display: none; }
   .hero .zticks { margin-bottom: 8px; }
@@ -372,7 +374,7 @@
     <div class="jcap">JJONG INDEX<span class="jnew">NEW</span></div>
     <div class="jname">쫑지표 <span>[10년물 금리 + 달러지수]</span></div>
     <div class="jrow"><div class="jscore" id="jscore">-</div><svg id="spark" viewBox="0 0 150 64" role="img" aria-label="최근 점수 흐름"></svg></div>
-    <div class="jstate"><span class="sicon" id="sicon">▼ SELL</span><span class="badge" id="badge">-</span></div>
+    <div class="jstate"><span class="sicon" id="sicon">▼ SELL</span><span class="badge" id="badge">-</span><span class="strength hidden" id="strength"></span></div>
     <div class="zonewrap">
       <div class="marker"><span class="mlabel" id="mlabel">현재 -</span></div>
       <div class="nowline" id="nowline" style="left:50%"></div>
@@ -559,7 +561,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 32</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 33</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -736,7 +738,10 @@ function renderState() {
   const d = D, up = new Date(d.updated), ws = weekStats();
   $("updated").textContent = `미국 종가 ${d.asof.slice(5)} · 갱신 ${up.toLocaleString("ko-KR", { month: "long", day: "numeric" })}`;
   $("stateCard").className = "card state hero " + d.state;
-  $("badge").textContent = d.state_kr + " 구간" + (d.state === "SELL" && d.sell_filter ? ` · 강도 ${d.sell_filter.strong ? "강" : "약"}` : "");
+  $("badge").textContent = d.state_kr + " 구간";
+  const stEl = $("strength");
+  if (d.state === "SELL" && d.sell_filter) { stEl.innerHTML = `매도 강도<b>${d.sell_filter.strong ? "강" : "약"}</b>`; stEl.classList.remove("hidden"); }
+  else stEl.classList.add("hidden");
   $("jscore").textContent = sgn(disp(d.score));
   drawSpark();
   $("sicon").textContent = { SELL: "▼ SELL", BUY: "▲ BUY", HOLD: "■ HOLD" }[d.state];

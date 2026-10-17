@@ -31,8 +31,7 @@ self.addEventListener("fetch", (e) => {
 self.addEventListener("push", (e) => {
   let d = { title: "쫑우 투자신호", body: "앱을 열어 확인하세요.", url: "./" };
   try { d = Object.assign(d, e.data.json()); } catch (_) {}
-  // a new tag for every message: replacing an old notification with the same tag can be silent on Android
-  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "icon-192.png", badge: "icon-192.png", tag: "signal-" + Date.now(), data: { url: d.url } }));
+  e.waitUntil(self.registration.showNotification(d.title, { body: d.body, icon: "icon-192.png", badge: "icon-192.png", tag: "signal", renotify: true, data: { url: d.url } }));
 });
 
 self.addEventListener("notificationclick", (e) => {

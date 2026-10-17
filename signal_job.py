@@ -8,6 +8,9 @@ Runs twice a day, Tuesday-Saturday, on GitHub Actions: 10:00 Korea time (the US 
      dxy   = clip( -(US dollar index / its 100-trading-day mean - 1) / 0.03 , -1, 1 )
      score = (rates + dxy) / 2      on the NASDAQ-100 trading calendar, read EVERY trading day
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
+   Sell strength (added 2026-10-17, twoy_ff_deep.py): spread = 2-year Treasury yield - effective fed funds rate (both 1-day lag).
+     If the spread is higher than 252 trading days ago (the market prices more hikes / fewer cuts than a year ago) the sell zone is
+     'strong' and sells 5% a week; otherwise it is 'weak' and sells 2.5% a week.  Buying is unchanged.
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
 3. Sends a web-push notification on every run EXCEPT when the state is HOLD and was HOLD the day before:
      "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on the first day of a new state).
@@ -31,6 +34,8 @@ import yfinance as yf
 THRESHOLD = -0.30  # score at or below: sell 5% of the holding this week
 BUY_LEVEL = 0.0    # score at or above: buy with 25% of the cash from earlier sales
 SELL_PCT, BUY_PCT = 5, 25
+SELL_PCT_WEAK = 2.5  # sell zone while the 2y - fed funds spread is not higher than a year ago
+FILTER_DAYS = 252    # 'a year ago' in trading days
 SCALE = 100        # the app shows score x 100
 HISTORY_WEEKS = 530  # about 10 years
 CYCLE_DAYS = 5       # actions repeat every 5th trading day while the score stays in the zone
@@ -72,6 +77,11 @@ def compute():
     sc["rates"] = (-(y - y.rolling(126).mean()) / 0.5).clip(-1, 1)
     sc["dxy"] = (-(dxy / dxy.rolling(100).mean() - 1) / 0.03).clip(-1, 1)
     sc["score"] = (sc["rates"] + sc["dxy"]) / 2
+    y2 = fred("DGS2").reindex(full, method="ffill").shift(1)
+    ff = fred("DFF").reindex(full, method="ffill").shift(1)
+    sc["y2"], sc["ff"] = y2, ff
+    sc["sp"] = y2 - ff
+    sc["sp_1y"] = sc["sp"].shift(FILTER_DAYS)
     sc["y10"], sc["y10_mean"] = y, y.rolling(126).mean()
     sc["dxy_lvl"], sc["dxy_mean"] = dxy, dxy.rolling(100).mean()
     sc["qld"], sc["usd"], sc["krw"] = qld, usd, krw
@@ -97,13 +107,18 @@ def build(wk):
         if st[i] != st[i - 1] and wk.index[i] >= wk.index[-1] - pd.Timedelta(days=5 * 365):
             changes.append({"d": str(wk.index[i].date()), "from": NAMES[st[i - 1]], "to": NAMES[st[i]], "s": round(float(wk["score"].iloc[i]), 3)})
     r = lambda x: round(float(x), 3)
+    chg = row["sp"] - row["sp_1y"]
+    strong = bool(pd.isna(chg) or chg > 0)
+    filt = {"strong": strong, "y2": r(row["y2"]), "ff": r(row["ff"]), "spread": r(row["sp"]), "spread_1y": r(row["sp_1y"]),
+            "chg": None if pd.isna(chg) else r(chg), "pct_strong": SELL_PCT, "pct_weak": SELL_PCT_WEAK}
     return {
         "updated": datetime.now(timezone.utc).isoformat(timespec="minutes"),
         "asof": str(row.name.date()), "state": row["state"], "state_kr": NAMES[row["state"]], "run": run, "scale": SCALE,
         "score": r(row["score"]), "rates": r(row["rates"]), "dxy": r(row["dxy"]),
         "y10": r(row["y10"]), "y10_mean": r(row["y10_mean"]), "dxy_lvl": r(row["dxy_lvl"]), "dxy_mean": r(row["dxy_mean"]),
         "prev_state_kr": NAMES[prev["state"]], "prev_score": r(prev["score"]),
-        "threshold": THRESHOLD, "buy_level": BUY_LEVEL, "sell_pct": SELL_PCT, "buy_pct": BUY_PCT,
+        "threshold": THRESHOLD, "buy_level": BUY_LEVEL, "sell_pct": SELL_PCT if strong else SELL_PCT_WEAK, "buy_pct": BUY_PCT,
+        "sell_filter": filt,
         "history": [{"d": str(d.date()), "s": round(float(s), 3), "q": round(float(q), 2), "u": round(float(u), 2)}
                     for d, s, q, u in zip(hist.index, hist["score"], hist["qld"], hist["usd"])],
         "qld_now": round(float(row["qld"]), 2), "usd_now": round(float(row["usd"]), 2),
@@ -154,10 +169,12 @@ def daily_info(sc, prev=None):
 
 
 def alert_message(d, kind, prev_state):
-    """-> (title, body), e.g. ('매도 구간입니다', '점수는 -88 · 관망에서 바뀜')."""
+    """-> (title, body), e.g. ('매도 구간입니다', '점수는 -88 · 매도 강도 강(주 5%) · 관망에서 바뀜')."""
     score = f"{round(d['score'] * d['scale']):+d}"
     word = NAMES[d["state"]]
     body = f"점수는 {score}"
+    if d["state"] == "SELL":
+        body += f" · 매도 강도 {'강' if d['sell_filter']['strong'] else '약'}(주 {d['sell_pct']:g}%)"
     if kind == "enter" and prev_state and prev_state != d["state"]:
         body += f" · {NAMES[prev_state]}에서 바뀜"
     return f"{word} 구간입니다", body
@@ -215,7 +232,8 @@ def main():
         print(title); print(body)
         push(title, body)
     elif args.test_push:
-        push("테스트 알림", f"{d['state_kr']} 구간입니다. 점수는 {round(d['score'] * SCALE):+d}")
+        t, b = alert_message(d, None, None)
+        push("테스트 알림", f"{t}. {b}")
     else:
         print("no state change / repeat day today: no notification")
 

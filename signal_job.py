@@ -199,7 +199,8 @@ def push(title, body):
         host = s.get("endpoint", "").split("/")[2] if "//" in s.get("endpoint", "") else "?"
         try:
             webpush(subscription_info=s, data=json.dumps({"title": title, "body": body, "url": "./"}, ensure_ascii=False),
-                    vapid_private_key=key, vapid_claims={"sub": claim}, ttl=86400)
+                    vapid_private_key=key, vapid_claims={"sub": claim}, ttl=86400,
+                    headers={"Urgency": "high"})   # 'high' = delivered right away even when the phone is idle (Android doze)
             print(f"pushed to #{i} ({host})")
         except WebPushException as e:
             code = e.response.status_code if e.response is not None else None

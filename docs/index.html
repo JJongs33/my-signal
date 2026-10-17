@@ -395,7 +395,7 @@
     <div class="crit HOLD" id="critHOLD"><div><b>-29 ~ -1 · 관망 <span class="nowtag hidden">지금</span></b>
       <span class="d">아무것도 하지 않아요</span></div></div>
     <div class="crit BUY" id="critBUY"><div><b>0 이상 · 매수 <span class="nowtag hidden">지금</span></b>
-      <span class="d">매주 모아 둔 현금의 <span class="amt">25%</span></span></div></div>
+      <span class="d">매주 모아 둔 현금의 <span class="amt">25%</span> (4주 넘게 이어지면 50%)</span></div></div>
     <details class="more">
       <summary>점수는 어떻게 계산되나요?</summary>
       <div class="note"><b>점수 = (금리 점수 + 달러 점수) ÷ 2</b></div>
@@ -509,17 +509,19 @@
     <details class="more"><summary>언제 확인하고 실행하나요?</summary>
       <div class="d">미국 장이 끝난 뒤 점수를 새로 계산하고(화~토 아침 10시), 아침 10시와 저녁 9시(한국)에 알려 줘요. 실제 매도·매수는 주 1회, <b>화요일</b>에 하는 것을 추천해요.</div></details>
     <details class="more"><summary>신호가 이어지면 얼마나 쌓이나요?</summary>
-      <div class="d">매주 같은 비율로 이어서 한다고 보고, 1,000만원이 있을 때 지금까지 누적된 금액이에요.</div>
+      <div class="d">신호가 이어진다고 보고, 1,000만원이 있을 때 지금까지 누적된 금액이에요. 매도는 주 5%, 매수는 처음 4주 25% → 5주째부터 50%.</div>
       <table class="perf-table acc">
         <tr><th></th><th>매도 누적<br><span>보유 주식 1,000만원일 때</span></th><th>매수 누적<br><span>모아 둔 현금 1,000만원일 때</span></th></tr>
         <tr><td>1주째</td><td>50만원<span>(5%)</span></td><td>250만원<span>(25%)</span></td></tr>
         <tr><td>2주째</td><td>98만원<span>(10%)</span></td><td>438만원<span>(44%)</span></td></tr>
         <tr><td>4주째</td><td>185만원<span>(19%)</span></td><td>684만원<span>(68%)</span></td></tr>
-        <tr><td>8주째</td><td>337만원<span>(34%)</span></td><td>900만원<span>(90%)</span></td></tr>
-        <tr><td>14주째</td><td>512만원<span>(51%)</span></td><td>982만원<span>(98%)</span></td></tr>
-        <tr><td>20주째</td><td>642만원<span>(64%)</span></td><td>997만원<span>(100%)</span></td></tr>
+        <tr><td>5주째</td><td>226만원<span>(23%)</span></td><td>842만원<span>(84%)</span></td></tr>
+        <tr><td>6주째</td><td>265만원<span>(26%)</span></td><td>921만원<span>(92%)</span></td></tr>
+        <tr><td>8주째</td><td>337만원<span>(34%)</span></td><td>980만원<span>(98%)</span></td></tr>
+        <tr><td>14주째</td><td>512만원<span>(51%)</span></td><td>1,000만원<span>(100%)</span></td></tr>
+        <tr><td>20주째</td><td>642만원<span>(64%)</span></td><td>1,000만원<span>(100%)</span></td></tr>
       </table>
-      <div class="d">매번 "남은 것"의 5%·25%라서, 5%씩 5번 팔아도 25%가 아니라 23%예요. 매도가 20주 이상 이어진 적도 있어서 표를 20주까지 넣었어요.</div></details>
+      <div class="d">매번 "남은 것"의 비율이라서, 5%씩 5번 팔아도 25%가 아니라 23%예요. 매도 강도가 약하면 매도는 절반(주 2.5%)이에요. 매도가 20주 이상 이어진 적도 있어서 표를 20주까지 넣었어요.</div></details>
     <details class="more"><summary>매도 신호가 켜졌던 기간 (10년)</summary><div id="refStats"></div></details>
     <details class="more"><summary>매수 신호가 켜졌던 기간 (10년)</summary><div id="refStatsBuy"></div></details>
     <details class="more"><summary>매도 횟수를 제한하지 않는 이유</summary>
@@ -549,7 +551,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 27</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 28</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -712,6 +714,11 @@ function renderState() {
     $("subaction").innerHTML = F.strong
       ? `매도 강도 <b>강</b> · 시장이 1년 전보다 금리 인상을 더 예상해요 <span class="nb">(2년물 − 기준금리 ${sp(F.spread_1y)} → ${sp(F.spread)}%p)</span>`
       : `매도 강도 <b>약</b> · 시장이 1년 전보다 금리 인상을 덜 예상해서 절반만 팔아요 <span class="nb">(2년물 − 기준금리 ${sp(F.spread_1y)} → ${sp(F.spread)}%p)</span>`;
+  } else if (d.state === "BUY" && d.buy_pct_late) {
+    const left = Math.max(0, d.buy_ramp_days - rd);
+    $("subaction").innerHTML = d.buy_pct > d.buy_pct_early
+      ? `매수 구간이 4주를 넘어서 <b>${d.buy_pct}%</b>로 빨라졌어요 <span class="nb">(처음 4주는 ${d.buy_pct_early}%)</span>`
+      : `처음 4주는 ${d.buy_pct_early}%, 매수 구간이 이어지면 <span class="nb">${left}거래일 뒤부터 ${d.buy_pct_late}%</span>`;
   } else $("subaction").innerHTML = "";
   if (F) {
     const sp = (v) => (v > 0 ? "+" : "") + v.toFixed(2);
@@ -724,7 +731,9 @@ function renderState() {
   else {
     pg.classList.remove("hidden");
     const isS = d.state === "SELL", name = isS ? "매도" : "매수", run = d.run;
-    const unit = (isS ? d.sell_pct : d.buy_pct) / 100, cum = (1 - Math.pow(1 - unit, run)) * 100;
+    const unit = (isS ? d.sell_pct : d.buy_pct) / 100;
+    const early = (d.buy_pct_early || d.buy_pct) / 100, late = (d.buy_pct_late || d.buy_pct) / 100;
+    const cum = (isS ? 1 - Math.pow(1 - unit, run) : 1 - Math.pow(1 - early, Math.min(run, 4)) * Math.pow(1 - late, Math.max(run - 4, 0))) * 100;
     const yr = d.asof.slice(0, 4);                       // which stretch of this state is it, counted within this year
     let n = 0, prev = null, first = true;
     D.history.forEach((p) => {

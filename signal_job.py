@@ -10,7 +10,9 @@ Runs twice a day, Tuesday-Saturday, on GitHub Actions: 10:00 Korea time (the US 
    The app shows score x 100 (sell at -30 or lower, buy at 0 or higher).
    Sell strength (added 2026-10-17, twoy_ff_deep.py): spread = 2-year Treasury yield - effective fed funds rate (both 1-day lag).
      If the spread is higher than 252 trading days ago (the market prices more hikes / fewer cuts than a year ago) the sell zone is
-     'strong' and sells 5% a week; otherwise it is 'weak' and sells 2.5% a week.  Buying is unchanged.
+     'strong' and sells 5% a week; otherwise it is 'weak' and sells 2.5% a week.
+   Buy speed (added 2026-10-17, sizing_test.py): in a buy zone, buy 25% of the cash for the first 4 weeks (20 trading days),
+     then 50% while the buy zone continues.  A short bounce spends little of the cash; a lasting recovery uses it faster.
 2. Writes docs/data.json (signal + 10 years of weekly history) and docs/prices.json (daily QLD / USD closes and USD/KRW).
 3. Sends a web-push notification on every run EXCEPT when the state is HOLD and was HOLD the day before:
      "<매도|매수|관망> 구간입니다" / "점수는 -88" (plus "· 관망에서 바뀜" on the first day of a new state).
@@ -34,6 +36,7 @@ import yfinance as yf
 THRESHOLD = -0.30  # score at or below: sell 5% of the holding this week
 BUY_LEVEL = 0.0    # score at or above: buy with 25% of the cash from earlier sales
 SELL_PCT, BUY_PCT = 5, 25
+BUY_PCT_LATE, BUY_RAMP_DAYS = 50, 20   # after 20 trading days in a buy zone, buy 50% of the cash instead of 25%
 SELL_PCT_WEAK = 2.5  # sell zone while the 2y - fed funds spread is not higher than a year ago
 FILTER_DAYS = 252    # 'a year ago' in trading days
 SCALE = 100        # the app shows score x 100
@@ -175,6 +178,8 @@ def alert_message(d, kind, prev_state):
     body = f"점수는 {score}"
     if d["state"] == "SELL":
         body += f" · 매도 강도 {'강' if d['sell_filter']['strong'] else '약'}(주 {d['sell_pct']:g}%)"
+    elif d["state"] == "BUY":
+        body += f" · 현금의 {d['buy_pct']:g}% 매수" + (" (4주가 넘어 빨라짐)" if d["buy_pct"] > BUY_PCT else "")
     if kind == "enter" and prev_state and prev_state != d["state"]:
         body += f" · {NAMES[prev_state]}에서 바뀜"
     return f"{word} 구간입니다", body
@@ -217,6 +222,9 @@ def main():
     d["daily"] = daily
     d["run"] = (daily["run_days"] - 1) // CYCLE_DAYS + 1   # action rounds: day 1, 6, 11, ... of the stretch
     d["run_days"] = daily["run_days"]
+    d["buy_pct_early"], d["buy_pct_late"], d["buy_ramp_days"] = BUY_PCT, BUY_PCT_LATE, BUY_RAMP_DAYS
+    if d["state"] == "BUY" and daily["run_days"] > BUY_RAMP_DAYS:
+        d["buy_pct"] = BUY_PCT_LATE
     os.makedirs(os.path.dirname(DATA), exist_ok=True)
     with open(DATA, "w", encoding="utf-8") as f:
         json.dump(d, f, ensure_ascii=False, separators=(",", ":"))

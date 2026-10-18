@@ -161,7 +161,7 @@
   .SELL .progress .pbar i.on { background: var(--sell); opacity: 1; } .BUY .progress .pbar i.on { background: var(--buy); opacity: 1; }
   .progress .plabel { color: var(--muted); font-size: 12px; }
   /* current position on the score bar: thick red line */
-  .nowline { position: absolute; top: -6px; height: 46px; width: 6px; transform: translateX(-50%); background: var(--now); border-radius: 1px; box-shadow: 0 0 0 2px var(--bg); z-index: 3; }
+  .nowline { position: absolute; top: -6px; height: 46px; width: 6px; transform: translateX(-50%); background: var(--now); border-radius: 1px; box-shadow: 0 0 0 2px var(--bg); z-index: 3; opacity: .45; }
   /* reference card */
   .refitem { padding: 14px 0; border-top: 1px solid var(--line); } .refitem:first-of-type { border-top: 0; padding-top: 2px; }
   .refitem b { font: 700 14px/1.4 var(--f-text); } .refitem .d { font-size: 13px; color: var(--muted); margin-top: 5px; text-wrap: pretty; }
@@ -281,8 +281,15 @@
   .jstate .strength { font: 500 13px/1 var(--f-text); letter-spacing: 0; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 6px 10px; white-space: nowrap; }
   .scorehint { font-size: 13px; line-height: 1.6; color: var(--muted); margin-top: 12px; text-wrap: pretty; }
   .scorehint b { color: var(--text); font-weight: 700; }
-  .scorehint .hmove { margin-top: 10px; font-size: 14px; color: var(--text); line-height: 1.7; }
-  .scorehint .hmove b.dn { color: var(--sell); } .scorehint .hmove b.up { color: var(--buy); }
+  .scorehint .hmove { margin-top: 12px; font-size: 14px; color: var(--text); font-weight: 700; }
+  .hmovet { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 13px; font-variant-numeric: tabular-nums; }
+  .hmovet th, .hmovet td { padding: 7px 4px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
+  .hmovet tr:first-child th { font-size: 11.5px; color: var(--faint); font-weight: 500; }
+  .hmovet th:first-child { text-align: left; color: var(--text); font-weight: 800; width: 44px; }
+  .hmovet .rng { display: block; color: var(--text); white-space: nowrap; } .hmovet .end { display: block; font-size: 11.5px; color: var(--muted); }
+  .hmovet b.dn { color: var(--sell); } .hmovet b.up { color: var(--buy); }
+  .hmovet tr.usual th, .hmovet tr.usual .rng, .hmovet tr.usual b.dn, .hmovet tr.usual b.up { color: var(--faint); font-weight: 500; }
+  .hmovet tr.usual th { font-size: 11.5px; padding-left: 8px; }
   .scorehint .hsmall { margin-top: 8px; font-size: 11.5px; color: var(--faint); line-height: 1.6; }
   .boxctl { display: flex; gap: 8px; margin: 10px 0 4px; flex-wrap: wrap; }
   .boxctl .seg { flex: 1; min-width: 140px; margin: 0; }
@@ -316,6 +323,8 @@
   .defs > div { display: flex; gap: 14px; padding: 11px 0; border-top: 1px solid var(--line2); font-size: 13px; line-height: 1.6; }
   .defs > div:last-child { border-bottom: 1px solid var(--line2); }
   .defs dt { flex: none; min-width: 64px; font-weight: 700; } .defs dd { margin: 0; color: var(--muted); }
+  .when-day { display: inline-block; font-weight: 800; color: var(--text); border: 1px solid var(--line2); border-radius: 2px; padding: 2px 8px; margin-bottom: 6px; letter-spacing: .04em; }
+  .when-time { display: block; color: var(--text); }
   .key { display: flex; gap: 18px; font: 500 12px/1.4 var(--f-text); margin: 20px 0 0; }
   .key .ku { color: var(--muted); } .key .kr { color: var(--sell); font-weight: 800; }
   table.perf3 { width: 100%; border-collapse: collapse; font-size: 14px; }
@@ -511,7 +520,7 @@
     <div class="note" id="pNote"></div>
 
     <h3 class="subh">연평균 수익률 추이</h3>
-    <div class="seg" id="perfMode"><button data-m="irr" class="on">시작부터 누적 연평균</button><button data-m="yr">연도별 수익률</button></div>
+    <div class="seg" id="perfMode"><button data-m="irr" class="on">기간 연평균</button><button data-m="yr">연도별 수익률</button></div>
     <div id="perfCharts"></div>
     <div class="legend"><span><i class="sw" style="background:var(--s-dca)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--s-rule)"></i>쫑 규칙</span></div>
     <div class="note" id="perfChartNote"></div>
@@ -569,7 +578,7 @@
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
     <dl class="defs alerts">
-      <div><dt>시간</dt><dd>화~토 아침 10시 · 저녁 9시 (한국)</dd></div>
+      <div><dt>시간</dt><dd><span class="when-day">화 · 수 · 목 · 금 · 토</span><span class="when-time">아침 10시 · 저녁 9시 (한국 시간)</span></dd></div>
       <div><dt>받는 날</dt><dd>구간이 바뀐 날, 매도·매수 구간인 날<br>(관망이 이어지면 알림 없음)</dd></div>
       <div><dt>내용</dt><dd>"매도 구간입니다 · 점수는 -88 · 매도 강도 강(주 5%)"<br>끝에 아침·저녁 표시가 붙어요</dd></div>
       <div><dt>점수 계산</dt><dd>화~토 아침 10시 (전날 미국 종가 기준). 저녁 9시는 같은 점수를 다시 알려 줘요</dd></div>
@@ -585,7 +594,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 37</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 38</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -680,7 +689,7 @@ function drawPerf() {
     g += `<circle cx="${x(nn - 1)}" cy="${y(ea)}" r="3.6" fill="${cv("--s-dca")}"/><circle cx="${x(nn - 1)}" cy="${y(eb)}" r="4.2" fill="${cv("--s-rule")}"/>`;
     return `<div class="pcn"><b>${f}</b><span>쫑 규칙 ${sgn1(eb)} · 적립식 규칙 ${sgn1(ea)} <i>(${yrs[nn - 1]} 기준)</i></span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${f} 연평균 수익률 추이">${g}</svg>`;
   }).join("");
-  $("perfChartNote").textContent = irr ? `${pRange.from}년부터 넣은 돈 전체의 연평균 수익률이에요. 처음 1~2년은 크게 흔들려서 눈금 밖으로 나갈 수 있어요.` : "해마다의 계좌 수익률이에요. 큰 하락이 있던 해에 쫑 규칙이 덜 빠졌어요.";
+  $("perfChartNote").textContent = irr ? `고른 기간의 첫해(${pRange.from}년)부터 각 연도 말까지, 넣은 돈 전체의 연평균 수익률이에요. 맨 오른쪽 점이 고른 기간 전체의 연평균이에요. 처음 1~2년은 크게 흔들려서 눈금 밖으로 나갈 수 있어요.` : "해마다의 계좌 수익률이에요. 큰 하락이 있던 해에 쫑 규칙이 덜 빠졌어요.";
 }
 function drawCum() {
   const box = $("cumCharts"); if (!box) return;
@@ -777,10 +786,13 @@ function renderState() {
     const sp = (v) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(Math.round(v)) + "%", one = (r) => Math.max(2, Math.round(1 / r));
     const env = d.state === "SELL" ? "금리가 오르고 달러가 강해서 주식, 특히 기술주에 불리한 환경이에요."
       : d.state === "BUY" ? "금리와 달러가 안정돼서 주식에 유리한 환경이에요." : "금리와 달러가 어느 쪽으로도 뚜렷하지 않은 환경이에요.";
-    const dur = zrow ? ` 과거 이 점수에서는 이런 환경이 보통 ${zrow.weeks < 1.5 ? "1주 정도" : "약 " + Math.round(zrow.weeks) + "주"} 더 이어졌어요.` : "";
-    hintEl.innerHTML = `${env}${dur}
-      <div class="hmove">이 점수대일 때 3개월 동안 평균적으로<br><b>QLD</b>는 <b class="dn">${sp(bq.dn)}</b>까지 내렸다가 <b class="up">${sp(bq.up)}</b>까지 올랐고, 3개월 뒤엔 평균 <b>${sp(bq.mean)}</b>였어요.<br><b>USD</b>는 <b class="dn">${sp(bu.dn)}</b> / <b class="up">${sp(bu.up)}</b>, 3개월 뒤 평균 <b>${sp(bu.mean)}</b>.</div>
-      <div class="hsmall">평소(모든 날 평균): QLD ${sp(aq.dn)} / ${sp(aq.up)}, 3개월 뒤 ${sp(aq.mean)} · USD ${sp(au.dn)} / ${sp(au.up)}, 3개월 뒤 ${sp(au.mean)}${hrow ? `<br>6개월 안에 20% 넘게 빠진 경우 ${one(hrow.risk20)}번 중 1번 (평소 ${one(HINT.base_risk20)}번 중 1번, 나스닥100 기준)` : ""}</div>`;
+    const pick = (f, h, all) => PBOX[f][h].find((r) => all ? r.z === "ALL" : r.z !== "ALL" && inB(r));
+    const cell = (r) => `<span class="rng"><b class="dn">${sp(r.dn)}</b> ~ <b class="up">${sp(r.up)}</b></span><span class="end">끝 ${sp(r.mean)}</span>`;
+    const line = (f, all) => `<tr class="${all ? "usual" : ""}"><th>${all ? "평소" : f}</th><td>${cell(pick(f, "3", all))}</td><td>${cell(pick(f, "6", all))}</td></tr>`;
+    hintEl.innerHTML = `${env}
+      <div class="hmove">이 점수대에서 샀다면, 과거 평균적으로</div>
+      <table class="hmovet"><tr><th></th><th>3개월 동안</th><th>6개월 동안</th></tr>${line("QLD", false)}${line("QLD", true)}${line("USD", false)}${line("USD", true)}</table>
+      <div class="hsmall">~ 앞뒤는 그 기간 중 가장 많이 내렸을 때와 가장 많이 올랐을 때, '끝'은 기간이 끝났을 때의 수익률 평균이에요. '평소'는 점수와 상관없이 아무 날이나 샀을 때예요.${hrow ? `<br>6개월 안에 20% 넘게 빠진 적이 있는 비율: 이 점수대 ${Math.round(hrow.risk20 * 100)}% (${one(hrow.risk20)}번 중 1번), 평소 ${Math.round(HINT.base_risk20 * 100)}% (${one(HINT.base_risk20)}번 중 1번) · 나스닥100 지수 기준` : ""}</div>`;
     hintEl.classList.remove("hidden");
   } else hintEl.classList.add("hidden");
   const stEl = $("strength");
@@ -830,10 +842,10 @@ function renderState() {
     let bar = ""; for (let i = 1; i <= cells; i++) bar += `<i class="${i === cells ? "now" : ""}"></i>`;
     const wks = isS ? ws.thisSell : ws.thisBuy;
     pg.innerHTML = `<div class="yearbar">${bar}</div><div><b>올해 ${n}번째 ${name} 구간</b></div>
-      <div class="plabel">올해 ${name} 구간이었던 기간은 모두 약 ${wks}주예요. 중간에 끊겼다가 다시 켜질 때마다 1번으로 세요.</div>
+      <div class="plabel">이번 ${name} 구간은 약 ${Math.max(1, Math.round(rd / 5))}주째이고, 올해 ${name} 구간을 모두 합치면 약 ${wks}주예요. 중간에 끊겼다가 다시 켜질 때마다 1번으로 세요.</div>
       <div class="plabel">규칙대로 ${run}번 ${isS ? "팔았다면 처음 보유 주식의" : "샀다면 모아 둔 현금의"} 약 ${cum.toFixed(0)}%를 ${isS ? "판 거예요" : "쓴 거예요"}</div>`;
   }
-  $("meta").textContent = `점수 ${sgn(disp(d.score))} · ${d.state_kr} 신호 ${rd}일째`;
+  $("meta").textContent = `점수 ${sgn(disp(d.score))} · 이번 ${d.state_kr} 구간 ${rd}거래일째 (약 ${Math.max(1, Math.round(rd / 5))}주)`;
 
   const pos = (Math.max(-100, Math.min(100, disp(d.score))) + 100) / 2;
   $("mlabel").style.left = Math.min(86, Math.max(14, pos)) + "%";

@@ -161,7 +161,10 @@
   .SELL .progress .pbar i.on { background: var(--sell); opacity: 1; } .BUY .progress .pbar i.on { background: var(--buy); opacity: 1; }
   .progress .plabel { color: var(--muted); font-size: 12px; }
   /* current position on the score bar: thick red line */
-  .nowline { position: absolute; top: -6px; height: 46px; width: 6px; transform: translateX(-50%); background: var(--now); border-radius: 1px; box-shadow: 0 0 0 2px var(--bg); z-index: 3; opacity: .45; }
+  .nowline { position: absolute; top: -6px; height: 46px; width: 6px; transform: translateX(-50%); background: var(--now); border-radius: 1px; box-shadow: 0 0 0 2px var(--bg), 0 0 10px 3px color-mix(in srgb, var(--now) 55%, transparent), 0 0 22px 6px color-mix(in srgb, var(--now) 22%, transparent); z-index: 3; animation: nowglow 2.4s ease-in-out infinite; }
+  @keyframes nowglow { 50% { box-shadow: 0 0 0 2px var(--bg), 0 0 14px 5px color-mix(in srgb, var(--now) 70%, transparent), 0 0 30px 10px color-mix(in srgb, var(--now) 28%, transparent); } }
+  @media (prefers-reduced-motion: reduce) { .nowline { animation: none; } }
+  .zonebar .z span { position: relative; z-index: 4; text-shadow: 0 0 4px rgba(0,0,0,.35); }
   /* reference card */
   .refitem { padding: 14px 0; border-top: 1px solid var(--line); } .refitem:first-of-type { border-top: 0; padding-top: 2px; }
   .refitem b { font: 700 14px/1.4 var(--f-text); } .refitem .d { font-size: 13px; color: var(--muted); margin-top: 5px; text-wrap: pretty; }
@@ -286,7 +289,7 @@
   .hmovet th, .hmovet td { padding: 7px 4px; border-bottom: 1px solid var(--line); text-align: right; vertical-align: top; }
   .hmovet tr:first-child th { font-size: 11.5px; color: var(--faint); font-weight: 500; }
   .hmovet th:first-child { text-align: left; color: var(--text); font-weight: 800; width: 44px; }
-  .hmovet .rng { display: block; color: var(--text); white-space: nowrap; } .hmovet .end { display: block; font-size: 11.5px; color: var(--muted); }
+  .hmovet td b { font-size: 15px; } .hmovet .end { display: block; font-size: 11px; color: var(--faint); margin-top: 2px; }
   .hmovet b.dn { color: var(--sell); } .hmovet b.up { color: var(--buy); }
   .hmovet tr.usual th, .hmovet tr.usual .rng, .hmovet tr.usual b.dn, .hmovet tr.usual b.up { color: var(--faint); font-weight: 500; }
   .hmovet tr.usual th { font-size: 11.5px; padding-left: 8px; }
@@ -395,7 +398,7 @@
     <div class="zonewrap">
       <div class="marker"><span class="mlabel" id="mlabel">현재 -</span></div>
       <div class="nowline" id="nowline" style="left:50%"></div>
-      <div class="zonebar"><div class="z sell">매도</div><div class="z hold">관망</div><div class="z buy">매수</div></div>
+      <div class="zonebar"><div class="z sell"><span>매도</span></div><div class="z hold"><span>관망</span></div><div class="z buy"><span>매수</span></div></div>
       <div class="zticks">
         <span style="left:0%;transform:none">-100</span><span style="left:35%">-30</span><span style="left:50%">0</span><span style="left:100%;transform:translateX(-100%)">+100</span>
       </div>
@@ -422,8 +425,8 @@
         <div class="seg" id="boxH"><button data-h="3" class="on">3개월</button><button data-h="6">6개월</button><button data-h="12">1년</button></div>
       </div>
       <svg id="boxChart" viewBox="0 0 360 280" role="img" aria-label="점수대별 수익률 분포"></svg>
-      <div class="legend" style="margin-top:6px"><span>상자: 가운데 절반(25~75%)</span><span>선: 10~90%</span><span>가로줄: 중간값</span><span>● 평균</span></div>
-      <div class="note">그 점수였던 날 산 뒤, 3개월·6개월·1년 뒤의 수익률 분포예요 (2000~2026, 상장 전은 지수로 만든 가상 가격). 지금 점수대는 굵게 표시돼요. 과거의 분포라서 이번에도 그 안에 들어온다는 보장은 없어요.</div>
+      <div class="legend" style="margin-top:6px"><span>상자: 가운데 절반(25~75%)</span><span>선: 10~90%</span><span>굵은 가로줄: 중간값</span><span>● 평균</span></div>
+      <div class="note">2000~2026년 중 그 점수였던 모든 날에 QLD·USD를 샀다고 보고, 3개월·6개월·1년 뒤 가격이 산 날보다 몇 % 오르거나 내렸는지를 모은 분포예요 (상장 전은 지수로 만든 가상 가격). 지금 점수대는 굵게 표시돼요.</div>
     </details>
     <details class="more">
       <summary>점수별로 과거에 어땠나요?</summary>
@@ -511,6 +514,19 @@
       <div class="rb r"><b>쫑 규칙</b><span>적립식 규칙 +<br>쫑지표 신호로<br>매수 매도(주 1회)</span></div>
     </div>
     <div class="note">시작 0원, 매월 100만원 · 매주 화요일 매매 · 세금·거래비용 반영 · 지금 규칙(매도 5%/2.5%, 매수 20%→40%)</div>
+    <h3 class="subh">10년 구간별 비교</h3>
+    <div id="perfBox"></div>
+    <details class="more first"><summary>표 보는 법</summary>
+      <dl class="defs">
+        <div><dt>구간</dt><dd>약 10년마다 새로 시작 (시작 0원)</dd></div>
+        <div><dt>연평균</dt><dd>납입 시점을 반영한 1년 수익률</dd></div>
+        <div><dt>총수익률</dt><dd>(최종 금액 − 총 납입금) ÷ 총 납입금</dd></div>
+        <div><dt>하락 평균</dt><dd>전고점보다 10% 넘게 빠졌을 때의 평균 (아래 숫자는 그 횟수)</dd></div>
+        <div><dt>반올림</dt><dd>세 자리는 10 단위, 네 자리 이상은 100 단위</dd></div>
+      </dl></details>
+    <div class="note">큰 하락은 줄였지만, 꾸준히 오른 구간(QLD 2010~2019)에는 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격이고, 마지막 구간은 6년 10개월입니다.</div>
+
+    <h3 class="subh">기간을 골라 보기</h3>
     <div class="range" style="margin-top:16px">
       <select id="pFrom" aria-label="시작 연도"></select><span class="tilde">~</span><select id="pTo" aria-label="끝 연도"></select>
     </div>
@@ -530,17 +546,6 @@
     <div class="legend"><span><i class="sw" style="background:var(--s-dca)"></i>적립식 규칙</span><span><i class="sw" style="background:var(--s-rule)"></i>쫑 규칙</span></div>
     <div class="note" id="cumNote"></div>
 
-    <h3 class="subh">10년 구간별 비교</h3>
-    <div id="perfBox"></div>
-    <details class="more first"><summary>표 보는 법</summary>
-      <dl class="defs">
-        <div><dt>구간</dt><dd>약 10년마다 새로 시작 (시작 0원)</dd></div>
-        <div><dt>연평균</dt><dd>납입 시점을 반영한 1년 수익률</dd></div>
-        <div><dt>총수익률</dt><dd>(최종 금액 − 총 납입금) ÷ 총 납입금</dd></div>
-        <div><dt>하락 평균</dt><dd>전고점보다 10% 넘게 빠졌을 때의 평균 (아래 숫자는 그 횟수)</dd></div>
-        <div><dt>반올림</dt><dd>세 자리는 10 단위, 네 자리 이상은 100 단위</dd></div>
-      </dl></details>
-    <div class="note">큰 하락은 줄였지만, 꾸준히 오른 구간(QLD 2010~2019)에는 졌어요. QLD는 2006년 6월, USD는 2007년 2월 이전이 가상 가격이고, 마지막 구간은 6년 10개월입니다. 앞으로는 이보다 낮을 수 있어요.</div>
   </section>
 
   <!-- 참고 -->
@@ -571,14 +576,14 @@
     <details class="more"><summary>매도해서 생긴 현금은?</summary>
       <div class="d">MMF·단기채처럼 이자가 붙는 곳에 두는 것으로 시험했어요.</div></details>
     <details class="more"><summary>시험 조건과 한계</summary>
-      <div class="d">세금 22%와 거래비용 0.1%를 반영했고 환전 비용은 뺐어요. 2배 상품은 큰 하락장에서 QLD는 -60%, 반도체 2배(USD)는 -80% 이상 빠질 수 있어요. 과거 자료로 고른 규칙이라 앞으로는 다를 수 있어요.</div></details>
+      <div class="d">세금 22%와 거래비용 0.1%를 반영했고 환전 비용은 뺐어요. 2배 상품은 큰 하락장에서 QLD는 -60%, 반도체 2배(USD)는 -80% 넘게 빠진 적이 있어요.</div></details>
   </section>
 
   <!-- 8. 알림 -->
   <section class="card">
     <h2><span class="idx">08</span>알림</h2>
     <dl class="defs alerts">
-      <div><dt>시간</dt><dd><span class="when-day">화 · 수 · 목 · 금 · 토</span><span class="when-time">아침 10시 · 저녁 9시 (한국 시간)</span></dd></div>
+      <div><dt>시간</dt><dd><span class="when-day">화 ~ 토</span><span class="when-time">아침 10시 · 저녁 9시 (한국 시간)</span></dd></div>
       <div><dt>받는 날</dt><dd>구간이 바뀐 날, 매도·매수 구간인 날<br>(관망이 이어지면 알림 없음)</dd></div>
       <div><dt>내용</dt><dd>"매도 구간입니다 · 점수는 -88 · 매도 강도 강(주 5%)"<br>끝에 아침·저녁 표시가 붙어요</dd></div>
       <div><dt>점수 계산</dt><dd>화~토 아침 10시 (전날 미국 종가 기준). 저녁 9시는 같은 점수를 다시 알려 줘요</dd></div>
@@ -594,7 +599,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 38</span></footer>
+  <footer><span style="font-family:var(--f-mono);font-size:11px">앱 버전 39</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -787,12 +792,13 @@ function renderState() {
     const env = d.state === "SELL" ? "금리가 오르고 달러가 강해서 주식, 특히 기술주에 불리한 환경이에요."
       : d.state === "BUY" ? "금리와 달러가 안정돼서 주식에 유리한 환경이에요." : "금리와 달러가 어느 쪽으로도 뚜렷하지 않은 환경이에요.";
     const pick = (f, h, all) => PBOX[f][h].find((r) => all ? r.z === "ALL" : r.z !== "ALL" && inB(r));
-    const cell = (r) => `<span class="rng"><b class="dn">${sp(r.dn)}</b> ~ <b class="up">${sp(r.up)}</b></span><span class="end">끝 ${sp(r.mean)}</span>`;
-    const line = (f, all) => `<tr class="${all ? "usual" : ""}"><th>${all ? "평소" : f}</th><td>${cell(pick(f, "3", all))}</td><td>${cell(pick(f, "6", all))}</td></tr>`;
+    const col = (v) => `<b class="${v >= 0 ? "up" : "dn"}">${sp(v)}</b>`;
+    const cell = (f, h) => `${col(pick(f, h, false).mean)}<span class="end">전체 ${sp(pick(f, h, true).mean)}</span>`;
+    const line = (f) => `<tr><th>${f}</th><td>${cell(f, "3")}</td><td>${cell(f, "6")}</td><td>${cell(f, "12")}</td></tr>`;
     hintEl.innerHTML = `${env}
-      <div class="hmove">이 점수대에서 샀다면, 과거 평균적으로</div>
-      <table class="hmovet"><tr><th></th><th>3개월 동안</th><th>6개월 동안</th></tr>${line("QLD", false)}${line("QLD", true)}${line("USD", false)}${line("USD", true)}</table>
-      <div class="hsmall">~ 앞뒤는 그 기간 중 가장 많이 내렸을 때와 가장 많이 올랐을 때, '끝'은 기간이 끝났을 때의 수익률 평균이에요. '평소'는 점수와 상관없이 아무 날이나 샀을 때예요.${hrow ? `<br>6개월 안에 20% 넘게 빠진 적이 있는 비율: 이 점수대 ${Math.round(hrow.risk20 * 100)}% (${one(hrow.risk20)}번 중 1번), 평소 ${Math.round(HINT.base_risk20 * 100)}% (${one(HINT.base_risk20)}번 중 1번) · 나스닥100 지수 기준` : ""}</div>`;
+      <div class="hmove">이 점수대에서 샀을 때 평균 수익률</div>
+      <table class="hmovet"><tr><th></th><th>3개월 뒤</th><th>6개월 뒤</th><th>1년 뒤</th></tr>${line("QLD")}${line("USD")}</table>
+      <div class="hsmall">작은 '전체'는 점수와 상관없이 2000~2026년 모든 날에 샀을 때의 평균이에요. 지금 점수대가 보통 때보다 나은지 비교해 보세요.${hrow ? `<br>6개월 안에 20% 넘게 빠진 적이 있는 비율: 이 점수대 ${Math.round(hrow.risk20 * 100)}% (${one(hrow.risk20)}번 중 1번), 전체 ${Math.round(HINT.base_risk20 * 100)}% (${one(HINT.base_risk20)}번 중 1번) · 나스닥100 지수 기준` : ""}</div>`;
     hintEl.classList.remove("hidden");
   } else hintEl.classList.add("hidden");
   const stEl = $("strength");
@@ -904,11 +910,14 @@ function renderScoreTable() {
   const one = (r) => Math.max(2, Math.round(1 / r)), pctx = (r) => Math.round(r * 100) + "%";
   const rows = [...HINT.SELL.map((r) => ["SELL", r]), ...HINT.HOLD.map((r) => ["HOLD", r]), ...HINT.BUY.map((r) => ["BUY", r])];
   const now = disp(D.score), lab = { SELL: "매도", HOLD: "관망", BUY: "매수" };
+  const sp6 = (v) => `<span style="color:var(--${v >= 0 ? "buy" : "sell"})">${v > 0 ? "+" : v < 0 ? "−" : ""}${Math.abs(Math.round(v))}%</span>`;
+  const m6 = (r, z) => { const f = (fd) => PBOX[fd]["6"].find((x) => x.z === z && x.lo === r.lo).mean; return `<span style="white-space:nowrap">${sp6(f("QLD"))} · ${sp6(f("USD"))}</span>`; };
   const inRow = (z, r) => z === "SELL" ? now > r.lo && now <= r.hi : z === "BUY" ? now >= r.lo && now < r.hi : now > r.lo && now < r.hi;
   const rng = (z, r) => { const lo = Math.max(-100, r.lo === -101 ? -100 : r.lo), hi = Math.min(100, r.hi === 101 ? 100 : r.hi); return z === "HOLD" && hi === 0 ? `${lo} ~ -1` : `${lo} ~ ${hi}`; };
-  const body = rows.map(([z, r]) => `<tr${inRow(z, r) ? ' style="font-weight:800;background:var(--field)"' : ""}><td style="white-space:nowrap;color:var(--${z === "SELL" ? "sell" : z === "BUY" ? "buy" : "hold"})">${inRow(z, r) ? "▶ " : ""}${rng(z, r)}</td><td>${lab[z]}</td><td>${r.weeks == null ? "-" : r.weeks < 1.5 ? "1주 정도" : "약 " + Math.round(r.weeks) + "주"}</td><td>${one(r.risk20)}번 중 1번<span style="color:var(--muted)"> (${pctx(r.risk20)})</span></td></tr>`).join("");
-  $("scoreTable").innerHTML = `<table class="perf-table"><tr><th>점수</th><th>구간</th><th>이어진 기간</th><th>6개월 안 -20% 하락</th></tr>${body}
-    <tr><td>전체 평균</td><td></td><td></td><td>${one(HINT.base_risk20)}번 중 1번<span style="color:var(--muted)"> (${pctx(HINT.base_risk20)})</span></td></tr></table>`;
+  const body = rows.map(([z, r]) => `<tr${inRow(z, r) ? ' style="font-weight:800;background:var(--field)"' : ""}><td style="white-space:nowrap;color:var(--${z === "SELL" ? "sell" : z === "BUY" ? "buy" : "hold"})">${inRow(z, r) ? "▶ " : ""}${rng(z, r)}</td><td>${lab[z]}</td><td>${r.weeks == null ? "-" : r.weeks < 1.5 ? "1주 정도" : "약 " + Math.round(r.weeks) + "주"}</td><td>${one(r.risk20)}번 중 1번<span style="color:var(--muted)"> (${pctx(r.risk20)})</span></td><td>${m6(r, z)}</td></tr>`).join("");
+  const all6 = (f) => PBOX[f]["6"].find((x) => x.z === "ALL").mean;
+  $("scoreTable").innerHTML = `<table class="perf-table" style="font-size:12px"><tr><th>점수</th><th>구간</th><th>이어진 기간</th><th>6개월 안 -20% 하락</th><th>6개월 뒤 평균<br>QLD · USD</th></tr>${body}
+    <tr><td>전체 평균</td><td></td><td></td><td>${one(HINT.base_risk20)}번 중 1번<span style="color:var(--muted)"> (${pctx(HINT.base_risk20)})</span></td><td style="white-space:nowrap">${sp6(all6("QLD"))} · ${sp6(all6("USD"))}</td></tr></table>`;
 }
 function renderRef() {
   $("refStats").innerHTML = refBlock("sell");

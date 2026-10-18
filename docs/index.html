@@ -463,8 +463,9 @@
 
     <h3 style="display:flex;align-items:center">가격 (시작일 = 100)
       <span class="toggle" id="scaleToggle"><button data-s="lin">보통</button><button data-s="log" class="on">로그</button></span></h3>
-    <div class="chartwrap" id="wrapPrice"><svg id="chartPrice" viewBox="0 0 360 250" role="img" aria-label="QLD와 USD 가격 추이 차트"></svg><div class="tip hidden" id="tipPrice"></div></div>
+    <div class="chartwrap" id="wrapPrice"><svg id="chartPrice" viewBox="0 0 360 262" role="img" aria-label="QLD와 USD 가격 추이 차트"></svg><div class="tip hidden" id="tipPrice"></div></div>
     <div class="legend"><span><i class="sw" style="background:var(--qld)"></i>QLD</span><span><i class="sw" style="background:var(--usd)"></i>USD</span></div>
+    <div class="legend marks" style="margin-top:6px"><span><b style="color:var(--sell)">▼</b> 관망→매도</span><span><b style="color:var(--sell)">▽</b> 매도→관망</span><span><b style="color:var(--buy)">▲</b> 관망→매수</span><span><b style="color:var(--buy)">△</b> 매수→관망</span></div>
     <div class="note" id="scaleNote"></div>
     <div class="grid" style="margin-top:20px">
       <div class="kv" id="kvQ"><span>QLD</span><b id="qldNow">-</b><span id="qldDD"></span></div>
@@ -569,7 +570,7 @@
     <div id="subMsg" class="note"></div>
   </section>
 
-  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 35</span></footer>
+  <footer>과거 시뮬레이션 기반 개인용 알림이며 투자 조언이 아닙니다.<br><span style="font-family:var(--f-mono);font-size:11px">앱 버전 36</span></footer>
 </main>
 
 <script src="config.js"></script>
@@ -1004,7 +1005,7 @@ function drawScore() {
 /* ---------- ② 가격 차트 (QLD, USD) ---------- */
 function drawPrice() {
   const h = rows(); if (h.length < 2) return;
-  const W = CW, H = 250, L = 42, R = 8, T = 48, B = 26, n = h.length;
+  const W = CW, H = 262, L = 42, R = 8, T = 60, B = 26, n = h.length;
   const q = h.map((p) => p.q / h[0].q * 100), u = h.map((p) => p.u / h[0].u * 100);
   const all = q.concat(u), lo = Math.min(...all), hi = Math.max(...all);
   const x = (i) => L + (W - L - R) * i / (n - 1);
@@ -1025,6 +1026,22 @@ function drawPrice() {
   const lineQ = `<path d="${path(q)}" fill="none" stroke="${cv("--qld")}" stroke-width="2.4"/>`;
   const lineU = `<path d="${path(u)}" fill="none" stroke="${cv("--usd")}" stroke-width="2.4"/>`;
   s += lineU + lineQ;
+  // zone changes: ▼ sell starts, ▽ sell ends, ▲ buy starts, △ buy ends (weekly score, same as the app's history)
+  const KR = { SELL: "매도", BUY: "매수", HOLD: "관망" }, chg = {};
+  const i0 = D.history.indexOf(h[0]);
+  let prevSt = i0 > 0 ? stateOf(D.history[i0 - 1].s) : stateOf(h[0].s);
+  h.forEach((p, i) => { const st = stateOf(p.s); if (st !== prevSt && (i > 0 || i0 > 0)) chg[i] = [prevSt, st]; prevSt = st; });
+  const tri = (cx, cy, up, filled, col) => {
+    const r = 4.8, pts = up ? `${cx},${cy - r} ${cx - r},${cy + r * 0.8} ${cx + r},${cy + r * 0.8}` : `${cx},${cy + r} ${cx - r},${cy - r * 0.8} ${cx + r},${cy - r * 0.8}`;
+    return `<polygon points="${pts}" fill="${filled ? cv(col) : cv("--card")}" stroke="${cv(col)}" stroke-width="1.6" stroke-linejoin="round"/>`;
+  };
+  Object.entries(chg).forEach(([k, [from, to]]) => {
+    const i = +k;
+    // to SELL: filled ▼ (blue); SELL -> HOLD: hollow ▽; to BUY: filled ▲ (red); BUY -> HOLD: hollow △
+    const kind = to === "SELL" ? ["sell", true] : to === "BUY" ? ["buy", true] : from === "SELL" ? ["sell", false] : ["buy", false];
+    const col = kind[0] === "sell" ? "--sell" : "--buy", up = kind[0] === "buy";
+    [q, u].forEach((arr) => { const cy = y(arr[i]) + (up ? 10 : -10); s += tri(x(i), cy, up, kind[1], col); });
+  });
   const info = {};
   [["QLD", q, "--qld"], ["USD", u, "--usd"]].forEach(([nm, arr, col]) => {
     const pk = Math.max(...arr), ip = arr.indexOf(pk), cur = arr[n - 1], dd = (cur / pk - 1) * 100;
@@ -1044,7 +1061,7 @@ function drawPrice() {
   $("usdDD").textContent = `기간 고점 대비 ${pct(info.USD.dd)}`;
   attachHover("chartPrice", "wrapPrice", "tipPrice", h, x, [T, H - B], {
     dots: (i) => `<circle cx="${x(i)}" cy="${y(q[i])}" r="4.5" fill="${cv("--qld")}" stroke="${cv("--card")}" stroke-width="2"/><circle cx="${x(i)}" cy="${y(u[i])}" r="4.5" fill="${cv("--usd")}" stroke="${cv("--card")}" stroke-width="2"/>`,
-    tip: (i) => `${h[i].d}<br><span style="color:var(--qld)">●</span> QLD <b>${q[i].toFixed(0)}</b> ($${h[i].q.toFixed(2)})<br><span style="color:var(--usd)">●</span> USD <b>${u[i].toFixed(0)}</b> ($${h[i].u.toFixed(2)})`,
+    tip: (i) => `${h[i].d}${chg[i] ? ` · <b>${KR[chg[i][0]]} → ${KR[chg[i][1]]}</b>` : ""}<br><span style="color:var(--qld)">●</span> QLD <b>${q[i].toFixed(0)}</b> ($${h[i].q.toFixed(2)})<br><span style="color:var(--usd)">●</span> USD <b>${u[i].toFixed(0)}</b> ($${h[i].u.toFixed(2)})`,
   });
 }
 

@@ -168,7 +168,21 @@ def daily_info(sc, prev=None):
         run_days += 1
     prev_state = states[-1 - run_days] if run_days < len(states) else None
     kind = "enter" if run_days == 1 else ("stay" if cur in ("SELL", "BUY") else None)
-    return {"state": cur, "asof": str(asof.date()), "run_days": run_days}, (kind, prev_state)
+    # this year, on DAILY scores: how many separate stretches of the current state, and how many trading days in it
+    yr = asof.year
+    ys = [(d, st) for d, st in zip(s.index, states) if d.year == yr]
+    year_runs = sum(1 for i, (d, st) in enumerate(ys) if st == cur and (i == 0 or ys[i - 1][1] != cur))
+    year_days = sum(1 for _, st in ys if st == cur)
+    # Tuesday trades inside the current stretch: decision days = trading days whose next trading day is a Tuesday
+    # (today counts if today is a Monday: you trade tomorrow)
+    idx = list(s.index)
+    tue = 0
+    for k in range(len(idx) - run_days, len(idx)):
+        nxt = idx[k + 1] if k + 1 < len(idx) else None
+        if (nxt is not None and nxt.weekday() == 1) or (nxt is None and idx[k].weekday() == 0):
+            tue += 1
+    return {"state": cur, "asof": str(asof.date()), "run_days": run_days, "year_runs": year_runs, "year_days": year_days,
+            "tue_trades": tue}, (kind, prev_state)
 
 
 def alert_message(d, kind, prev_state):
